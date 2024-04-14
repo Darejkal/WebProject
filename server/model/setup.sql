@@ -138,10 +138,11 @@ CREATE TABLE attendance_reports (
   created_at TIMESTAMP NOT NULL
 );
 
-CREATE TABLE attendance_items (
+CREATE TABLE student_attendance_report_relations (
   id         SERIAL PRIMARY KEY,
-  uuid       VARCHAR(64) NOT NULL UNIQUE,
-  name       VARCHAR(255),
+  user_id            INTEGER REFERENCES users(id),
+  attendance_report_id INTEGER REFERENCES attendance_reports(id),
+  is_attended   BOOLEAN,
   created_at TIMESTAMP NOT NULL
 );
 CREATE TABLE threads (

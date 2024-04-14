@@ -134,9 +134,10 @@ type AttendanceReport struct {
 	CreatedAt time.Time `json:"create_at"`
 }
 
-type AttendanceItem struct {
-	Id        int       `json:"id"`
-	Uuid      string    `json:"uuid"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"create_at"`
+type StudentAttendanceReportRelation struct {
+	Id                 int       `json:"id"`
+	UserId             int       `json:"userid"`
+	AttendanceReportId int       `json:"attendancereport_id"`
+	IsAttended         bool      `json:"is_attended"`
+	CreatedAt          time.Time `json:"create_at"`
 }

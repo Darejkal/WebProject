@@ -104,7 +104,12 @@ func ExamItemStudentRelationByUUID(uuid string) (conv ExamItemStudentRelation, e
 		Scan(&conv.Id, &conv.UserId, &conv.QuestionId, &conv.ChosenAnswerId, &conv.CreatedAt)
 	return
 }
-
+func GetExamItemStudentRelation(user_id int, question_id int) (conv ExamItemStudentRelation, err error) {
+	conv = ExamItemStudentRelation{}
+	err = dbpool.QueryRow(context.Background(), "SELECT id, user_id, question_id, chosen_answer_id, created_at FROM exam_item_student_relations WHERE user_id = $1, question_id = $2", user_id, question_id).
+		Scan(&conv.Id, &conv.UserId, &conv.QuestionId, &conv.ChosenAnswerId, &conv.CreatedAt)
+	return
+}
 func (relation *ExamItemStudentRelation) Delete() (err error) {
 	_, err = dbpool.Exec(context.Background(), "DELETE FROM exam_item_student_relations WHERE id = $1", relation.Id)
 	return
