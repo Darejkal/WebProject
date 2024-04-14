@@ -35,15 +35,22 @@ type Exam struct {
 	CreatedAt time.Time `json:"create_at"`
 	ExamType  string    `json:"exam_type"`
 }
-type NormalExamItem struct {
+type ExamItemQuestion struct {
 	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
-	Question  string    `json:"question"`
+	ExamId    int       `json:"examid"`
+	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"create_at"`
 }
-type NormalExamStudentRelation struct {
-	Id int `json:"id"`
-
+type ExamItemChoice struct {
+	Id         int       `json:"id"`
+	Uuid       string    `json:"uuid"`
+	QuestionId int       `json:"questionid"`
+	Content    string    `json:"content"`
+	CreatedAt  time.Time `json:"create_at"`
+}
+type ExamStudentRelation struct {
+	Id          int       `json:"id"`
 	UserId      int       `json:"userid"`
 	ExamId      int       `json:"examid"`
 	Score       int       `json:"score"`
@@ -51,13 +58,12 @@ type NormalExamStudentRelation struct {
 	IsScored    bool      `json:"is_scored"`
 	CreatedAt   time.Time `json:"create_at"`
 }
-type NormalExamItemStudentRelation struct {
-	Id int `json:"id"`
-
-	UserId     int       `json:"userid"`
-	QuestionId int       `json:"questionid"`
-	Answer     string    `json:"answer"`
-	CreatedAt  time.Time `json:"create_at"`
+type ExamItemStudentRelation struct {
+	Id             int       `json:"id"`
+	UserId         int       `json:"userid"`
+	QuestionId     int       `json:"questionid"`
+	ChosenAnswerId int       `json:"answerid"`
+	CreatedAt      time.Time `json:"create_at"`
 }
 type User struct {
 	Id        int       `json:"id"`
