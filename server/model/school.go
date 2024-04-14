@@ -12,7 +12,7 @@ func CreateClass(name string, abbrev string) (conv Class, err error) {
 }
 
 func (cls *Class) Update(name string, abbrev string) (conv Class, err error) {
-	statement := "UPDATE classes SET name=$1, abbrev=$2 WHERE uuid=$3"
+	statement := "UPDATE classes SET name=$1, abbrev=$2 WHERE uuid=$3 RETURNING id, uuid, name, abbrev, created_at"
 	err = dbpool.QueryRow(context.Background(), statement, name, abbrev, cls.Uuid).Scan(&conv.Id, &conv.Uuid, &conv.Name, &conv.Abbrev, &conv.CreatedAt)
 	return
 }
@@ -37,7 +37,7 @@ func CreateSchool(name string) (conv School, err error) {
 }
 
 func (school *School) Update(name string) (conv School, err error) {
-	statement := "UPDATE schools SET name=$1 WHERE uuid=$2"
+	statement := "UPDATE schools SET name=$1 WHERE uuid=$2 RETURNING id, uuid, name, created_at"
 	err = dbpool.QueryRow(context.Background(), statement, name, school.Uuid).Scan(&conv.Id, &conv.Uuid, &conv.Name, &conv.CreatedAt)
 	return
 }

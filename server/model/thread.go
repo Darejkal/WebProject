@@ -49,7 +49,7 @@ func PostByUUID(uuid string) (post Post, err error) {
 
 // DeleteByUUID deletes the post from the database using its UUID.
 func (post *Post) Delete() (err error) {
-	_, err = dbpool.Exec(context.Background(), "DELETE FROM threads WHERE uuid = $1", post.Uuid)
+	_, err = dbpool.Exec(context.Background(), "DELETE FROM posts WHERE uuid = $1", post.Uuid)
 	return
 }
 

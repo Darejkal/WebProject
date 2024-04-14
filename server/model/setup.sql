@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS teacher_subject_relations CASCADE;
 DROP TABLE IF EXISTS student_subject_relations CASCADE;
 DROP TABLE IF EXISTS schools CASCADE;
 DROP TABLE IF EXISTS attendance_reports CASCADE;
-DROP TABLE IF EXISTS attendance_items CASCADE;
+DROP TABLE IF EXISTS student_attendance_report_relations CASCADE;
 
 CREATE TABLE schools (
   id         SERIAL PRIMARY KEY,

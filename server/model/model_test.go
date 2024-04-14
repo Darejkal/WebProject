@@ -7,6 +7,15 @@ import (
 
 // Mock data for testing
 var (
+	testClass = Class{
+		Id:     1,
+		Uuid:   "test_uuid",
+		Name:   "KHMT Test",
+		Abbrev: "IT1 Test",
+	}
+	testSchool = School{
+		Name: "HUSTe",
+	}
 	testUser = User{
 		Id:        1,
 		Uuid:      "test_uuid",
@@ -56,7 +65,17 @@ func TestUserCRUD(t *testing.T) {
 
 	// Test Create, Read, Update, Delete operations for User
 	// Create
-	err := testUser.Create()
+	createdClass, err := CreateClass(testClass.Name, testClass.Uuid)
+	if err != nil {
+		t.Errorf("Error creating class: %v", err)
+	}
+	createdSchool, err := CreateSchool(testSchool.Name)
+	if err != nil {
+		t.Errorf("Error creating school: %v", err)
+	}
+	testUser.SchoolId = createdSchool.Id
+	testUser.ClassId = createdClass.Id
+	err = testUser.Create()
 	if err != nil {
 		t.Errorf("Error creating user: %v", err)
 	}
@@ -76,10 +95,28 @@ func TestUserCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error deleting user: %v", err)
 	}
+	err = createdClass.Delete()
+	if err != nil {
+		t.Errorf("Error deleting class: %v", err)
+	}
+	err = createdSchool.Delete()
+	if err != nil {
+		t.Errorf("Error deleting class: %v", err)
+	}
 }
 
 func TestSessionCRUD(t *testing.T) {
-	err := testUser.Create()
+	createdClass, err := CreateClass(testClass.Name, testClass.Uuid)
+	if err != nil {
+		t.Errorf("Error creating class: %v", err)
+	}
+	createdSchool, err := CreateSchool(testSchool.Name)
+	if err != nil {
+		t.Errorf("Error creating school: %v", err)
+	}
+	testUser.SchoolId = createdSchool.Id
+	testUser.ClassId = createdClass.Id
+	err = testUser.Create()
 	if err != nil {
 		t.Errorf("Error creating user: %v", err)
 	}
@@ -106,10 +143,28 @@ func TestSessionCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error deleting user: %v", err)
 	}
+	err = createdClass.Delete()
+	if err != nil {
+		t.Errorf("Error deleting class: %v", err)
+	}
+	err = createdSchool.Delete()
+	if err != nil {
+		t.Errorf("Error deleting class: %v", err)
+	}
 }
 
 func TestThreadCRUD(t *testing.T) {
-	err := testUser.Create()
+	createdClass, err := CreateClass(testClass.Name, testClass.Uuid)
+	if err != nil {
+		t.Errorf("Error creating class: %v", err)
+	}
+	createdSchool, err := CreateSchool(testSchool.Name)
+	if err != nil {
+		t.Errorf("Error creating school: %v", err)
+	}
+	testUser.SchoolId = createdSchool.Id
+	testUser.ClassId = createdClass.Id
+	err = testUser.Create()
 	if err != nil {
 		t.Errorf("Error creating user: %v", err)
 	}
@@ -135,10 +190,28 @@ func TestThreadCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error deleting user: %v", err)
 	}
+	err = createdClass.Delete()
+	if err != nil {
+		t.Errorf("Error deleting class: %v", err)
+	}
+	err = createdSchool.Delete()
+	if err != nil {
+		t.Errorf("Error deleting class: %v", err)
+	}
 }
 
 func TestPostCRUD(t *testing.T) {
-	err := testUser.Create()
+	createdClass, err := CreateClass(testClass.Name, testClass.Uuid)
+	if err != nil {
+		t.Errorf("Error creating class: %v", err)
+	}
+	createdSchool, err := CreateSchool(testSchool.Name)
+	if err != nil {
+		t.Errorf("Error creating school: %v", err)
+	}
+	testUser.SchoolId = createdSchool.Id
+	testUser.ClassId = createdClass.Id
+	err = testUser.Create()
 	if err != nil {
 		t.Errorf("Error creating user: %v", err)
 	}
@@ -159,6 +232,9 @@ func TestPostCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error reading post: %v", err)
 	}
+	if readPost.Id != createdPost.Id {
+		t.Errorf("Error reading post: Id mismatch %d vs %d", readPost.Id, createdPost.Id)
+	}
 	// Delete
 	err = readPost.Delete()
 	if err != nil {
@@ -171,6 +247,14 @@ func TestPostCRUD(t *testing.T) {
 	err = testUser.Delete()
 	if err != nil {
 		t.Errorf("Error deleting user: %v", err)
+	}
+	err = createdClass.Delete()
+	if err != nil {
+		t.Errorf("Error deleting class: %v", err)
+	}
+	err = createdSchool.Delete()
+	if err != nil {
+		t.Errorf("Error deleting class: %v", err)
 	}
 }
 
@@ -198,7 +282,8 @@ func TestClassCRUD(t *testing.T) {
 	// Update Class
 	updatedClass, err := readClass.Update("KHMT", "IT1")
 	if updatedClass.Name != "KHMT" || updatedClass.Abbrev != "IT1" {
-		t.Fatalf("Error updating class: Name mismatch")
+		t.Fatalf("Error updating class: Name mismatch %s vs %s", updatedClass.Name, "KHMT")
+		t.Fatalf("Error updating class: Name mismatch %s vs %s", updatedClass.Abbrev, "IT1")
 	}
 
 	if err != nil {
@@ -236,7 +321,7 @@ func TestSchoolCRUD(t *testing.T) {
 
 	updatedSchool, err := readSchool.Update("SOICT HAHAHAHAHA")
 	if updatedSchool.Name != "SOICT HAHAHAHAHA" {
-		t.Fatalf("Error updating school: Name mismatch")
+		t.Fatalf("Error updating school: Name mismatch: %s vs %s", updatedSchool.Name, "SOICT HAHAHAHAHA")
 	}
 	if err != nil {
 		t.Fatalf("Error updating school: %v", err)
