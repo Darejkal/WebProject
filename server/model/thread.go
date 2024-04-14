@@ -60,7 +60,7 @@ func (user *User) CreateThread(topic string) (conv Thread, err error) {
 
 // Create a new post to a thread
 func (user *User) CreatePost(conv Thread, body string) (post Post, err error) {
-	statement := "insert into posts (uuid, content, user_id, thread_id, created_at) values ($1, $2, $3, $4, $5) returning id, uuid, body, user_id, thread_id, created_at"
+	statement := "insert into posts (uuid, content, user_id, thread_id, created_at) values ($1, $2, $3, $4, $5) returning id, uuid, content, user_id, thread_id, created_at"
 	_, err = conn.Prepare(context.Background(), "insert-to-posts", statement)
 	if err != nil {
 		return

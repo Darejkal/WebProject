@@ -15,7 +15,7 @@ func version() string {
 	return "0.1"
 }
 func p(a ...interface{}) {
-	fmt.Println(a)
+	fmt.Println(a...)
 }
 
 type Configuration struct {
