@@ -44,7 +44,7 @@ func getThread(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	vals := request.URL.Query()
-	uuid := vals.Get("id")
+	uuid := vals.Get("uuid")
 	thread, err := model.ThreadByUUID(uuid)
 	if err != nil {
 		generateJSONResponse(writer, "Cannot read thread", http.StatusInternalServerError)
@@ -81,7 +81,7 @@ func postThread(writer http.ResponseWriter, request *http.Request) {
 		uuid := request.PostFormValue("uuid")
 		thread, err := model.ThreadByUUID(uuid)
 		if err != nil {
-			// error_message(writer, request, "Cannot read thread")
+
 			danger(err, "Cannot read thread")
 			generateJSONResponse(writer, "", http.StatusInternalServerError)
 		}

@@ -25,11 +25,31 @@ func main_setup() {
 	mux.HandleFunc("/thread/post", postThread)
 	mux.HandleFunc("/thread/get", getThread)
 
-	// // defined in route_thread.go
+	// // defined in route_class.go
 	mux.HandleFunc("/class/create", createClass)
 	mux.HandleFunc("/class/update", updateClass)
 	mux.HandleFunc("/class/get", getClass)
 
+	// // defined in route_school.go
+	mux.HandleFunc("/school/create", createSchool)
+	mux.HandleFunc("/school/update", updateSchool)
+	mux.HandleFunc("/school/get", getSchool)
+
+	// // defined in route_exam.go
+	mux.HandleFunc("/exam/create", createExam)
+	mux.HandleFunc("/exam/update", updateExam)
+	mux.HandleFunc("/exam/get", getExam)
+	mux.HandleFunc("/exam/create", createExamInstance)
+	mux.HandleFunc("/exam/update", updateExamInstance)
+	mux.HandleFunc("/exam/get", getExamInstance)
+	mux.HandleFunc("/exam/answer/submit", answerExamQuestion)
+
+	// // defined in route_attendance.go
+	mux.HandleFunc("/attendance/create", createAttendanceReport)
+	mux.HandleFunc("/exam/update", updateAttendanceReport)
+	mux.HandleFunc("/exam/get", getAttendanceReport)
+	mux.HandleFunc("/attendance/checkin", attendanceCheckin)
+	mux.HandleFunc("/attendance/uncheckin", attendanceUncheckin)
 	// starting up the server
 	server := &http.Server{
 		Addr:           config.Address,

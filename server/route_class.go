@@ -40,7 +40,7 @@ func getClass(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	vals := request.URL.Query()
-	uuid := vals.Get("id")
+	uuid := vals.Get("uuid")
 	class, err := model.ClassByUUID(uuid)
 	if err != nil {
 		generateJSONResponse(writer, "Cannot get Class", http.StatusInternalServerError)
@@ -78,7 +78,7 @@ func updateClass(writer http.ResponseWriter, request *http.Request) {
 		abbrev := request.PostFormValue("abbrev")
 		class, err := model.ClassByUUID(uuid)
 		if err != nil {
-			// error_message(writer, request, "Cannot read thread")
+
 			danger(err, "Cannot read class")
 			generateJSONResponse(writer, "", http.StatusInternalServerError)
 		}
