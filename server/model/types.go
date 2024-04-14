@@ -97,6 +97,13 @@ type Class struct {
 	Abbrev    string    `json:"abbrev"`
 	CreatedAt time.Time `json:"create_at"`
 }
+type Subject struct {
+	Id        int       `json:"id"`
+	Uuid      string    `json:"uuid"`
+	Name      string    `json:"name"`
+	Abbrev    string    `json:"abbrev"`
+	CreatedAt time.Time `json:"create_at"`
+}
 type School struct {
 	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
