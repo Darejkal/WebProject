@@ -51,8 +51,8 @@ func loadConfig() {
 }
 
 func generateJSONResponse(writer http.ResponseWriter, data interface{}, statusCode int) {
-	writer.WriteHeader(statusCode)
 	writer.Header().Set("Content-Type", "application/json")
+	writer.WriteHeader(statusCode)
 	json.NewEncoder(writer).Encode(data)
 }
 func danger(args ...interface{}) {
