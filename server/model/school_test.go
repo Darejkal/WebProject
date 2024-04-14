@@ -56,6 +56,15 @@ func Test_Schools_CRUD(t *testing.T) {
 	if rschool.Name != new_name {
 		t.Error("Retrieved school is not of correct name")
 	}
+	err = school.DeleteByUUID()
+	if err != nil {
+		t.Error(err, "Cannot delete scholl by UUID.")
+	}
+	_, err = ClassByUUID(school.Uuid)
+	if err == nil {
+		t.Error(err, "Delete class by UUID error.")
+
+	}
 }
 func Test_Classes_CRUD(t *testing.T) {
 	conn, err := createConn()
@@ -87,5 +96,14 @@ func Test_Classes_CRUD(t *testing.T) {
 	}
 	if class.Name != classes[1].Name || class.Abbrev != classes[1].Abbrev {
 		t.Error("Retrieved class is not of correct name")
+	}
+	err = class.DeleteByUUID()
+	if err != nil {
+		t.Error(err, "Cannot delete class by UUID.")
+	}
+	_, err = ClassByUUID(class.Uuid)
+	if err == nil {
+		t.Error(err, "Delete class by UUID error.")
+
 	}
 }
