@@ -7,20 +7,37 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var conn *pgx.Conn
+// var conn *pgx.Conn
 
-func createConn() (conn *pgx.Conn, err error) {
-	conn, err = pgx.Connect(context.Background(), "postgres://postgres:postgres@0.0.0.0:5432/postgres")
+//	func createConn() (conn *pgx.Conn, err error) {
+//		conn, err = pgx.Connect(context.Background(), "postgres://postgres:postgres@0.0.0.0:5432/postgres")
+//		if err != nil {
+//			log.Fatal(err)
+//		}
+//		return
+//	}
+var dbpool *pgxpool.Pool
+
+func createPool() (dbpool *pgxpool.Pool, err error) {
+	config, err := pgxpool.ParseConfig("postgres://postgres:postgres@0.0.0.0:5432/postgres")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
+
+	// You can customize pool configuration here if needed
+
+	dbpool, err = pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		return nil, err
+	}
+
 	return
 }
 func init() {
-	conn, _ = createConn()
+	dbpool, _ = createPool()
 }
 
 // create a random UUID with from RFC 4122
