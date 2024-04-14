@@ -7,7 +7,7 @@ type Thread struct {
 	Uuid      string    `json:"uuid"`
 	Topic     string    `json:"topic"`
 	UserId    int       `json:"userid"`
-	CreatedAt time.Time `json:"createdat"`
+	CreatedAt time.Time `json:"create_at"`
 }
 
 type Session struct {
@@ -24,7 +24,7 @@ type Post struct {
 	Content   string    `json:"content"`
 	ThreadId  int       `json:"threadid"`
 	UserId    int       `json:"userid"`
-	CreatedAt time.Time `json:"createdat"`
+	CreatedAt time.Time `json:"create_at"`
 }
 type Exam struct {
 	Id int `json:"id"`
@@ -32,14 +32,14 @@ type Exam struct {
 	Uuid      string    `json:"uuid"`
 	Name      string    `json:"name"`
 	AuthorId  int       `json:"authorid"`
-	CreatedAt time.Time `json:"createdat"`
+	CreatedAt time.Time `json:"create_at"`
 	ExamType  string    `json:"exam_type"`
 }
 type NormalExamItem struct {
 	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
 	Question  string    `json:"question"`
-	CreatedAt time.Time `json:"createdat"`
+	CreatedAt time.Time `json:"create_at"`
 }
 type NormalExamStudentRelation struct {
 	Id int `json:"id"`
@@ -49,7 +49,7 @@ type NormalExamStudentRelation struct {
 	Score       int       `json:"score"`
 	IsSubmitted bool      `json:"is_submitted"`
 	IsScored    bool      `json:"is_scored"`
-	CreatedAt   time.Time `json:"createdat"`
+	CreatedAt   time.Time `json:"create_at"`
 }
 type NormalExamItemStudentRelation struct {
 	Id int `json:"id"`
@@ -57,7 +57,7 @@ type NormalExamItemStudentRelation struct {
 	UserId     int       `json:"userid"`
 	QuestionId int       `json:"questionid"`
 	Answer     string    `json:"answer"`
-	CreatedAt  time.Time `json:"createdat"`
+	CreatedAt  time.Time `json:"create_at"`
 }
 type User struct {
 	Id        int       `json:"id"`
@@ -67,14 +67,14 @@ type User struct {
 	Email     string    `json:"email"`
 	ClassId   int       `json:"classid"`
 	SchoolId  int       `json:"schoolid"`
-	CreatedAt time.Time `json:"createdat"`
+	CreatedAt time.Time `json:"create_at"`
 }
 type TeacherClassRelation struct {
 	Id int `json:"id"`
 
 	UserId    int       `json:"userid"`
 	ClassId   int       `json:"classid"`
-	CreatedAt time.Time `json:"createdat"`
+	CreatedAt time.Time `json:"create_at"`
 }
 
 type StudentClassRelation struct {
@@ -82,18 +82,18 @@ type StudentClassRelation struct {
 
 	UserId    int       `json:"userid"`
 	ClassId   int       `json:"classid"`
-	CreatedAt time.Time `json:"createdat"`
+	CreatedAt time.Time `json:"create_at"`
 }
 type Class struct {
 	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
 	Name      string    `json:"name"`
 	Abbrev    string    `json:"abbrev"`
-	CreatedAt time.Time `json:"createdat"`
+	CreatedAt time.Time `json:"create_at"`
 }
 type School struct {
 	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
 	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"createdat"`
+	CreatedAt time.Time `json:"create_at"`
 }
