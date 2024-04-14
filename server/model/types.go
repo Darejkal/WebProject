@@ -27,13 +27,12 @@ type Post struct {
 	CreatedAt time.Time `json:"create_at"`
 }
 type Exam struct {
-	Id int `json:"id"`
-
+	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
 	Name      string    `json:"name"`
 	AuthorId  int       `json:"authorid"`
-	CreatedAt time.Time `json:"create_at"`
 	ExamType  string    `json:"exam_type"`
+	CreatedAt time.Time `json:"create_at"`
 }
 type ExamItemQuestion struct {
 	Id        int       `json:"id"`
@@ -42,7 +41,7 @@ type ExamItemQuestion struct {
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"create_at"`
 }
-type ExamItemChoice struct {
+type ExamItemAnswer struct {
 	Id         int       `json:"id"`
 	Uuid       string    `json:"uuid"`
 	QuestionId int       `json:"questionid"`
@@ -65,6 +64,13 @@ type ExamItemStudentRelation struct {
 	ChosenAnswerId int       `json:"answerid"`
 	CreatedAt      time.Time `json:"create_at"`
 }
+type ExamInstance struct {
+	Id                int       `json:"id"`
+	Uuid              string    `json:"uuid"`
+	SubjectInstanceId int       `json:"subjectinstance_id"`
+	ExamId            int       `json:"examid"`
+	CreatedAt         time.Time `json:"create_at"`
+}
 type User struct {
 	Id        int       `json:"id"`
 	Name      string    `json:"name"`
@@ -75,21 +81,6 @@ type User struct {
 	SchoolId  int       `json:"schoolid"`
 	CreatedAt time.Time `json:"create_at"`
 }
-type TeacherClassRelation struct {
-	Id int `json:"id"`
-
-	UserId    int       `json:"userid"`
-	ClassId   int       `json:"classid"`
-	CreatedAt time.Time `json:"create_at"`
-}
-
-type StudentClassRelation struct {
-	Id int `json:"id"`
-
-	UserId    int       `json:"userid"`
-	ClassId   int       `json:"classid"`
-	CreatedAt time.Time `json:"create_at"`
-}
 type Class struct {
 	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
@@ -97,6 +88,13 @@ type Class struct {
 	Abbrev    string    `json:"abbrev"`
 	CreatedAt time.Time `json:"create_at"`
 }
+type TeacherClassRelation struct {
+	Id        int       `json:"id"`
+	UserId    int       `json:"userid"`
+	ClassId   int       `json:"classid"`
+	CreatedAt time.Time `json:"create_at"`
+}
+
 type Subject struct {
 	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
@@ -104,7 +102,39 @@ type Subject struct {
 	Abbrev    string    `json:"abbrev"`
 	CreatedAt time.Time `json:"create_at"`
 }
+type SubjectInstance struct {
+	Id        int       `json:"id"`
+	Uuid      string    `json:"uuid"`
+	Name      string    `json:"abbrev"`
+	CreatedAt time.Time `json:"create_at"`
+}
+type TeacherSubjectRelation struct {
+	Id                int       `json:"id"`
+	UserId            int       `json:"userid"`
+	SubjectInstanceId int       `json:"subjectinstance_id"`
+	CreatedAt         time.Time `json:"create_at"`
+}
+
+type StudentSubjectRelation struct {
+	Id                int       `json:"id"`
+	UserId            int       `json:"userid"`
+	SubjectInstanceId int       `json:"subjectinstance_id"`
+	CreatedAt         time.Time `json:"create_at"`
+}
 type School struct {
+	Id        int       `json:"id"`
+	Uuid      string    `json:"uuid"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"create_at"`
+}
+type AttendanceReport struct {
+	Id        int       `json:"id"`
+	Uuid      string    `json:"uuid"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"create_at"`
+}
+
+type AttendanceItem struct {
 	Id        int       `json:"id"`
 	Uuid      string    `json:"uuid"`
 	Name      string    `json:"name"`

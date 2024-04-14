@@ -16,7 +16,7 @@ func CreateClass(name string, abbrev string) (conv Class, err error) {
 	return
 }
 func (cls *Class) Update(name string, abbrev string) (conv Class, err error) {
-	statement := "update classes (name, abbrev) values ($1, $2) WHERE uuid=$3"
+	statement := "update classes set name=$1, abbrev=$2 WHERE uuid=$3"
 	_, err = conn.Prepare(context.Background(), "update-classes", statement)
 	if err != nil {
 		return
@@ -53,7 +53,7 @@ func CreateSchool(name string) (conv School, err error) {
 	return
 }
 func (cls *School) Update(name string) (conv School, err error) {
-	statement := "update classes (name) values ($1) WHERE uuid=$3"
+	statement := "update schools set name=$1 WHERE uuid=$2"
 	_, err = conn.Prepare(context.Background(), "update-schools", statement)
 	if err != nil {
 		return

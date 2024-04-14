@@ -45,15 +45,13 @@ func Test_Schools_CRUD(t *testing.T) {
 	school, err = school.Update(new_name)
 	if err != nil {
 		t.Error(err, "Cannot update school.")
-	}
-	if school.Name != new_name {
+	} else if school.Name != new_name {
 		t.Error("School is not of correct name")
 	}
 	rschool, err := SchoolByUUID(school.Uuid)
 	if err != nil {
 		t.Error(err, "Cannot get school by UUID.")
-	}
-	if rschool.Name != new_name {
+	} else if rschool.Name != new_name {
 		t.Error("Retrieved school is not of correct name")
 	}
 	err = school.DeleteByUUID()
