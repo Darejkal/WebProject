@@ -37,28 +37,24 @@ func deleteOne(collection string, filter bson.D) (err error) {
 type hasCollection interface {
 	Collection() (value string)
 }
-type databaseItemWrapper[T any] struct {
+type databaseItem[T any] struct {
 	hasCollection
-	object *T
 }
 
-func (item *databaseItemWrapper[T]) CreateOneUnsafe() (err error) {
-	marshalled, err := bson.Marshal(item.object)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	log.Println("OKKKKKKKKKKKKKKKKKK", item.Collection())
+func (item *databaseItem[T]) CreateOneUnsafe(value T) (err error) {
+	log.Println("CREATE", value)
+	marshalled, err := bson.Marshal(value)
+
 	result, err := db.Collection(item.Collection()).InsertOne(context.Background(), marshalled)
 	if err != nil {
 		log.Println(err)
-		return
+	} else {
+		log.Println("Inserted %s to collection", result.InsertedID, item.Collection())
 	}
-	log.Println("Inserted %s to collection", result.InsertedID, item.Collection())
 	return
 }
 
-func (item *databaseItemWrapper[T]) DeleteOneUnsafe(filter bson.D) (err error) {
+func (item *databaseItem[T]) DeleteOneUnsafe(filter bson.D) (err error) {
 	result, err := db.Collection(item.Collection()).DeleteOne(context.Background(), filter)
 	if err != nil {
 		log.Println(err)
@@ -69,20 +65,20 @@ func (item *databaseItemWrapper[T]) DeleteOneUnsafe(filter bson.D) (err error) {
 	}
 	return
 }
-func (item *databaseItemWrapper[T]) GetOneUnsafe(filter bson.D) (err error) {
+func (item *databaseItem[T]) GetOneUnsafe(filter bson.D) (result_value T, err error) {
 	// log.Println(filter)
 	result := db.Collection(item.Collection()).FindOne(context.Background(), filter)
 	err = result.Err()
 	if err != nil {
 		log.Println(err)
 	}
-	err = result.Decode(&item.object)
+	err = result.Decode(&result_value)
 	if err != nil {
 		log.Println(err)
 	}
 	return
 }
-func (item *databaseItemWrapper[T]) UpdateOneUnsafe(filter bson.D, update bson.D) (err error) {
+func (item *databaseItem[T]) UpdateOneUnsafe(filter bson.D, update bson.D) (err error) {
 	result, err := db.Collection(item.Collection()).UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		log.Println(err)
@@ -93,7 +89,7 @@ func (item *databaseItemWrapper[T]) UpdateOneUnsafe(filter bson.D, update bson.D
 	}
 	return
 }
-func (item *databaseItemWrapper[T]) GetAll(collection string) (result_values []T, err error) {
+func (item *databaseItem[T]) GetAll(collection string) (result_values []T, err error) {
 	// log.Println(filter)
 	result, err := db.Collection(item.Collection()).Find(context.Background(), bson.D{})
 	if err != nil {

@@ -11,9 +11,10 @@ type ChatThread struct {
 	Topic     string
 	UserId    string
 	CreatedAt time.Time
+	databaseItem[ChatThread]
 }
 
-func (item *databaseItemWrapper[ChatThread]) Collection() string {
+func (item ChatThread) Collection() string {
 	return "chatthread"
 }
 func (user User) CreateChatThread(topic string) (result ChatThread, err error) {
@@ -23,18 +24,11 @@ func (user User) CreateChatThread(topic string) (result ChatThread, err error) {
 		UserId:    user.Uuid,
 		CreatedAt: getTimeNow(),
 	}
-	wrapper := databaseItemWrapper[ChatThread]{
-		object: &result,
-	}
-	err = wrapper.CreateOneUnsafe()
-	result = *wrapper.object
+	err = result.CreateOneUnsafe(result)
 	return
 }
 func ChatThreadByUUID(uuid string) (returned ChatThread, err error) {
-	wrapper := databaseItemWrapper[ChatThread]{
-		object: &returned,
-	}
-	err = wrapper.GetOneUnsafe(bson.D{{"uuid", uuid}})
+	returned, err = returned.GetOneUnsafe(bson.D{{"uuid", uuid}})
 	return
 }
 
@@ -44,9 +38,10 @@ type Post struct {
 	ThreadId  string
 	UserId    string
 	CreatedAt time.Time
+	databaseItem[Post]
 }
 
-func (item *databaseItemWrapper[Post]) Collection() string {
+func (item Post) Collection() string {
 	return "chatthreadpost"
 }
 func (user User) CreatePost(thread ChatThread, content string) (result Post, err error) {
@@ -57,7 +52,6 @@ func (user User) CreatePost(thread ChatThread, content string) (result Post, err
 		UserId:    user.Uuid,
 		CreatedAt: getTimeNow(),
 	}
-	wrapper := databaseItemWrapper[Post]{object: &result}
-	err = wrapper.CreateOneUnsafe()
+	err = result.CreateOneUnsafe(result)
 	return
 }

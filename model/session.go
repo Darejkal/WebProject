@@ -14,11 +14,12 @@ type Session struct {
 	Email     string
 	UserId    string
 	CreatedAt time.Time
+	databaseItem[Session]
 }
 
 const sessionCollection = "session"
 
-func (sess *databaseItemWrapper[Session]) Collection() (val string) {
+func (sess *Session) Collection() (val string) {
 	return "session"
 }
 
