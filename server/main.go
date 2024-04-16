@@ -6,7 +6,7 @@ import (
 )
 
 func main_setup() {
-	p("ChitChat", version(), "started at", config.Address)
+	p("HustServe", version(), "started at", config.Address)
 
 	// handle static assets
 	mux := http.NewServeMux()
@@ -39,15 +39,15 @@ func main_setup() {
 	mux.HandleFunc("/exam/create", createExam)
 	mux.HandleFunc("/exam/update", updateExam)
 	mux.HandleFunc("/exam/get", getExam)
-	mux.HandleFunc("/exam/create", createExamInstance)
-	mux.HandleFunc("/exam/update", updateExamInstance)
-	mux.HandleFunc("/exam/get", getExamInstance)
+	mux.HandleFunc("/exam/createinstance", createExamInstance)
+	mux.HandleFunc("/exam/updateinstance", updateExamInstance)
+	mux.HandleFunc("/exam/getinstance", getExamInstance)
 	mux.HandleFunc("/exam/answer/submit", answerExamQuestion)
 
 	// // defined in route_attendance.go
 	mux.HandleFunc("/attendance/create", createAttendanceReport)
-	mux.HandleFunc("/exam/update", updateAttendanceReport)
-	mux.HandleFunc("/exam/get", getAttendanceReport)
+	mux.HandleFunc("/attendance/update", updateAttendanceReport)
+	mux.HandleFunc("/attendance/get", getAttendanceReport)
 	mux.HandleFunc("/attendance/checkin", attendanceCheckin)
 	mux.HandleFunc("/attendance/uncheckin", attendanceUncheckin)
 	// starting up the server
