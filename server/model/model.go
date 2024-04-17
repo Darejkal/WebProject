@@ -22,7 +22,7 @@ import (
 var dbpool *pgxpool.Pool
 
 func createPool() (dbpool *pgxpool.Pool, err error) {
-	config, err := pgxpool.ParseConfig("postgres://postgres:postgres@0.0.0.0:5432/postgres")
+	config, err := pgxpool.ParseConfig("postgres://postgres:xuyenkim@127.0.0.1:8000/webqrcode")
 	if err != nil {
 		return nil, err
 	}
