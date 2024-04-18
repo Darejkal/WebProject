@@ -11,7 +11,7 @@ type ChatThread struct {
 	Topic     string
 	UserId    string
 	CreatedAt time.Time
-	databaseItem[ChatThread]
+	hasCollection
 }
 
 func (item ChatThread) Collection() string {
@@ -24,12 +24,16 @@ func (user User) CreateChatThread(topic string) (result ChatThread, err error) {
 		UserId:    user.Uuid,
 		CreatedAt: getTimeNow(),
 	}
-	err = result.CreateOneUnsafe(result)
+	err = CreateOneUnsafe[ChatThread](result.Collection(), result)
 	return
 }
 func ChatThreadByUUID(uuid string) (returned ChatThread, err error) {
-	returned, err = returned.GetOneUnsafe(bson.D{{"uuid", uuid}})
+	returned, err = GetOneUnsafe[ChatThread](returned.Collection(), bson.D{{"uuid", uuid}})
 	return
+}
+func (item ChatThread) NumReplies() int64 {
+	result, _ := CountItems(Post{}.Collection(), bson.D{{"threadid", item.Uuid}})
+	return result
 }
 
 type Post struct {
@@ -38,11 +42,15 @@ type Post struct {
 	ThreadId  string
 	UserId    string
 	CreatedAt time.Time
-	databaseItem[Post]
+	hasCollection
 }
 
 func (item Post) Collection() string {
 	return "chatthreadpost"
+}
+func (post Post) User() (user User, err error) {
+	user, err = UserByUUID(post.UserId)
+	return
 }
 func (user User) CreatePost(thread ChatThread, content string) (result Post, err error) {
 	result = Post{
@@ -52,6 +60,6 @@ func (user User) CreatePost(thread ChatThread, content string) (result Post, err
 		UserId:    user.Uuid,
 		CreatedAt: getTimeNow(),
 	}
-	err = result.CreateOneUnsafe(result)
+	err = CreateOneUnsafe[Post](result.Collection(), result)
 	return
 }

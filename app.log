@@ -23,3 +23,4 @@ ERROR 2024/04/16 13:04:54 utils.go:95: mongo: no documents in result Cannot get 
 ERROR 2024/04/16 13:05:40 utils.go:95: mongo: no documents in result Cannot get user from session
 ERROR 2024/04/16 13:06:07 utils.go:95: mongo: no documents in result Cannot get user from session
 ERROR 2024/04/16 13:06:28 utils.go:95: mongo: no documents in result Cannot get user from session
+ERROR 2024/04/16 14:31:35 utils.go:95: mongo: no documents in result Cannot get user from session

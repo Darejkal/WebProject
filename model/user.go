@@ -14,12 +14,12 @@ type User struct {
 	Email     string
 	Password  string
 	CreatedAt time.Time
-	databaseItem[User]
+	hasCollection
 }
 
 const userCollection = "user"
 
-func (user *User) Collection() (val string) {
+func (user User) Collection() (val string) {
 	return "user"
 }
 

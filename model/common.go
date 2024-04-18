@@ -8,6 +8,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
+type hasCollection interface {
+	Collection() string
+}
+
 func findOne[T interface{}](collection string, filter bson.D) (result_value T, err error) {
 	// log.Println(filter)
 	result := db.Collection(collection).FindOne(context.Background(), filter)
@@ -34,28 +38,21 @@ func deleteOne(collection string, filter bson.D) (err error) {
 	return
 }
 
-type hasCollection interface {
-	Collection() (value string)
-}
-type databaseItem[T any] struct {
-	hasCollection
-}
-
-func (item *databaseItem[T]) CreateOneUnsafe(value T) (err error) {
+func CreateOneUnsafe[T any](collection string, value T) (err error) {
 	log.Println("CREATE", value)
 	marshalled, err := bson.Marshal(value)
 
-	result, err := db.Collection(item.Collection()).InsertOne(context.Background(), marshalled)
+	result, err := db.Collection(collection).InsertOne(context.Background(), marshalled)
 	if err != nil {
 		log.Println(err)
 	} else {
-		log.Println("Inserted %s to collection", result.InsertedID, item.Collection())
+		log.Println("Inserted %s to collection", result.InsertedID, collection)
 	}
 	return
 }
 
-func (item *databaseItem[T]) DeleteOneUnsafe(filter bson.D) (err error) {
-	result, err := db.Collection(item.Collection()).DeleteOne(context.Background(), filter)
+func DeleteOneUnsafe(collection string, filter bson.D) (err error) {
+	result, err := db.Collection(collection).DeleteOne(context.Background(), filter)
 	if err != nil {
 		log.Println(err)
 	}
@@ -65,9 +62,9 @@ func (item *databaseItem[T]) DeleteOneUnsafe(filter bson.D) (err error) {
 	}
 	return
 }
-func (item *databaseItem[T]) GetOneUnsafe(filter bson.D) (result_value T, err error) {
+func GetOneUnsafe[T any](collection string, filter bson.D) (result_value T, err error) {
 	// log.Println(filter)
-	result := db.Collection(item.Collection()).FindOne(context.Background(), filter)
+	result := db.Collection(collection).FindOne(context.Background(), filter)
 	err = result.Err()
 	if err != nil {
 		log.Println(err)
@@ -78,8 +75,8 @@ func (item *databaseItem[T]) GetOneUnsafe(filter bson.D) (result_value T, err er
 	}
 	return
 }
-func (item *databaseItem[T]) UpdateOneUnsafe(filter bson.D, update bson.D) (err error) {
-	result, err := db.Collection(item.Collection()).UpdateOne(context.Background(), filter, update)
+func UpdateOneUnsafe(collection string, filter bson.D, update bson.D) (err error) {
+	result, err := db.Collection(collection).UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		log.Println(err)
 	}
@@ -89,9 +86,9 @@ func (item *databaseItem[T]) UpdateOneUnsafe(filter bson.D, update bson.D) (err 
 	}
 	return
 }
-func (item *databaseItem[T]) GetAll(collection string) (result_values []T, err error) {
+func GetAll[T any](collection string) (result_values []T, err error) {
 	// log.Println(filter)
-	result, err := db.Collection(item.Collection()).Find(context.Background(), bson.D{})
+	result, err := db.Collection(collection).Find(context.Background(), bson.D{})
 	if err != nil {
 		log.Println(err)
 	}
@@ -99,7 +96,18 @@ func (item *databaseItem[T]) GetAll(collection string) (result_values []T, err e
 		err = errors.New("Collection is empty")
 		log.Println(err)
 	}
-	err = result.All(context.Background(), result_values)
+	err = result.All(context.Background(), &result_values)
+	if err != nil {
+		log.Println(err)
+	}
+	return
+}
+func CountItems(collection string, filter bson.D) (result int64, err error) {
+	// log.Println(filter)
+	result, err = db.Collection(collection).CountDocuments(context.Background(), filter)
+	if err != nil {
+		log.Println(err)
+	}
 	return
 }
 

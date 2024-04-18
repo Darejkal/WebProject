@@ -6,8 +6,6 @@ import (
 	"popman/model"
 )
 
-// GET /chat/new
-// Show the new thread form page
 func NewChatThread(writer http.ResponseWriter, request *http.Request) {
 	_, err := session(writer, request)
 	if err != nil {
@@ -17,8 +15,6 @@ func NewChatThread(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-// POST /signup
-// Create the user account
 func CreateChatThread(writer http.ResponseWriter, request *http.Request) {
 	sess, err := session(writer, request)
 	if err != nil {
@@ -40,8 +36,6 @@ func CreateChatThread(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-// GET /chat/read
-// Show the details of the thread, including the posts and the form to write a post
 func ReadChatThread(writer http.ResponseWriter, request *http.Request) {
 	vals := request.URL.Query()
 	uuid := vals.Get("id")
@@ -58,8 +52,6 @@ func ReadChatThread(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-// POST /thread/post
-// Create the post
 func PostChatThread(writer http.ResponseWriter, request *http.Request) {
 	sess, err := session(writer, request)
 	if err != nil {

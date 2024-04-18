@@ -2,6 +2,7 @@ package controller
 
 import (
 	"net/http"
+	"popman/model"
 )
 
 // GET /err?msg=
@@ -18,16 +19,16 @@ func Err(writer http.ResponseWriter, request *http.Request) {
 
 // GET /
 func Index(writer http.ResponseWriter, request *http.Request) {
-	// threads, err := model.Threads()
-	// if err != nil {
-	// 	error_message(writer, request, "Cannot get threads")
-	// } else {
-	_, err := session(writer, request)
+	threads, err := model.GetAll[model.ChatThread](model.ChatThread{}.Collection())
 	if err != nil {
-		generateHTML(writer, nil, "layout", "public.navbar", "index")
+		error_message(writer, request, "Cannot get threads")
 	} else {
-		generateHTML(writer, nil, "layout", "private.navbar", "index")
+		_, err := session(writer, request)
+		if err != nil {
+			generateHTML(writer, threads, "layout", "public.navbar", "index")
+		} else {
+			generateHTML(writer, threads, "layout", "private.navbar", "index")
+		}
 	}
-	// }
 
 }
