@@ -5,6 +5,11 @@
 cd ./front_server&& npm run dev 
 cd ./go_server&& go run --mod=mod main.go
 ```
+
+## Structure
+
+Nextjs -> Go HTTP -> Mongo
+
 ## Progress
 ||Login/logout|Attendance|Exam|Chat
 |--|--|--|--|--|
