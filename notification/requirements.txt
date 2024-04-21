@@ -1,0 +1,5 @@
+apprise
+kafka-python
+fastapi
+pydantic
+uvicorn[standard]

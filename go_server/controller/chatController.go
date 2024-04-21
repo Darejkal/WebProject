@@ -93,7 +93,7 @@ func ApiGetListChatThreads(writer http.ResponseWriter, request *http.Request) {
 	threads, err := model.GetAll[model.ChatThread](model.ChatThread{}.Collection())
 	log.Printf("%+v\n", threads[0])
 	if err != nil {
-		error_message(writer, request, "Cannot get threads")
+		generateJSONResponse(writer, nil, http.StatusInternalServerError)
 	} else {
 		generateJSONResponse(writer, threads, http.StatusOK)
 	}
@@ -103,13 +103,75 @@ func ApiGetChatThreadPosts(writer http.ResponseWriter, request *http.Request) {
 	uuid := vals.Get("id")
 	thread, err := model.ChatThreadByUUID(uuid)
 	if err != nil {
-		error_message(writer, request, "Cannot read thread")
+		generateJSONResponse(writer, nil, http.StatusInternalServerError)
 	} else {
 		posts, err := thread.Posts()
 		if err != nil {
-			error_message(writer, request, "Cannot read thread")
+			generateJSONResponse(writer, nil, http.StatusInternalServerError)
 		} else {
 			generateJSONResponse(writer, posts, http.StatusOK)
 		}
+	}
+}
+func ApiCreateChatThread(writer http.ResponseWriter, request *http.Request) {
+	sess, err := session(writer, request)
+	if err != nil {
+		generateJSONResponse(writer, nil, http.StatusForbidden)
+		return
+	} else {
+		err = request.ParseForm()
+		if err != nil {
+			danger(err, "Cannot parse form")
+			generateJSONResponse(writer, nil, http.StatusInternalServerError)
+			return
+		}
+		user, err := sess.User()
+		if err != nil {
+			danger(err, "Cannot get user from session")
+			generateJSONResponse(writer, nil, http.StatusInternalServerError)
+			return
+		}
+		topic := request.PostFormValue("topic")
+		thread, err := user.CreateChatThread(topic)
+		if err != nil {
+			danger(err, "Cannot create thread")
+			generateJSONResponse(writer, nil, http.StatusInternalServerError)
+			return
+		}
+		generateJSONResponse(writer, thread, http.StatusOK)
+	}
+}
+func ApiPostChatThread(writer http.ResponseWriter, request *http.Request) {
+	sess, err := session(writer, request)
+	if err != nil {
+		generateJSONResponse(writer, nil, http.StatusForbidden)
+		return
+	} else {
+		err = request.ParseForm()
+		if err != nil {
+			danger(err, "Cannot parse form")
+			generateJSONResponse(writer, nil, http.StatusInternalServerError)
+			return
+		}
+		user, err := sess.User()
+		if err != nil {
+			danger(err, "Cannot get user from session")
+			generateJSONResponse(writer, nil, http.StatusInternalServerError)
+			return
+		}
+		body := request.PostFormValue("body")
+		uuid := request.PostFormValue("uuid")
+		thread, err := model.ChatThreadByUUID(uuid)
+		if err != nil {
+			generateJSONResponse(writer, nil, http.StatusInternalServerError)
+			return
+		}
+		post, err := user.CreatePost(thread, body)
+		if err != nil {
+			danger(err, "Cannot create post")
+			generateJSONResponse(writer, nil, http.StatusInternalServerError)
+			return
+		}
+		generateJSONResponse(writer, post, http.StatusOK)
 	}
 }

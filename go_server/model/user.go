@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -27,6 +28,15 @@ func (user User) Collection() (val string) {
 
 // Create a new user, save user info into the database
 func CreateUser(name string, unencrypted_password string, email string, classid string, schoolid string) (user User, err error) {
+	if name == "" || email == "" {
+		err = fmt.Errorf("invalid name (%s) or email (%s)", name, email)
+		return
+	}
+	user, err = UserByEmail(email)
+	if err == nil {
+		err = fmt.Errorf("user with the email existed: %s", email)
+		return
+	}
 	user = User{
 		Name:     name,
 		Password: Encrypt(unencrypted_password),

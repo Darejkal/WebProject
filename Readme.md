@@ -16,4 +16,4 @@ Nextjs -> Go HTTP -> Mongo
 |Backend|Dai An|||Dai An|
 |Frontend|Dai An (chatonly)|||Dai An|
 
-Empty means not done yet (in this branch)
+Empty means that it is not up and running yet (in this branch)

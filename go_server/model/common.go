@@ -18,10 +18,12 @@ func findOne[T interface{}](collection string, filter bson.D) (result_value T, e
 	err = result.Err()
 	if err != nil {
 		log.Println(err)
+		return
 	}
 	err = result.Decode(&result_value)
 	if err != nil {
 		log.Println(err)
+		return
 	}
 	log.Printf("FindOne from %s returned %+v\n", collection, result_value)
 	return

@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"popman/model"
@@ -88,4 +90,59 @@ func Logout(writer http.ResponseWriter, request *http.Request) {
 		session.DeleteByUUID()
 	}
 	http.Redirect(writer, request, "/", 302)
+}
+
+func ApiSignupAccount(writer http.ResponseWriter, request *http.Request) {
+	err := request.ParseForm()
+	if err != nil {
+		danger(err, "Cannot parse form")
+	}
+	request.ParseForm()
+	fmt.Println(json.Marshal(request.Form))
+	if _, err := model.CreateUser(
+		request.PostFormValue("name"),
+		request.PostFormValue("password"),
+		request.PostFormValue("email"),
+		"",
+		"",
+	); err != nil {
+		danger(err, "Cannot create user")
+		generateJSONResponse(writer, nil, http.StatusInternalServerError)
+	}
+	generateJSONResponse(writer, nil, http.StatusOK)
+}
+func ApiAuthenticate(writer http.ResponseWriter, request *http.Request) {
+	err := request.ParseForm()
+	if err != nil {
+		danger(err, "Cannot parse form")
+		generateJSONResponse(writer, nil, http.StatusInternalServerError)
+
+		return
+	}
+	user, err := model.UserByEmail(request.PostFormValue("email"))
+	if err != nil {
+		danger(err, "Cannot find user")
+		generateJSONResponse(writer, nil, http.StatusInternalServerError)
+
+		return
+	}
+	if user.Password == request.PostFormValue("password") {
+		session, err := user.CreateSession()
+		if err != nil {
+			danger(err, "Cannot create session")
+			generateJSONResponse(writer, nil, http.StatusInternalServerError)
+			return
+		}
+		cookie := http.Cookie{
+			Name:     authCookie,
+			Value:    session.Uuid,
+			HttpOnly: true,
+		}
+		http.SetCookie(writer, &cookie)
+		log.Println("Login OK")
+		generateJSONResponse(writer, nil, http.StatusOK)
+	} else {
+		generateJSONResponse(writer, nil, http.StatusInternalServerError)
+	}
+
 }
