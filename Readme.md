@@ -2,7 +2,7 @@
 
 ## Startup commands
 ```
-cd ./front_server&& react-scripts start 
+cd ./front_server&& npm run dev 
 cd ./go_server&& go run --mod=mod main.go
 ```
 ## Progress
