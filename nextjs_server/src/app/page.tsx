@@ -5,7 +5,7 @@ export default function Home() {
         <a href={`http://${process.env.APIHOST}`} className="">
           Goto Golang Chat
         </a>
-        <a href="/index" className="">
+        <a href="/home" className="">
           Goto Main Web
         </a>
       </div>

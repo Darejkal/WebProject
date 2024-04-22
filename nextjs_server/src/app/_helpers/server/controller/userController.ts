@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { headers } from 'next/headers';
-import { db } from './db';
-import { customEncrypt, customEncryptCompare, generateUUID } from '../utils';
+import { db } from '../model/userModel';
+import { customEncrypt, customEncryptCompare, generateUUID } from '../../utils';
 
 const User = db.User;
 
