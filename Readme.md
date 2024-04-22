@@ -14,6 +14,6 @@ Nextjs -> Go HTTP -> Mongo
 ||Login/logout|Attendance|Exam|Chat
 |--|--|--|--|--|
 |Backend|Dai An|||Dai An|
-|Frontend|Dai An (chatonly)|||Dai An|
+|Frontend|Dai An|||Dai An|
 
 Empty means that it is not up and running yet (in this branch)
