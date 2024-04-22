@@ -91,6 +91,22 @@ func generateHTML(writer http.ResponseWriter, data interface{}, filenames ...str
 		Data:   data,
 	})
 }
+func generateHTMLPage(writer http.ResponseWriter, data interface{}, filenames ...string) {
+	if len(filenames) == 0 {
+		log.Fatal("generate html page has no base template")
+	}
+	var files []string
+	for _, file := range filenames {
+		files = append(files, fmt.Sprintf("template/%s.html", file))
+	}
+
+	templates := template.Must(template.ParseFiles(files...))
+
+	templates.Execute(writer, ConfigDataBundle{
+		Config: Config,
+		Data:   data,
+	})
+}
 
 // for logging
 func info(args ...interface{}) {

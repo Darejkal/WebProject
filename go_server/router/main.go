@@ -28,15 +28,17 @@ func Router() *mux.Router {
 	router.HandleFunc("/thread/create", controller.CreateChatThread).Methods("POST")
 	router.HandleFunc("/thread/post", controller.PostChatThread).Methods("POST")
 	router.HandleFunc("/thread/read", controller.ReadChatThread).Methods("GET")
+	router.HandleFunc("/message/", controller.GetMessagePage).Methods("GET")
 
-	apiRouter := router.PathPrefix("/api").Subrouter()
-	apiRouter.HandleFunc("/signup", controller.ApiSignupAccount).Methods("POST")
-	apiRouter.HandleFunc("/authenticate", controller.ApiAuthenticate).Methods("POST")
+	handleVideoSubRouter(router, "/call")
+	// apiRouter := router.PathPrefix("/api").Subrouter()
+	// apiRouter.HandleFunc("/signup", controller.ApiSignupAccount).Methods("POST")
+	// apiRouter.HandleFunc("/authenticate", controller.ApiAuthenticate).Methods("POST")
 
-	apiRouter.HandleFunc("/thread/create", controller.ApiCreateChatThread).Methods("POST")
-	apiRouter.HandleFunc("/thread/post", controller.ApiPostChatThread).Methods("POST")
-	apiRouter.HandleFunc("/thread/get", controller.ApiGetChatThread).Methods("GET")
-	apiRouter.HandleFunc("/thread/getmany", controller.ApiGetListChatThreads).Methods("GET")
-	apiRouter.HandleFunc("/thread/post/get", controller.ApiGetChatThreadPosts).Methods("GET")
+	// apiRouter.HandleFunc("/thread/create", controller.ApiCreateChatThread).Methods("POST")
+	// apiRouter.HandleFunc("/thread/post", controller.ApiPostChatThread).Methods("POST")
+	// apiRouter.HandleFunc("/thread/get", controller.ApiGetChatThread).Methods("GET")
+	// apiRouter.HandleFunc("/thread/getmany", controller.ApiGetListChatThreads).Methods("GET")
+	// apiRouter.HandleFunc("/thread/post/get", controller.ApiGetChatThreadPosts).Methods("GET")
 	return router
 }
