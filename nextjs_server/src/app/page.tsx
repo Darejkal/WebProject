@@ -5,8 +5,8 @@ export default function Home() {
         <a href={`http://${process.env.APIHOST}`} className="">
           Goto Golang Chat
         </a>
-        <a href="/chat" className="">
-          Goto Nextjs Chat
+        <a href="/index" className="">
+          Goto Main Web
         </a>
       </div>
   );

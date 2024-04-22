@@ -2,10 +2,11 @@ package model
 
 import (
 	"crypto/rand"
-	"crypto/sha1"
 	"fmt"
 	"log"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func getTimeNow() (t time.Time) {
@@ -28,8 +29,12 @@ func generateUUID() (uuid string) {
 	return
 }
 
-// hash plaintext with SHA-1
 func Encrypt(plaintext string) (cryptext string) {
-	cryptext = fmt.Sprintf("%x", sha1.Sum([]byte(plaintext)))
+	value, _ := bcrypt.GenerateFromPassword([]byte(plaintext), 10)
+	cryptext = string(value)
 	return
+}
+func CompareEncrypt(plaintext string, hashed string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(plaintext))
+	return err == nil
 }

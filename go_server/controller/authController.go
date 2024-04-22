@@ -57,7 +57,7 @@ func Authenticate(writer http.ResponseWriter, request *http.Request) {
 		http.Redirect(writer, request, "/error", http.StatusInternalServerError)
 		return
 	}
-	if user.Password == request.PostFormValue("password") {
+	if model.CompareEncrypt(request.PostFormValue("password"), user.Password) {
 		session, err := user.CreateSession()
 		if err != nil {
 			danger(err, "Cannot create session")
@@ -126,7 +126,7 @@ func ApiAuthenticate(writer http.ResponseWriter, request *http.Request) {
 
 		return
 	}
-	if user.Password == request.PostFormValue("password") {
+	if model.CompareEncrypt(request.PostFormValue("password"), user.Password) {
 		session, err := user.CreateSession()
 		if err != nil {
 			danger(err, "Cannot create session")

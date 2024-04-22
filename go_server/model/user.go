@@ -46,7 +46,6 @@ func CreateUser(name string, unencrypted_password string, email string, classid 
 	}
 	user.Uuid = generateUUID()
 	user.CreatedAt = getTimeNow()
-	user.Uuid = Encrypt(user.Uuid)
 	result, err := db.Collection(userCollection).InsertOne(context.Background(), user)
 	if err != nil {
 		log.Println(err)
