@@ -8,8 +8,9 @@ cd ./go_server&& go run --mod=mod main.go
 
 ## Structure
 
-Nextjs -> Go HTTP -> Mongo
+Nextjs -----> Mongo
 
+Go HTTP ----->Mongo
 ## Progress
 ||Login/logout|Attendance|Exam|Chat
 |--|--|--|--|--|
