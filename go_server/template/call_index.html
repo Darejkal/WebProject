@@ -65,6 +65,7 @@
 
       ws.onmessage = function(evt) {
         let msg = JSON.parse(evt.data)
+        console.log(msg)
         if (!msg) {
           return console.log('failed to parse msg')
         }

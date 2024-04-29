@@ -6,10 +6,10 @@ import { usersRepo } from '@/app/_helpers/server';
 import { NextResponse } from 'next/server';
 
 module.exports = apiHandler({
-    POST: login
+    POST: getAttendanceLink
 });
 
-async function login(req: Request) {
+async function getAttendanceLink(req: Request) {
     const body = await req.json();
     const { user, token } = await usersRepo.authenticate(body);
     // return jwt token in http only cookie
@@ -17,8 +17,7 @@ async function login(req: Request) {
 
     return user
 }
-
-login.schema = joi.object({
+getAttendanceLink.schema = joi.object({
+    name: joi.string().required(),
     email: joi.string().required(),
-    password: joi.string().required()
 });

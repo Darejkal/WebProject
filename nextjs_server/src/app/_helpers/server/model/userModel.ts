@@ -17,7 +17,7 @@ function userModel() {
         password: { type: String, required: true },
         email: { type: String,unique: true, required: true },
         createdat:{type: Date, required:true},
-        uuid:{type: String, required:true},
+        uuid:{type: String,unique: true, required:true},
     });
 
     // schema.set('toJSON', {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { errorHandler, jwtMiddleware, validateMiddleware } from './';
+import { errorHandler, jwtMiddleware, validateBodyMiddleware } from '.';
 
 export { apiHandler };
 
@@ -23,7 +23,7 @@ function apiHandler(handler: any) {
             try {
                 // global middleware
                 await jwtMiddleware(req);
-                await validateMiddleware(req, handler[method].schema);
+                await validateBodyMiddleware(req, handler[method].schema);
 
                 // route handler
                 const responseBody = await handler[method](req, ...args);

@@ -1,8 +1,8 @@
 import joi from 'joi';
 
-export { validateMiddleware };
+export { validateBodyMiddleware };
 
-async function validateMiddleware(req: Request, schema: joi.ObjectSchema) {
+async function validateBodyMiddleware(req: Request, schema: joi.ObjectSchema) {
     if (!schema) return;
 
     const options = {

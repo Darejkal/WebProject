@@ -1,5 +1,5 @@
 import { usersRepo } from '@/app/_helpers/server';
-import { apiHandler } from '@/app/_helpers/server/api';
+import { apiHandler } from '@/app/_helpers/server/middleware';
 import joi from 'joi';
 
 

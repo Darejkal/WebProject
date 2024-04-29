@@ -74,7 +74,7 @@ func signalPeerConnections() {
 				return true // We modified the slice, start from the beginning
 			}
 
-			// map of sender we already are seanding, so we don't double send
+			// map of sender we already are sending, so we don't double send
 			existingSenders := map[string]bool{}
 
 			for _, sender := range peerConnections[i].peerConnection.GetSenders() {
