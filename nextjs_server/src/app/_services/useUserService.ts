@@ -30,7 +30,6 @@ function useUserService(): IUserService {
             try {
                 const currentUser = await fetch.post('/api/user/login', { email, password });
                 userStore.setState({ ...initialState, currentUser });
-
                 // get return url from query parameters or default to '/'
                 const returnUrl = searchParams.get('returnUrl') || '/';
                 router.push(returnUrl);
@@ -51,53 +50,53 @@ function useUserService(): IUserService {
                 alertService.error(error);
             }
         },
-        getAll: async () => {
-            userStore.setState({ users: await fetch.get('/api/users') });
-        },
-        getById: async (id) => {
-            userStore.setState({ user: undefined });
-            try {
-                userStore.setState({ user: await fetch.get(`/api/users/${id}`) });
-            } catch (error: any) {
-                alertService.error(error);
-            }
-        },
+        // getAll: async () => {
+        //     userStore.setState({ users: await fetch.get('/api/users') });
+        // },
+        // getById: async (id) => {
+        //     userStore.setState({ user: undefined });
+        //     try {
+        //         userStore.setState({ user: await fetch.get(`/api/users/${id}`) });
+        //     } catch (error: any) {
+        //         alertService.error(error);
+        //     }
+        // },
         getCurrent: async () => {
             if (!currentUser) {
-                userStore.setState({ currentUser: await fetch.get('/api/users/current') });
+                userStore.setState({ currentUser: await fetch.get('/api/user/current') });
             }
         },
-        create: async (user) => {
-            await fetch.post('/api/users', user);
-        },
-        update: async (id, params) => {
-            await fetch.put(`/api/users/${id}`, params);
+        // create: async (user) => {
+        //     await fetch.post('/api/users', user);
+        // },
+        // update: async (id, params) => {
+        //     await fetch.put(`/api/users/${id}`, params);
 
-            // update current user if the user updated their own record
-            if (id === currentUser?.id) {
-                userStore.setState({ currentUser: { ...currentUser, ...params } })
-            }
-        },
-        delete: async (id) => {
-            // set isDeleting prop to true on user
-            userStore.setState({
-                users: users!.map(x => {
-                    if (x.id === id) { x.isDeleting = true; }
-                    return x;
-                })
-            });
+        //     // update current user if the user updated their own record
+        //     if (id === currentUser?.id) {
+        //         userStore.setState({ currentUser: { ...currentUser, ...params } })
+        //     }
+        // },
+        // delete: async (id) => {
+        //     // set isDeleting prop to true on user
+        //     userStore.setState({
+        //         users: users!.map(x => {
+        //             if (x.id === id) { x.isDeleting = true; }
+        //             return x;
+        //         })
+        //     });
 
-            // delete user
-            const response = await fetch.delete(`/api/users/${id}`);
+        //     // delete user
+        //     const response = await fetch.delete(`/api/users/${id}`);
 
-            // remove deleted user from state
-            userStore.setState({ users: users!.filter(x => x.id !== id) });
+        //     // remove deleted user from state
+        //     userStore.setState({ users: users!.filter(x => x.id !== id) });
 
-            // logout if the user deleted their own record
-            if (response.deletedSelf) {
-                router.push('/user/login');
-            }
-        }
+        //     // logout if the user deleted their own record
+        //     if (response.deletedSelf) {
+        //         router.push('/user/login');
+        //     }
+        // }
     }
 };
 
@@ -122,10 +121,10 @@ interface IUserService extends IUserStore {
     login: (email: string, password: string) => Promise<void>,
     logout: () => Promise<void>,
     register: (user: IUser) => Promise<void>,
-    getAll: () => Promise<void>,
-    getById: (id: string) => Promise<void>,
+    // getAll: () => Promise<void>,
+    // getById: (id: string) => Promise<void>,
     getCurrent: () => Promise<void>,
-    create: (user: IUser) => Promise<void>,
-    update: (id: string, params: Partial<IUser>) => Promise<void>,
-    delete: (id: string) => Promise<void>
+    // create: (user: IUser) => Promise<void>,
+    // update: (id: string, params: Partial<IUser>) => Promise<void>,
+    // delete: (id: string) => Promise<void>
 }

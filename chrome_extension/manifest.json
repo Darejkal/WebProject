@@ -1,0 +1,10 @@
+{
+    "manifest_version": 3,
+    "name": "HustServe Extension",
+    "description": "HustServe Project Extension",
+    "version": "0.1",
+    "action": {
+      "default_popup": "index.html",
+      "default_icon": "index.png"
+    }
+  }

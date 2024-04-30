@@ -1,3 +1,3 @@
 export * from './auth';
-export * from './model/userModel';
+export * from './model/user';
 export * from './controller/userController';

@@ -1,4 +1,4 @@
-import { usersRepo } from '@/app/_helpers/server';
+import { userController } from '@/app/_helpers/server';
 import { apiHandler } from '@/app/_helpers/server/middleware';
 import joi from 'joi';
 
@@ -9,7 +9,7 @@ module.exports = apiHandler({
 
 async function signup(req: Request) {
     const body = await req.json();
-    await usersRepo.create(body);
+    await userController.create(body);
 }
 
 signup.schema = joi.object({

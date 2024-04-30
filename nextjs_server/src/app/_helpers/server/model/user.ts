@@ -5,9 +5,7 @@ mongoose.pluralize(null);
 mongoose.connect(process.env.MONGODB_URI!);
 mongoose.Promise = global.Promise;
 
-export const db = {
-    User: userModel()
-};
+export const User= userModel()
 
 // mongoose models with schema definitions
 
