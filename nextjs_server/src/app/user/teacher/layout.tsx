@@ -10,6 +10,6 @@ export default function TeacherLayout({
     return <div >
         <AppHeader />
         {children}
-        <AppFooter />
+        {/* <AppFooter /> */}
     </div>
 }

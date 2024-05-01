@@ -54,7 +54,7 @@ function CollapsibleExample() {
             <Nav>
               {/* Tên tài khoản */}
               <Nav.Link href="#deets">Name</Nav.Link>
-              <Nav.Link eventKey={2} href="#memes" onClick={() => setShow(true)}>
+              <Nav.Link href="#memes" onClick={() => setShow(true)}>
                 Log out
               </Nav.Link>
             </Nav>
