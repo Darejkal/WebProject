@@ -33,7 +33,7 @@ function Register() {
             <div className="card-body">
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="mb-3">
-                        <label className="form-label">Last Name</label>
+                        <label className="form-label">Email</label>
                         <input {...fields.email} type="text" className={`form-control ${errors.lastName ? 'is-invalid' : ''}`} />
                         <div className="invalid-feedback">{errors.lastName?.message?.toString()}</div>
                     </div>
