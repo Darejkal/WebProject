@@ -2,13 +2,8 @@ package router
 
 import (
 	"popman/controller"
-	"text/template"
 
 	"github.com/gorilla/mux"
-)
-
-var (
-	indexTemplate = &template.Template{}
 )
 
 func handleVideoSubRouter(router *mux.Router, prefix string) {

@@ -23,3 +23,12 @@ export const SubjectInstance=(()=>{
     });
     return mongoose.models.subjectinstance || mongoose.model('subjectinstance', schema);
 })()
+export const UserSubjectInstanceRelation=(()=>{
+    const schema = new Schema({
+        userid:{ type: String, required: true },
+        subjectid: { type: String, required: true },
+        role: { type: String, required: true,default:"guest" },
+        createdat:{type: Date, required:true},
+    });
+    return mongoose.models.subjectinstance || mongoose.model('subjectinstance', schema);
+})()

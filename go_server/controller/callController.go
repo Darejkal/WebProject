@@ -17,8 +17,8 @@ type peerConnectionState struct {
 	websocket      *threadSafeWriter
 }
 type websocketMessage struct {
-	Event string
-	Data  string
+	Event string `json:"event"`
+	Data  string `json:"data"`
 }
 
 var (
@@ -123,7 +123,6 @@ func signalPeerConnections() {
 			if err != nil {
 				return true
 			}
-
 			if err = peerConnections[i].websocket.WriteJSON(&websocketMessage{
 				Event: "offer",
 				Data:  string(offerString),
@@ -155,13 +154,13 @@ func signalPeerConnections() {
 func dispatchKeyFrame() {
 	listLock.Lock()
 	defer listLock.Unlock()
-
 	for i := range peerConnections {
 		for _, receiver := range peerConnections[i].peerConnection.GetReceivers() {
 			if receiver.Track() == nil {
+				log.Default().Printf("notrack on receiver no %d", i)
 				continue
 			}
-
+			log.Println("sending keyframe")
 			_ = peerConnections[i].peerConnection.WriteRTCP([]rtcp.Packet{
 				&rtcp.PictureLossIndication{
 					MediaSSRC: uint32(receiver.Track().SSRC()),
@@ -170,15 +169,19 @@ func dispatchKeyFrame() {
 		}
 	}
 }
-
-// Handle incoming websockets
-func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
+func init() {
 	trackLocals = map[string]*webrtc.TrackLocalStaticRTP{}
 	go func() {
 		for range time.NewTicker(time.Second * 3).C {
 			dispatchKeyFrame()
 		}
 	}()
+}
+
+// Handle incoming websockets
+func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("received websocket connection.")
+
 	// Upgrade HTTP request to Websocket
 	unsafeConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -186,10 +189,10 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c := &threadSafeWriter{unsafeConn, sync.Mutex{}}
+	ws := &threadSafeWriter{unsafeConn, sync.Mutex{}}
 
 	// When this frame returns close the Websocket
-	defer c.Close() //nolint
+	defer ws.Close() //nolint
 
 	// Create new PeerConnection
 	peerConnection, err := webrtc.NewPeerConnection(webrtc.Configuration{})
@@ -213,7 +216,7 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Add our new PeerConnection to global list
 	listLock.Lock()
-	peerConnections = append(peerConnections, peerConnectionState{peerConnection, c})
+	peerConnections = append(peerConnections, peerConnectionState{peerConnection, ws})
 	listLock.Unlock()
 
 	// Trickle ICE. Emit server candidate to client
@@ -228,7 +231,7 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if writeErr := c.WriteJSON(&websocketMessage{
+		if writeErr := ws.WriteJSON(&websocketMessage{
 			Event: "candidate",
 			Data:  string(candidateString),
 		}); writeErr != nil {
@@ -272,7 +275,7 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	message := &websocketMessage{}
 	for {
-		_, raw, err := c.ReadMessage()
+		_, raw, err := ws.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
