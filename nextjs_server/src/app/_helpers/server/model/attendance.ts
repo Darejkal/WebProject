@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 mongoose.pluralize(null);
 mongoose.connect(process.env.MONGODB_URI!);
 mongoose.Promise = global.Promise;
-
 export const Attendance =(()=> {
     const schema = new Schema({
         subjectid:{type: String, required:true},

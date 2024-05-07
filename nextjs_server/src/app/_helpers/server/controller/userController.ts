@@ -23,7 +23,10 @@ async function authenticate({ email, password }: { email: string, password: stri
     }
 
     // create a jwt token that is valid for 7 days
-    const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET!, { expiresIn: '7d' });
+    const token = jwt.sign({ 
+        sub: user.id,
+        position:user.position
+    }, process.env.JWT_SECRET!, { expiresIn: '7d' });
     return {
         user: user.toJSON(),
         token
@@ -51,20 +54,22 @@ async function getCurrent() {
     }
 }
 
-async function create(params: {email:string,password:string}) {
+async function create(email:string,password:string,position:"user"|"admin"="user") {
     // validate
     
-    if (await User.findOne({ email: params.email })) {
-        throw 'Email "' + params.email + '" is already taken';
+    if (await User.findOne({ email: email })) {
+        throw 'Email "' + email + '" is already taken';
     }
 
-    const user = new User(params);
+    const user = new User({
+        email,password,position
+    });
     user.uuid=generateUUID()
     user.createdat=new Date();
 
     // hash password
-    if (params.password) {
-        user.password = customEncrypt(params.password);
+    if (password) {
+        user.password = customEncrypt(password);
     }
 
     // save user

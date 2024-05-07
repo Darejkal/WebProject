@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { errorHandler, jwtMiddleware, validateBodyMiddleware } from '.';
 
-export { apiHandler };
 
-function apiHandler(handler: any) {
+export function apiHandler(handler:any) {
     const wrappedHandler: any = {};
     const httpMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
@@ -22,7 +21,7 @@ function apiHandler(handler: any) {
 
             try {
                 // global middleware
-                await jwtMiddleware(req);
+                await jwtMiddleware(req,handler[method]?.position);
                 await validateBodyMiddleware(req, handler[method].schema);
 
                 // route handler

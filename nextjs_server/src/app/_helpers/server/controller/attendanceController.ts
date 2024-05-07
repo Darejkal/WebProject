@@ -10,6 +10,13 @@ export const attendanceController = {
     create
 };
 
-function create(params:{subjectid:string,creatorid:string}){
-
+async function create(params:{subjectid:string,creatorid:string}){
+    let attendance=new Attendance({
+        subjectid:params.subjectid,
+        creatorid:params.creatorid,
+        uuid:generateUUID(),
+        createdat:new Date()
+    })
+    return await attendance.save()
 }
+

@@ -4,9 +4,9 @@ import { headers } from 'next/headers';
 import { db } from '../model';
 import { customEncrypt, customEncryptCompare, generateUUID } from '../../utils';
 
-const Subject = db.Subject;
+const School = db.School;
 
-export const subjectController = {
+export const schoolController = {
     create,
 };
 function create(params:{name:string,abbrev:string,schoolid:string}){

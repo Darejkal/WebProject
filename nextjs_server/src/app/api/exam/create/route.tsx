@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import joi from 'joi';
 
 import { apiHandler } from '@/app/_helpers/server/middleware';
-import { usersRepo } from '@/app/_helpers/server';
+import {examController } from '@/app/_helpers/server';
 import { NextResponse } from 'next/server';
 
 module.exports = apiHandler({
@@ -11,7 +11,7 @@ module.exports = apiHandler({
 
 async function getAttendanceLink(req: Request) {
     const body = await req.json();
-    const { user, token } = await usersRepo.authenticate(body);
+    const { user, token } = await userController.authenticate(body);
     // return jwt token in http only cookie
     cookies().set('authorization', token, { httpOnly: true });
 

@@ -24,7 +24,7 @@
 
 <script>
   console.log("website loaded")
-  navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  navigator.mediaDevices.getUserMedia({ video: {facingMode: {ideal: "user"}}, audio: true })
     .then((stream) => {
       handleStream(stream)
     }).catch((e) => {

@@ -4,13 +4,14 @@ import { auth } from '..';
 
 export { jwtMiddleware };
 
-async function jwtMiddleware(req: NextRequest) {
+async function jwtMiddleware(req: NextRequest,position:string|null=null) {
     if (isPublicPath(req))
         return;
-
     // verify token in request cookie
-    const id = auth.verifyToken();
-    req.headers.set('userId', id);
+    const id = auth.authenticate(position);
+    if (id){
+        req.headers.set('userId', id);
+    }
 }
 
 function isPublicPath(req: NextRequest) {

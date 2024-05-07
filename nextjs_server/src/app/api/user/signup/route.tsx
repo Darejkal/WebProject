@@ -9,7 +9,7 @@ module.exports = apiHandler({
 
 async function signup(req: Request) {
     const body = await req.json();
-    await userController.create(body);
+    await userController.create(body.email,body.password,body.position||"user");
 }
 
 signup.schema = joi.object({

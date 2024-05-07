@@ -18,6 +18,7 @@ export const Subject =(() =>{
 export const SubjectInstance=(()=>{
     const schema = new Schema({
         subjectid: { type: String, required: true },
+        name:{type: String, required:true},
         uuid:{type: String,unique: true, required:true},
         createdat:{type: Date, required:true},
     });

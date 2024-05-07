@@ -16,16 +16,7 @@ function userModel() {
         email: { type: String,unique: true, required: true },
         createdat:{type: Date, required:true},
         uuid:{type: String,unique: true, required:true},
+        postion:{type: String,default:"user",enum:["user","admin"], required:true},
     });
-
-    // schema.set('toJSON', {
-    //     virtuals: true,
-    //     versionKey: false,
-    //     transform: function (doc, ret) {
-    //         delete ret._id;
-    //         delete ret.hash;
-    //     }
-    // });
-
     return mongoose.models.user || mongoose.model('user', schema);
 }

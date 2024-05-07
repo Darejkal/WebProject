@@ -6,6 +6,7 @@ import { Exam, ExamAnswer, ExamInstance, Question } from "./exam";
 export const db = {
     "Subject": Subject,
     "SubjectInstance": SubjectInstance,
+    "UserSubjectInstanceRelation":UserSubjectInstanceRelation,
     "User":User,
     "Attendance":Attendance,
     "School":School,
