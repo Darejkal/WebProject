@@ -5,7 +5,7 @@ import { Button } from "react-bootstrap";
 import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default function IndexTeacherPage(){
+export default function ListClassPage(){
     return (<div className="d-flex flex-column h-100 w-100 justify-content-center align-items-center">
         <Table striped bordered hover variant="success">
             <thead>
