@@ -11,6 +11,23 @@ export default function DetailClassPage(){
     const [show, setShow] = useState(false);
 
     return (<div className="d-flex flex-column h-100 w-100 justify-content-center align-items-center">
+        <div>
+            <b>Chi tiết lớp học</b>
+            <table>
+                <tr>
+                    <th>Tên lớp học</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Mã code</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <th>Giáo viên</th>
+                    <th></th>
+                </tr>
+            </table>
+        </div>
 
         <Table striped bordered hover variant="success">
             <thead>
