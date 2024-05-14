@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function ListClassPage(){
     return (<div className="d-flex flex-column h-100 w-100 justify-content-center align-items-center">
+        <h3 className="m-4">Danh sách lớp học thuộc quản lý của <span>...</span></h3>
         <Table striped bordered hover variant="success">
             <thead>
                 <tr>
@@ -23,14 +24,14 @@ export default function ListClassPage(){
                     <td>Demo</td>
                     <td>Demo</td>
                     <td>Demo</td>
-                    <td><a href="">Demo</a></td>
+                    <td><a href="/user/teacher/classroom-detail">Demo</a></td>
                 </tr>
                 <tr>
                     <td>2</td>
                     <td>Demo</td>
                     <td>Demo</td>
                     <td>Demo</td>
-                    <td><a href="">Demo</a></td>
+                    <td><a href="/user/teacher/classroom-detail">Demo</a></td>
                 </tr>
                 {/* for */}
                 

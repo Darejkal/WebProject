@@ -10,25 +10,30 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 export default function DetailClassPage(){
     const [show, setShow] = useState(false);
 
-    return (<div className="d-flex flex-column h-100 w-100 justify-content-center align-items-center">
-        <div>
-            <b>Chi tiết lớp học</b>
-            <table>
-                <tr>
-                    <th>Tên lớp học</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Mã code</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <th>Giáo viên</th>
-                    <th></th>
-                </tr>
-            </table>
+    return (<div className="">
+        <h3 className="m-2">Chi tiết lớp học</h3>
+        <div className="d-flex flex-column h-100 w-50 justify-content-center align-items-center mx-5">
+            <Table striped bordered hover variant="warning" size="xl">
+                <tbody>
+                    <tr>
+                        <th>Tên lớp học</th>
+                        <th>...</th>
+                    </tr>
+                    <tr>
+                        <th>Mã code</th>
+                        <th>...</th>
+                    </tr>
+                    <tr>
+                        <th>Tên giáo viên</th>
+                        <th>...</th>
+                    </tr>
+                </tbody>
+            </Table>
         </div>
 
+        <Button variant="outline-danger">Tạo phiếu điểm danh</Button>
+
+        <h3 className="m-2">Danh sách học sinh</h3>
         <Table striped bordered hover variant="success">
             <thead>
                 <tr>
@@ -36,12 +41,14 @@ export default function DetailClassPage(){
                     <th>Họ và tên</th>
                     <th>MSSV</th>
                     <th>Email</th>
+                    <th>Số buổi vắng</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>1</td>
+                    <td>Demo</td>
                     <td>Demo</td>
                     <td>Demo</td>
                     <td>Demo</td>
@@ -56,11 +63,13 @@ export default function DetailClassPage(){
                     <td>Demo</td>
                     <td>Demo</td>
                     <td>Demo</td>
+                    <td>Demo</td>
                     <td></td>
                 </tr>
                 {/* for */}
                 
             </tbody>
         </Table>
+        
     </div>);
 }

@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function CreateClassPage(){
     return (<div className="d-flex flex-column justify-content-center align-items-center">
-        <form action="" method="" className="card">
+        <form action="" method="" className="card y">
             <b>Tạo lớp học mới</b>
             <div>
                 <label htmlFor="">Tên lớp học</label>
