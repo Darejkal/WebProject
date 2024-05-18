@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function ListClassPage(){
     return (<div className="d-flex flex-column h-100 w-100 justify-content-center align-items-center">
-        <h3 className="m-4">Danh sách lớp học thuộc quản lý của <span>...</span></h3>
+        <h3 className="m-4 ">Danh sách lớp học thuộc quản lý của <span>...</span></h3>
         <Table striped bordered hover variant="success">
             <thead>
                 <tr>

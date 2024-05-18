@@ -5,7 +5,7 @@ export default function AuthenticationLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>){
-    return <div className="container">
+    return <div className="h-100 w-100 ">
         <Alert />
         {children}
     </div>
