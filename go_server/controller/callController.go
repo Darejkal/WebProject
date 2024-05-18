@@ -358,13 +358,17 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-func GetCallIndexPage(writer http.ResponseWriter, response *http.Request) {
-	vars := mux.Vars()
+func GetCallIndexPage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
 	roomid, ok := vars["roomid"]
 	if ok {
-		generateHTMLPage(writer, nil, "call_index")
+		generateHTMLPage(w, struct {
+			Roomid string
+		}{
+			Roomid: roomid,
+		}, "call_index")
 	} else {
-		http.Redirect(writer, response, "/", http.StatusSeeOther)
+		http.Redirect(w, r, fmt.Sprintf("/call/%s", generateUUID()), http.StatusSeeOther)
 	}
 }
 

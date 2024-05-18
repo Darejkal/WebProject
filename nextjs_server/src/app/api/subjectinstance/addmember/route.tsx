@@ -11,7 +11,7 @@ module.exports = apiHandler({
 async function addmember(req: Request) {
     const body=await req.json()
     // const author=userController.getById(req.headers.get("userId")!)
-    await subjectInstanceController.addMember(
+    return await subjectInstanceController.addMember(
         body.studentid,
         body.subjectid,
         body.role

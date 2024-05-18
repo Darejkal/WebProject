@@ -10,12 +10,6 @@ module.exports = apiHandler({
 });
 
 async function getAttendanceLink(req: Request) {
-    const body = await req.json();
-    const { user, token } = await userController.authenticate(body);
-    // return jwt token in http only cookie
-    cookies().set('authorization', token, { httpOnly: true });
-
-    return user
 }
 getAttendanceLink.schema = joi.object({
     name: joi.string().required(),

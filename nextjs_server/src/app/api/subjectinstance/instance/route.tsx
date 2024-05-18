@@ -11,7 +11,7 @@ module.exports = apiHandler({
 async function createSubjectInstance(req: Request) {
     const body=await req.json()
     // const author=userController.getById(req.headers.get("userId")!)
-    await subjectInstanceController.create(
+    return await subjectInstanceController.create(
         body.subjectid,
         body.name,
     )

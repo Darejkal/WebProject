@@ -9,6 +9,12 @@ const School = db.School;
 export const schoolController = {
     create,
 };
-function create(params:{name:string,abbrev:string,schoolid:string}){
-    
+async function create(name:string,abbrev:string){
+    let school= new School({
+        name,
+        abbrev,
+        uuid:generateUUID(),
+        createdat:new Date(),
+    })
+    return await school.save()
 }

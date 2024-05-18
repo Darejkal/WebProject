@@ -78,7 +78,7 @@
       pc.addTrack(track, stream)
       console.log(`Added 1 ${track.kind} track to rtcpeerconnection`)
     })
-    let ws = new WebSocket("ws://{{ .Config.Address }}/call/websocket/")
+    let ws = new WebSocket("ws://{{ .Config.Address }}/call/websocket/{{ .Data.RoomID }}")
 
     ws.onclose = function (evt) {
       window.alert("Websocket has closed")

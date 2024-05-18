@@ -1,8 +1,9 @@
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
-
-
+function call():int{
+	return 1
+}
 export default function RootLayout({
   children,
 }: Readonly<{

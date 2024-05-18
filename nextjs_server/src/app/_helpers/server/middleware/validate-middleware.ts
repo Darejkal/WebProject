@@ -2,7 +2,7 @@ import joi from 'joi';
 
 export { validateBodyMiddleware };
 
-async function validateBodyMiddleware(req: Request, schema: joi.ObjectSchema) {
+async function validateBodyMiddleware(req: Request, schema?: joi.ObjectSchema|undefined) {
     if (!schema) return;
 
     const options = {
