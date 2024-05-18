@@ -6,6 +6,6 @@ module.exports = apiHandler({
     POST: logout
 });
 
-function logout() {
+function logout(req:Request) {
     cookies().delete('authorization');
 }

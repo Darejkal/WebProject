@@ -9,31 +9,39 @@ const SubjectInstance = db.SubjectInstance;
 const UserSubjectInstanceRelation =db.UserSubjectInstanceRelation;
 
 export const subjectInstanceController = {
-    create,
-    addMember
+    create:async (subjectid:string,name:string,authorid:string)=>{
+        return subjectController.getByUUID(subjectid).then(
+            async ()=>{
+                let subjectinstance=new SubjectInstance({
+                    subjectid:subjectid,
+                    name:name,
+                    uuid:generateUUID(),
+                    createdat:new Date(),
+                    authorid,
+                })
+                return await subjectinstance.save()
+            }
+        )    
+    },
+    addMember:async (userid:string, subjectinstanceid:string, role:string)=>{
+        let user= await userController.getByUUID(userid)
+        let subject= await subjectController.getByUUID(subjectinstanceid)
+        let relation= new UserSubjectInstanceRelation({
+            userid:user.id,
+            subjectinstanceid:subject!.id,
+            role:role
+        })
+        return await relation.save()
+    },
+    getUserSubjectInstanceRelation: async (userid:string,subjectinstanceid:string)=>{
+        let user= await userController.getByUUID(userid)
+        let subject= await subjectController.getByUUID(subjectinstanceid)
+        let usersubject=await UserSubjectInstanceRelation.findOne({
+            userid:user.id,
+            subjectinstanceid:subject!.id,
+        })
+        return usersubject
+    }
+    
 };
-function create(subjectid:string,name:string){
-    return subjectController.getById(subjectid).then(
-        async ()=>{
-            let subjectinstance=new SubjectInstance({
-                subjectid:subjectid,
-                name:name,
-                uuid:generateUUID(),
-                createdat:new Date(),
-            })
-            return await subjectinstance.save()
-        }
-    )    
-}
-
-async function addMember(studentid:string, subjectid:string, role:string){
-    let student= await userController.getById(studentid)
-    let subject= await subjectController.getById(subjectid)
-    let relation= new UserSubjectInstanceRelation({
-        userid:student.id,
-        subjectid:subject.id,
-        role:role
-    })
-    return await relation.save()
-}
 

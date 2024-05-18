@@ -2,17 +2,28 @@
 
 import { useUserService } from "@/app/_services";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export default function LoginPage(){
     const userService = useUserService();
     const { register, handleSubmit, formState } = useForm();
     const { errors } = formState;
+    const router=useRouter()
+    useEffect(()=>{
+        try{
+            userService.getCurrent()
+            router.push("/home")
+        } catch(e){
+            // pass
+        }
+    },[])
     const fields = {
         email: register('email', { required: 'Username is required' }),
         password: register('password', { required: 'Password is required' })
     };
-    async function onSubmit({ email, password }: any) {
+    async function onSubmit({ email, password }:any) {
         const res=await userService.login(email, password);
     }
     return(

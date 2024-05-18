@@ -1,5 +1,5 @@
 import {User} from "./user"
-import {Subject, SubjectInstance} from "./subject"
+import {Subject, SubjectInstance,UserSubjectInstanceRelation} from "./subject"
 import {Attendance} from "./attendance"
 import {School} from "./school"
 import { Exam, ExamAnswer, ExamInstance, Question } from "./exam";

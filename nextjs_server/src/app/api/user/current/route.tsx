@@ -10,7 +10,10 @@ module.exports = apiHandler({
 });
 
 async function getCurrent(req: Request) {
-    const userid=auth.verifyToken()
+    const userid=req.headers.get('userId')
+    if(!userid){
+        throw "userid is null";
+    }
     const user = userController.getById(userid)
     return user
 }

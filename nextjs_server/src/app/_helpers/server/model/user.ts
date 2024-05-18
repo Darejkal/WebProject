@@ -4,12 +4,15 @@ const Schema = mongoose.Schema;
 mongoose.pluralize(null);
 mongoose.connect(process.env.MONGODB_URI!);
 mongoose.Promise = global.Promise;
-
-export const User= userModel()
-
-// mongoose models with schema definitions
-
-function userModel() {
+interface IUser{
+    name:string,
+    password:string,
+    email:string,
+    createdat:Date,
+    uuid:string,
+    position:string
+}
+export const User:mongoose.Model<IUser>= (()=> {
     const schema = new Schema({
         name: { type: String, required: true },
         password: { type: String, required: true },
@@ -18,5 +21,5 @@ function userModel() {
         uuid:{type: String,unique: true, required:true},
         postion:{type: String,default:"user",enum:["user","admin"], required:true},
     });
-    return mongoose.models.user || mongoose.model('user', schema);
-}
+    return mongoose.models.user|| mongoose.model<IUser> ('user', schema);
+})()

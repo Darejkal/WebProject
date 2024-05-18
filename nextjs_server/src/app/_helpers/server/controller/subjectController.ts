@@ -8,24 +8,24 @@ const Subject = db.Subject;
 
 export const subjectController = {
     create,
-    getById
+    getByUUID
 };
 async function create(name:string,abbrev:string,schoolid:string){
     let subject= new Subject({
-        "name":name,
-        abbrev:abbrev,
-        schoolid:schoolid,
+        name,
+        abbrev,
+        schoolid,
         uuid:generateUUID(),
         createdat:new Date()
     })
     return await subject.save()
 }
-async function getById(id:string){
-    try{
-        return await Subject.findById(id)
-    } catch{
-
+async function getByUUID(uuid:string){
+    let subject= await Subject.findOne({uuid})
+    if(!subject){
+        throw "cannot find the subject"
     }
+    return subject
 }
 
 

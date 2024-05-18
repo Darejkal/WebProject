@@ -6,13 +6,40 @@ import { useFetch } from '@/app/_helpers/client';
 
 export { useUserService };
 
-// user state store
+
+// interfaces
+
+interface IServiceUser {
+    id: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+}
+
+interface IServiceUserStore {
+    users?: IServiceUser[],
+    user?: IServiceUser,
+    currentUser?: IServiceUser
+}
+
+interface IUserService extends IServiceUserStore {
+    login: (email: string, password: string) => Promise<void>,
+    logout: () => Promise<void>,
+    register: (user: IServiceUser) => Promise<void>,
+    // getAll: () => Promise<void>,
+    // getById: (id: string) => Promise<void>,
+    getCurrent: () => Promise<void>,
+    // create: (user: IServiceUser) => Promise<void>,
+    // update: (id: string, params: Partial<IServiceUser>) => Promise<void>,
+    // delete: (id: string) => Promise<void>
+}
 const initialState = {
     users: undefined,
     user: undefined,
     currentUser: undefined
 };
-const userStore = create<IUserStore>(() => initialState);
+const userStore = create<IServiceUserStore>(() => initialState);
 
 function useUserService(): IUserService {
     const alertService = useAlertService();
@@ -50,6 +77,7 @@ function useUserService(): IUserService {
                 alertService.error(error);
             }
         },
+   
         // getAll: async () => {
         //     userStore.setState({ users: await fetch.get('/api/users') });
         // },
@@ -100,31 +128,3 @@ function useUserService(): IUserService {
     }
 };
 
-// interfaces
-
-interface IUser {
-    id: string,
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
-    isDeleting?: boolean
-}
-
-interface IUserStore {
-    users?: IUser[],
-    user?: IUser,
-    currentUser?: IUser
-}
-
-interface IUserService extends IUserStore {
-    login: (email: string, password: string) => Promise<void>,
-    logout: () => Promise<void>,
-    register: (user: IUser) => Promise<void>,
-    // getAll: () => Promise<void>,
-    // getById: (id: string) => Promise<void>,
-    getCurrent: () => Promise<void>,
-    // create: (user: IUser) => Promise<void>,
-    // update: (id: string, params: Partial<IUser>) => Promise<void>,
-    // delete: (id: string) => Promise<void>
-}

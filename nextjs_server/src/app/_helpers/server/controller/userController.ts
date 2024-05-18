@@ -9,7 +9,7 @@ const User = db.User;
 export const userController = {
     authenticate,
     getAll,
-    getById,
+    getByUUID,
     getCurrent,
     create,
     update,
@@ -22,13 +22,19 @@ async function authenticate({ email, password }: { email: string, password: stri
         throw 'Email or password is incorrect';
     }
 
-    // create a jwt token that is valid for 7 days
     const token = jwt.sign({ 
         sub: user.id,
         position:user.position
     }, process.env.JWT_SECRET!, { expiresIn: '7d' });
     return {
-        user: user.toJSON(),
+        user: {
+            name:user.name,
+            email:user.email,
+            createdat:user.createdat,
+            uuid:user.uuid,
+            position:user.position,
+            id:user.id
+        },
         token
     };
 }
@@ -37,26 +43,23 @@ async function getAll() {
     return await User.find();
 }
 
-async function getById(id: string) {
-    try {
-        return await User.findById(id);
-    } catch {
-        throw 'User Not Found';
+async function getByUUID(uuid: string) {
+    let user= await User.findOne({uuid});
+    if(!user){
+        throw 'user not found';
     }
+    return user
 }
 
 async function getCurrent() {
-    try {
-        const currentUserId = headers().get('userId');
-        return await User.findById(currentUserId);
-    } catch {
-        throw 'Current User Not Found';
+    const uuid = headers().get('userId');
+    if(!uuid){
+        throw 'user not found';
     }
+    return await getByUUID(uuid)
 }
 
 async function create(email:string,password:string,position:"user"|"admin"="user") {
-    // validate
-    
     if (await User.findOne({ email: email })) {
         throw 'Email "' + email + '" is already taken';
     }
@@ -76,8 +79,8 @@ async function create(email:string,password:string,position:"user"|"admin"="user
     await user.save();
 }
 
-async function update(id: string, params: any) {
-    const user = await User.findById(id);
+async function update(uuid: string, params: any) {
+    const user = await getByUUID(uuid)
 
     // validate
     if (!user) throw 'User not found';
@@ -96,7 +99,7 @@ async function update(id: string, params: any) {
     await user.save();
 }
 
-async function _delete(id: string) {
-    await User.findByIdAndDelete(id);
+async function _delete(uuid: string) {
+    await User.findOneAndDelete({uuid});
 }
 
