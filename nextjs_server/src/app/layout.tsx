@@ -1,6 +1,8 @@
-import { Inter } from "next/font/google";
+import { Be_Vietnam_Pro } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Be_Vietnam_Pro({ weight:['400', '700'] ,subsets: ["latin"] });
+
+
 export default function RootLayout({
   children,
 }: Readonly<{

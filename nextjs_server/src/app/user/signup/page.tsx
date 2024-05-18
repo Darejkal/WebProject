@@ -3,7 +3,7 @@
 import { useUserService } from '@/app/_services';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-
+import styles from '../login/page.module.css'
 
 export default Register;
 
@@ -28,31 +28,38 @@ function Register() {
     }
 
     return (
-        <div className="card">
-            <h4 className="card-header">Register</h4>
-            <div className="card-body">
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="mb-3">
-                        <label className="form-label">Last Name</label>
-                        <input {...fields.email} type="text" className={`form-control ${errors.lastName ? 'is-invalid' : ''}`} />
-                        <div className="invalid-feedback">{errors.lastName?.message?.toString()}</div>
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Name</label>
-                        <input {...fields.name} type="text" className={`form-control ${errors.name ? 'is-invalid' : ''}`} />
-                        <div className="invalid-feedback">{errors.name?.message?.toString()}</div>
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Password</label>
-                        <input {...fields.password} type="password" className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
-                        <div className="invalid-feedback">{errors.password?.message?.toString()}</div>
-                    </div>
-                    <button disabled={formState.isSubmitting} className="btn btn-primary">
-                        {formState.isSubmitting && <span className="spinner-border spinner-border-sm me-1"></span>}
-                        Register
-                    </button>
-                    <Link href="/user/login" className="btn btn-link">Đăng nhập</Link>
-                </form>
+        <div className={styles.contain}>
+            <div className={styles.card}>
+                <div className={styles.cardheader}>
+                    <h4 className={styles.cardtitle}>Đăng ký</h4>
+                </div>
+                <div className="card-body">
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <div className="mb-3">
+                            <label className="form-label">Email</label>
+                            <input {...fields.email} type="text" className={`form-control ${errors.lastName ? 'is-invalid' : ''}`} />
+                            <div className="invalid-feedback">{errors.lastName?.message?.toString()}</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Name</label>
+                            <input {...fields.name} type="text" className={`form-control ${errors.name ? 'is-invalid' : ''}`} />
+                            <div className="invalid-feedback">{errors.name?.message?.toString()}</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Password</label>
+                            <input {...fields.password} type="password" className={`form-control ${errors.password ? 'is-invalid' : ''}`} />
+                            <div className="invalid-feedback">{errors.password?.message?.toString()}</div>
+                        </div>
+                        <button disabled={formState.isSubmitting} className="btn btn-primary w-100 mt-3">
+                            {formState.isSubmitting && <span className="spinner-border spinner-border-sm me-1"></span>}
+                            Đăng ký
+                        </button>
+                        <div className={styles.cardlogin}>
+                            <p style={{margin:0, padding:'5px'}}>Đã có tài khoản?</p>
+                            <a href="/user/login" style={{margin:0}}>Đăng nhập</a>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );
