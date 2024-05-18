@@ -4,7 +4,7 @@ import { errorHandler, jwtMiddleware, validateBodyMiddleware } from '.';
 type HandlerFunc={
     (req:Request,...args:any):any,
     schema?:joi.ObjectSchema
-    position:string
+    position?:string
 }
 type APIHandlerType={
     GET?:HandlerFunc,
