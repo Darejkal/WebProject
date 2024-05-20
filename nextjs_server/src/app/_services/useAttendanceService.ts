@@ -19,7 +19,7 @@ export function useAttendanceService(): IAttendanceService {
 
     return {
        createAttendanceUUID: async (subjectinstanceid:string) => {
-            let userid=userService.currentUser?.id;
+            let userid=userService.currentUser?.uuid;
             if(!userid){
                 throw "not loggedin error"
             }

@@ -26,6 +26,6 @@ export const Attendance:mongoose.Model<IAttendance> =(()=> {
             attended: {type: Boolean, default:false,required:true}
         }]
     });
-    return mongoose.models.attendace || mongoose.model<IAttendance>('subject', schema);
+    return mongoose.models.attendance || mongoose.model<IAttendance>('attendance', schema);
 })()
 

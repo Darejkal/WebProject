@@ -4,15 +4,15 @@ import { useAlertService,useUserService } from '.';
 import { useFetch } from '@/app/_helpers/client';
 
 
-interface ISubjectStore {
+interface IExamStore {
 }
 const initialState = {
 
 };
-const subjectStore = create<ISubjectStore>(() => initialState);
-interface ISubjectService extends ISubjectStore {
+const subjectStore = create<IExamStore>(() => initialState);
+interface IExamService extends IExamStore {
 }
-export function useSubjectService(): ISubjectService {
+export function useExamService(): IExamService {
     const userService = useUserService();
     const fetch = useFetch();
 

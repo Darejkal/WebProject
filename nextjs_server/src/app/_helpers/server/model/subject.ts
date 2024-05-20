@@ -9,6 +9,7 @@ interface ISubject{
     abbrev:string,
     createdat:Date,
     uuid:string,
+    authorid:string,
     schoolid:string
 }
 export const Subject:mongoose.Model<ISubject> =(() =>{
@@ -17,6 +18,7 @@ export const Subject:mongoose.Model<ISubject> =(() =>{
         abbrev: { type: String, required: true },
         createdat:{type: Date, required:true},
         uuid:{type: String,unique: true, required:true},
+        authorid:{type: String,unique: true},
         schoolid:{type: String}
     });
     return mongoose.models.subject || mongoose.model<ISubject>('subject', schema);
@@ -52,5 +54,5 @@ export const UserSubjectInstanceRelation:mongoose.Model<IUserSubjectInstanceRela
         createdat:{type: Date, required:true},
     });
     schema.index({userid:1,subjectinstanceid:1})
-    return mongoose.models.subjectinstance || mongoose.model<IUserSubjectInstanceRelation>('subjectinstance', schema);
+    return mongoose.models.usersubjectinstance || mongoose.model<IUserSubjectInstanceRelation>('usersubjectinstance', schema);
 })()

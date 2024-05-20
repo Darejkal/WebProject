@@ -4,7 +4,8 @@ import { errorHandler, jwtMiddleware, validateBodyMiddleware } from '.';
 type HandlerFunc={
     (req:Request,...args:any):any,
     schema?:joi.ObjectSchema
-    position?:string
+    position?:string,
+    ispublic?:Boolean
 }
 type APIHandlerType={
     GET?:HandlerFunc,
@@ -20,7 +21,7 @@ export function apiHandler(handler:APIHandlerType) {
     // wrap handler methods to add middleware and global error handler
     httpMethods.forEach(method => {
         if (typeof handler[method] !== 'function'){
-            throw "invalid handler for routing";
+            return;
         }
 
         wrappedHandler[method] = async (req: NextRequest, ...args: any) => {
@@ -32,7 +33,10 @@ export function apiHandler(handler:APIHandlerType) {
 
             try {
                 // global middleware
-                await jwtMiddleware(req,handler[method]?.position);
+                await jwtMiddleware(req,{
+                    position:handler[method]?.position,
+                    ispublic:handler[method]?.ispublic
+                });
                 await validateBodyMiddleware(req, handler[method]!.schema);
 
                 // route handler

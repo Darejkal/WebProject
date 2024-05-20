@@ -4,13 +4,19 @@ import { auth } from '..';
 
 export { jwtMiddleware };
 
-async function jwtMiddleware(req: NextRequest,position:string|null=null) {
-    if (isPublicPath(req))
+async function jwtMiddleware(req: NextRequest,{position,ispublic}:{
+    position?:string|null,
+    ispublic?:Boolean|null
+}) {
+    if (ispublic===true||isPublicPath(req)){
         return;
+    }
     // verify token in request cookie
     const id = auth.authenticate(position);
     if (id){
         req.headers.set('userId', id);
+    } else{
+        throw "forbidden"
     }
 }
 

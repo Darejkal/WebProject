@@ -1,14 +1,14 @@
 import { Be_Vietnam_Pro } from "next/font/google";
+import { UserStoreProvider } from "./_services";
+import AppHeader from "./_components/AppHeader";
 
-const inter = Be_Vietnam_Pro({ weight:['400', '700'] ,subsets: ["latin"] });
-
-
+const inter = Be_Vietnam_Pro({ weight: ["400", "700"], subsets: ["latin"] });
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
+	return (
 		<html lang="en" className="h-100 w-100">
 			<head>
 				<meta charSet="utf-8"></meta>
@@ -21,8 +21,12 @@ export default function RootLayout({
 				<link href="/static/css/bootstrap.min.css" rel="stylesheet"></link>
 				<link href="/static/css/font-awesome.min.css" rel="stylesheet"></link>
 			</head>
-			<body className={inter.className+" h-100 w-100"}>
-				<div className="h-100 w-100">{children}</div>
+			<body className={inter.className + " h-100 w-100"}>
+				<div className="h-100 w-100">
+					<UserStoreProvider>
+						{children}
+					</UserStoreProvider>
+				</div>
 				<script src="/static/js/jquery-2.1.1.min.js"></script>
 				<script src="/static/js/bootstrap.min.js"></script>
 			</body>

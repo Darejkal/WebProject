@@ -19,7 +19,7 @@ export const User:mongoose.Model<IUser>= (()=> {
         email: { type: String,unique: true, required: true },
         createdat:{type: Date, required:true},
         uuid:{type: String,unique: true, required:true},
-        postion:{type: String,default:"user",enum:["user","admin"], required:true},
+        position:{type: String,default:"user",enum:["user","admin"], required:true},
     });
     return mongoose.models.user|| mongoose.model<IUser> ('user', schema);
 })()
