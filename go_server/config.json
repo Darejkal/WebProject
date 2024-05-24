@@ -1,6 +1,6 @@
 {
   "AppName":"Lớp học chat",
-  "Address"        : "0.0.0.0:6060",
+  "Address"        : "localhost:6060",
   "ReadTimeout"    : 10,
   "WriteTimeout"   : 600,
   "Static"         : "static"

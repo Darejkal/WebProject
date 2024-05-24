@@ -1,97 +1,130 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import { headers } from 'next/headers';
-import { db } from '../model/userModel';
-import { customEncrypt, customEncryptCompare, generateUUID } from '../../utils';
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
+import { db } from "../model";
+import { customEncrypt, customEncryptCompare, generateUUID } from "../../utils";
+import { StringExpressionOperator } from "mongoose";
 
 const User = db.User;
 
-export const usersRepo = {
-    authenticate,
-    getAll,
-    getById,
-    getCurrent,
-    create,
-    update,
-    delete: _delete
+export const userController = {
+	authenticate,
+	getNext,
+	getByUUID,
+	getCurrent,
+	create,
+	update,
+	delete: _delete,
 };
 
-async function authenticate({ email, password }: { email: string, password: string }) {
-    const user = await User.findOne({ email:email });
-    if (!(user && customEncryptCompare(password,user.password))) {
-        throw 'Email or password is incorrect';
-    }
-
-    // create a jwt token that is valid for 7 days
-    const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET!, { expiresIn: '7d' });
-    return {
-        user: user.toJSON(),
-        token
-    };
+async function authenticate({
+	email,
+	password,
+}: {
+	email: string;
+	password: string;
+}) {
+	const user = await User.findOne({ email: email });
+	if (!(user && customEncryptCompare(password, user.password))) {
+		throw "Email or password is incorrect";
+	}
+	const token = jwt.sign(
+		{
+			sub: user.uuid,
+			position: user.position,
+		},
+		process.env.JWT_SECRET!,
+		{ expiresIn: "7d" }
+	);
+	return {
+		user: {
+			name: user.name,
+			email: user.email,
+			createdat: user.createdat,
+			uuid: user.uuid,
+			position: user.position,
+			// id:user.id
+		},
+		token,
+	};
 }
 
-async function getAll() {
-    return await User.find();
+async function getNext(limit: number, next?: string) {
+	let results= await User.find(next?{ _id: { $lt: next } }:{})
+		.sort({
+			_id: -1,
+		})
+		.limit(limit);
+    return {results,next:results.length==0?undefined:results[results.length - 1]._id}
 }
 
-async function getById(id: string) {
-    try {
-        return await User.findById(id);
-    } catch {
-        throw 'User Not Found';
-    }
+async function getByUUID(uuid: string) {
+	let user = await User.findOne({ uuid });
+	if (!user) {
+		throw "user not found";
+	}
+	return user;
 }
 
 async function getCurrent() {
-    try {
-        const currentUserId = headers().get('userId');
-        return await User.findById(currentUserId);
-    } catch {
-        throw 'Current User Not Found';
-    }
+	const uuid = headers().get("userId");
+	if (!uuid) {
+		throw "user not found";
+	}
+	return await getByUUID(uuid);
 }
 
-async function create(params: any) {
-    // validate
-    
-    if (await User.findOne({ email: params.email })) {
-        throw 'Email "' + params.email + '" is already taken';
-    }
+async function create(
+	email: string,
+	password: string,
+	name: StringExpressionOperator,
+	position: "user" | "admin" = "user"
+) {
+	if (await User.findOne({ email: email })) {
+		throw 'Email "' + email + '" is already taken';
+	}
 
-    const user = new User(params);
-    user.uuid=generateUUID()
-    user.createdat=new Date();
+	const user = new User({
+		email,
+		password,
+		position,
+		name,
+	});
+	user.uuid = generateUUID();
+	user.createdat = new Date();
 
-    // hash password
-    if (params.password) {
-        user.password = customEncrypt(params.password);
-    }
+	// hash password
+	if (password) {
+		user.password = customEncrypt(password);
+	}
 
-    // save user
-    await user.save();
+	// save user
+	await user.save();
 }
 
-async function update(id: string, params: any) {
-    const user = await User.findById(id);
+async function update(uuid: string, params: any) {
+	const user = await getByUUID(uuid);
 
-    // validate
-    if (!user) throw 'User not found';
-    if (user.email !== params.email && await User.findOne({ email: params.email })) {
-        throw 'Email "' + params.email + '" is already taken';
-    }
+	// validate
+	if (!user) throw "User not found";
+	if (
+		user.email !== params.email &&
+		(await User.findOne({ email: params.email }))
+	) {
+		throw 'Email "' + params.email + '" is already taken';
+	}
 
-    // hash password if it was entered
-    if (params.password) {
-        params.hash = customEncrypt(params.password);
-    }
+	// hash password if it was entered
+	if (params.password) {
+		params.hash = customEncrypt(params.password);
+	}
 
-    // copy params properties to user
-    Object.assign(user, params);
+	// copy params properties to user
+	Object.assign(user, params);
 
-    await user.save();
+	await user.save();
 }
 
-async function _delete(id: string) {
-    await User.findByIdAndDelete(id);
+async function _delete(uuid: string) {
+	await User.findOneAndDelete({ uuid });
 }
-

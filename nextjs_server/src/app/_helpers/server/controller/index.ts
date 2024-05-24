@@ -1,0 +1,5 @@
+export {attendanceController} from "./attendanceController"
+export {schoolController} from "./schoolController"
+export {subjectController} from "./subjectController"
+export {subjectInstanceController} from "./subjectInstanceController"
+export {userController} from "./userController"

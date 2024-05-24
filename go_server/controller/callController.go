@@ -2,11 +2,13 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/pion/rtcp"
 	"github.com/pion/webrtc/v3"
@@ -17,25 +19,25 @@ type peerConnectionState struct {
 	websocket      *threadSafeWriter
 }
 type websocketMessage struct {
-	Event string
-	Data  string
+	Event string `json:"event"`
+	Data  string `json:"data"`
 }
 
 var (
 	upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
 	}
-	listLock        sync.RWMutex
-	peerConnections []peerConnectionState
+	listLocks       map[string]*sync.RWMutex
+	peerConnections map[string]*[]peerConnectionState
 	trackLocals     map[string]*webrtc.TrackLocalStaticRTP
 )
 
 // Add to list of tracks and fire renegotation for all PeerConnections
-func addTrack(t *webrtc.TrackRemote) *webrtc.TrackLocalStaticRTP {
-	listLock.Lock()
+func addTrack(t *webrtc.TrackRemote, roomid string) *webrtc.TrackLocalStaticRTP {
+	listLocks[roomid].Lock()
 	defer func() {
-		listLock.Unlock()
-		signalPeerConnections()
+		listLocks[roomid].Unlock()
+		signalPeerConnections(roomid)
 	}()
 
 	// Create a new TrackLocal with the same codec as our incoming
@@ -49,35 +51,44 @@ func addTrack(t *webrtc.TrackRemote) *webrtc.TrackLocalStaticRTP {
 }
 
 // Remove from list of tracks and fire renegotation for all PeerConnections
-func removeTrack(t *webrtc.TrackLocalStaticRTP) {
-	listLock.Lock()
+func removeTrack(t *webrtc.TrackLocalStaticRTP, roomid string) {
+	listLocks[roomid].Lock()
 	defer func() {
-		listLock.Unlock()
-		signalPeerConnections()
+		listLocks[roomid].Unlock()
+		signalPeerConnections(roomid)
 	}()
 
 	delete(trackLocals, t.ID())
 }
 
 // signalPeerConnections updates each PeerConnection so that it is getting all the expected media tracks
-func signalPeerConnections() {
+func signalPeerConnections(roomid string) {
+	listLock, ok := listLocks[roomid]
+	if !ok {
+		log.Fatalf("lock not found for room %s", roomid)
+	}
+	peerConnRoom, ok := peerConnections[roomid]
+	if !ok {
+		log.Fatalf("peerroom not found for room %s", roomid)
+	}
 	listLock.Lock()
 	defer func() {
 		listLock.Unlock()
-		dispatchKeyFrame()
+		// why?
+		dispatchKeyFrame(roomid)
 	}()
 
 	attemptSync := func() (tryAgain bool) {
-		for i := range peerConnections {
-			if peerConnections[i].peerConnection.ConnectionState() == webrtc.PeerConnectionStateClosed {
-				peerConnections = append(peerConnections[:i], peerConnections[i+1:]...)
+		for i := range *peerConnRoom {
+			if (*peerConnRoom)[i].peerConnection.ConnectionState() == webrtc.PeerConnectionStateClosed {
+				*peerConnRoom = append((*peerConnRoom)[:i], (*peerConnRoom)[i+1:]...)
 				return true // We modified the slice, start from the beginning
 			}
 
-			// map of sender we already are seanding, so we don't double send
+			// map of sender we already are sending, so we don't double send
 			existingSenders := map[string]bool{}
 
-			for _, sender := range peerConnections[i].peerConnection.GetSenders() {
+			for _, sender := range (*peerConnRoom)[i].peerConnection.GetSenders() {
 				if sender.Track() == nil {
 					continue
 				}
@@ -86,14 +97,14 @@ func signalPeerConnections() {
 
 				// If we have a RTPSender that doesn't map to a existing track remove and signal
 				if _, ok := trackLocals[sender.Track().ID()]; !ok {
-					if err := peerConnections[i].peerConnection.RemoveTrack(sender); err != nil {
+					if err := (*peerConnRoom)[i].peerConnection.RemoveTrack(sender); err != nil {
 						return true
 					}
 				}
 			}
 
 			// Don't receive videos we are sending, make sure we don't have loopback
-			for _, receiver := range peerConnections[i].peerConnection.GetReceivers() {
+			for _, receiver := range (*peerConnRoom)[i].peerConnection.GetReceivers() {
 				if receiver.Track() == nil {
 					continue
 				}
@@ -104,18 +115,18 @@ func signalPeerConnections() {
 			// Add all track we aren't sending yet to the PeerConnection
 			for trackID := range trackLocals {
 				if _, ok := existingSenders[trackID]; !ok {
-					if _, err := peerConnections[i].peerConnection.AddTrack(trackLocals[trackID]); err != nil {
+					if _, err := (*peerConnRoom)[i].peerConnection.AddTrack(trackLocals[trackID]); err != nil {
 						return true
 					}
 				}
 			}
 
-			offer, err := peerConnections[i].peerConnection.CreateOffer(nil)
+			offer, err := (*peerConnRoom)[i].peerConnection.CreateOffer(nil)
 			if err != nil {
 				return true
 			}
 
-			if err = peerConnections[i].peerConnection.SetLocalDescription(offer); err != nil {
+			if err = (*peerConnRoom)[i].peerConnection.SetLocalDescription(offer); err != nil {
 				return true
 			}
 
@@ -123,8 +134,7 @@ func signalPeerConnections() {
 			if err != nil {
 				return true
 			}
-
-			if err = peerConnections[i].websocket.WriteJSON(&websocketMessage{
+			if err = (*peerConnRoom)[i].websocket.WriteJSON(&websocketMessage{
 				Event: "offer",
 				Data:  string(offerString),
 			}); err != nil {
@@ -140,7 +150,7 @@ func signalPeerConnections() {
 			// Release the lock and attempt a sync in 3 seconds. We might be blocking a RemoveTrack or AddTrack
 			go func() {
 				time.Sleep(time.Second * 3)
-				signalPeerConnections()
+				signalPeerConnections(roomid)
 			}()
 			return
 		}
@@ -152,33 +162,73 @@ func signalPeerConnections() {
 }
 
 // dispatchKeyFrame sends a keyframe to all PeerConnections, used everytime a new user joins the call
-func dispatchKeyFrame() {
+func dispatchKeyFrame(roomid string) error {
+	listLock, ok := listLocks[roomid]
+	if !ok {
+		return fmt.Errorf("list lock not found for room %s", roomid)
+
+	}
+	peerConnRoom, ok := peerConnections[roomid]
+	if !ok {
+		return fmt.Errorf("peerroom not found for room %s", roomid)
+	}
 	listLock.Lock()
 	defer listLock.Unlock()
-
-	for i := range peerConnections {
-		for _, receiver := range peerConnections[i].peerConnection.GetReceivers() {
+	for i := range *peerConnRoom {
+		for _, receiver := range (*peerConnRoom)[i].peerConnection.GetReceivers() {
 			if receiver.Track() == nil {
+				log.Default().Printf("notrack on receiver no %d", i)
 				continue
 			}
-
-			_ = peerConnections[i].peerConnection.WriteRTCP([]rtcp.Packet{
+			log.Println("sending keyframe")
+			_ = (*peerConnRoom)[i].peerConnection.WriteRTCP([]rtcp.Packet{
 				&rtcp.PictureLossIndication{
 					MediaSSRC: uint32(receiver.Track().SSRC()),
 				},
 			})
 		}
 	}
+	return nil
+}
+func init() {
+	trackLocals = map[string]*webrtc.TrackLocalStaticRTP{}
 }
 
 // Handle incoming websockets
 func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
-	trackLocals = map[string]*webrtc.TrackLocalStaticRTP{}
-	go func() {
-		for range time.NewTicker(time.Second * 3).C {
-			dispatchKeyFrame()
+	vars := mux.Vars(r)
+	roomid := vars["roomid"]
+	var peerConnRoom *[]peerConnectionState
+	val, ok := peerConnections[roomid]
+	if ok {
+		peerConnRoom = val
+	} else {
+		peerConnRoom = new([]peerConnectionState)
+		peerConnections[roomid] = peerConnRoom
+	}
+	defer func() {
+		// the connection should be removed by onstatechangeevent after connection's closed in defer
+		if len((*peerConnRoom)) == 0 {
+			delete(peerConnections, roomid)
+			delete(listLocks, roomid)
 		}
 	}()
+	listLock, ok := listLocks[roomid]
+	if !ok {
+		listLock = new(sync.RWMutex)
+		listLocks["roomid"] = listLock
+		go func() {
+			for range time.NewTicker(time.Second * 3).C {
+				err := dispatchKeyFrame(roomid)
+				if err != nil {
+					break
+				}
+			}
+		}()
+	}
+
+	log.Println("received websocket connection.")
+
 	// Upgrade HTTP request to Websocket
 	unsafeConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -186,10 +236,10 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c := &threadSafeWriter{unsafeConn, sync.Mutex{}}
+	ws := &threadSafeWriter{unsafeConn, sync.Mutex{}}
 
 	// When this frame returns close the Websocket
-	defer c.Close() //nolint
+	defer ws.Close() //nolint
 
 	// Create new PeerConnection
 	peerConnection, err := webrtc.NewPeerConnection(webrtc.Configuration{})
@@ -213,7 +263,7 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Add our new PeerConnection to global list
 	listLock.Lock()
-	peerConnections = append(peerConnections, peerConnectionState{peerConnection, c})
+	*peerConnRoom = append(*peerConnRoom, peerConnectionState{peerConnection, ws})
 	listLock.Unlock()
 
 	// Trickle ICE. Emit server candidate to client
@@ -228,7 +278,7 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if writeErr := c.WriteJSON(&websocketMessage{
+		if writeErr := ws.WriteJSON(&websocketMessage{
 			Event: "candidate",
 			Data:  string(candidateString),
 		}); writeErr != nil {
@@ -236,7 +286,8 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	})
 
-	// If PeerConnection is closed remove it from global list
+	// If PeerConnection is closed remove it from the room
+	// This will also be called without the need for defer to update the peerroom.
 	peerConnection.OnConnectionStateChange(func(p webrtc.PeerConnectionState) {
 		switch p {
 		case webrtc.PeerConnectionStateFailed:
@@ -244,15 +295,15 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 				log.Print(err)
 			}
 		case webrtc.PeerConnectionStateClosed:
-			signalPeerConnections()
+			signalPeerConnections(roomid)
 		default:
 		}
 	})
 
 	peerConnection.OnTrack(func(t *webrtc.TrackRemote, _ *webrtc.RTPReceiver) {
 		// Create a track to fan out our incoming video to all peers
-		trackLocal := addTrack(t)
-		defer removeTrack(trackLocal)
+		trackLocal := addTrack(t, roomid)
+		defer removeTrack(trackLocal, roomid)
 
 		buf := make([]byte, 1500)
 		for {
@@ -268,11 +319,11 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	// Signal for the new PeerConnection
-	signalPeerConnections()
+	signalPeerConnections(roomid)
 
 	message := &websocketMessage{}
 	for {
-		_, raw, err := c.ReadMessage()
+		_, raw, err := ws.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			return
@@ -307,8 +358,18 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-func GetCallIndexPage(writer http.ResponseWriter, response *http.Request) {
-	generateHTMLPage(writer, nil, "call_index")
+func GetCallIndexPage(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	roomid, ok := vars["roomid"]
+	if ok {
+		generateHTMLPage(w, struct {
+			Roomid string
+		}{
+			Roomid: roomid,
+		}, "call_index")
+	} else {
+		http.Redirect(w, r, fmt.Sprintf("/call/%s", generateUUID()), http.StatusSeeOther)
+	}
 }
 
 // Helper to make Gorilla Websockets threadsafe
