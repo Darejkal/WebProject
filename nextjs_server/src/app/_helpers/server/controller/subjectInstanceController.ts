@@ -5,6 +5,7 @@ import { db } from "../model";
 import { customEncrypt, customEncryptCompare, generateUUID } from "../../utils";
 import { subjectController } from "./subjectController";
 import { userController } from "./userController";
+import { FormatListBulleted } from "@mui/icons-material";
 const SubjectInstance = db.SubjectInstance;
 const UserSubjectInstanceRelation = db.UserSubjectInstanceRelation;
 
@@ -77,4 +78,13 @@ export const subjectInstanceController = {
 			next: results.length == 0 ? undefined : results[results.length - 1]._id,
 		};
 	},
+	doesUserHaveRole: async (userid:string,role:string)=>{
+		let r=await UserSubjectInstanceRelation.findOne({
+			userid:userid,
+			role:role
+		})
+		console.log("r")
+		console.log(r)
+		return r?true:false
+	}
 };

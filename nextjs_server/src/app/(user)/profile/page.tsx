@@ -7,10 +7,17 @@ import { SetStateAction, useState, useEffect } from "react";
 import React from 'react';
 import { useUserService } from "@/app/_services"
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useForm } from "react-hook-form";
 
 export default function ProfilePage(){
     const userService=useUserService()
     // const [user,setUser]=useState<any>();
+    const { register, handleSubmit, formState } = useForm();
+    const fields = {
+        name: register('name', { required: 'Username is required' }),
+        email: register('email', { required: 'Email is required' }),
+        phonenumber: register('phonenumber'),
+    };
     useEffect(()=>{
         userService.getCurrent()
     },[])
@@ -41,15 +48,14 @@ export default function ProfilePage(){
         setSelectedItem4(eventKey);
     };
 
-    return (<div className="" style={{marginBottom: '50px'}}>
+    return (
+    <div className="" style={{margin:"1rem 10rem"}}>
         <div>
             <h2 style={{
-                fontSize: '24px',
                 color: '#171717',
-                marginBottom: '32px',
                 paddingTop: 0,
                 fontWeight: 700,
-                marginTop: '32px'
+                margin: '2rem 0'
             }}>Thiết lập tài khoản</h2>
         </div>
 
@@ -57,9 +63,8 @@ export default function ProfilePage(){
             <h3 style={{
                 paddingTop: 0,
                 color: '#171717',
-                fontSize: '20px',
                 lineHeight: 1.4,
-                marginBottom: '8px',
+                marginBottom: '1rem',
                 fontWeight: 600,
             }}>Thông tin tài khoản cơ bản</h3>
 
@@ -67,7 +72,7 @@ export default function ProfilePage(){
                 fontSize: '16px',
                 lineHeight: 1.5,
                 color: '#404040',
-                paddingBottom: '32px',
+                paddingBottom: '1.5rem',
                 marginTop: 0,
             }}>Thiết lập thông tin cơ bản về tài khoản của bạn.</p>
             

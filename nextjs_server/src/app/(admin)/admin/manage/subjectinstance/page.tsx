@@ -21,6 +21,9 @@ const SubjectInstancesPage = () => {
 		const res = await subjectInstanceService.create(subjectid,name);
 		console.log(res);
 		setShowModal(false)
+		subjectInstanceService.clearPage().then(()=>{
+			subjectInstanceService.getPaginated(20)
+		})
 	}
 	const [isFetching, setIsFetching] = useState(false);
 	const fetchNextPage = useCallback((containerRefElement?: HTMLDivElement | null) => {
@@ -61,10 +64,13 @@ const SubjectInstancesPage = () => {
 			<MaterialReactTable
 				columns={[
 					{ accessorKey: "name", header: "Tên" },
-					{ accessorKey: "subjectid", header: "Mã môn" },
-					{ accessorKey: "uuid", header: "UUID" },
+					// { accessorKey: "subjectid", header: "Mã môn" },
+					{ accessorKey: "subjectName", header: "Tên môn" },
+					{ accessorKey: "subjectAbbrev", header: "Mã môn" },
+					// { accessorKey: "uuid", header: "UUID" },
 					{ accessorKey: "createdat", header: "Tạo lúc" },
-					{ accessorKey: "authorid", header: "ID tác giả" },
+					// { accessorKey: "authorid", header: "ID tác giả" },
+					{ accessorKey: "authorName", header: "Tên tác giả" },
 				]}
 				data={subjectTableInstanceData}
 				enablePagination={false}
