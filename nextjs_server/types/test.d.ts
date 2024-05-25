@@ -1,6 +1,7 @@
 interface ICourses {
     id: number;
     name: string;
-    code: number;
+    code: string;
     link: string;
+    students: string[] | null;
 }
