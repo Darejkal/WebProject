@@ -1,10 +1,11 @@
-'use client'
+"use client";
 import { type ReactNode, createContext, useRef, useContext } from "react";
 import { StoreApi, create, useStore } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useAlertService } from ".";
 import { useFetch } from "@/app/_helpers/client";
+import React from "react";
 
 // interfaces
 
@@ -15,11 +16,13 @@ interface IServiceUser {
 	uuid: string;
 	position: string;
 }
-
+interface IMightBeTeacher{
+	isTeacher?:Boolean;
+}
 interface IServiceUserStoreData {
 	users?: IServiceUser[];
 	user?: IServiceUser;
-	currentUser?: IServiceUser;
+	currentUser?: IServiceUser&IMightBeTeacher;
 }
 interface IServiceUserStore extends IServiceUserStoreData {
 	setUser: (newuser: IServiceUser) => void;
@@ -29,32 +32,37 @@ interface IUserService extends IServiceUserStoreData {
 	login: (email: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
 	register: (user: IServiceUser) => Promise<void>;
-	getPaginated: (limit:number,next?:string) => Promise<IServiceUser[]|undefined>,
-	getByUUID: (id: string) => Promise<IServiceUser|undefined>,
-	getCurrent: (redirect?:Boolean) => Promise<IServiceUser | undefined>;
+	getPaginated: (
+		limit: number,
+		next?: string
+	) => Promise<IServiceUser[] | undefined>;
+	getByUUID: (id: string) => Promise<IServiceUser | undefined>;
+	getCurrent: (redirect?: Boolean) => Promise<IServiceUser | undefined>;
+	currentHasTeacherRole:()=>Promise<Boolean>;
 	// create: (user: IServiceUser) => Promise<void>,
 	// update: (id: string, params: Partial<IServiceUser>) => Promise<void>,
 	// delete: (id: string) => Promise<void>
 }
-const defaultInitState={
+const defaultInitState = {
 	users: undefined,
 	user: undefined,
 	currentUser: undefined,
-}
+};
 const createUserStore = (
 	initState: IServiceUserStoreData = defaultInitState
 ) => {
-	return create<IServiceUserStore>(
-			(set, get) => ({
-				...initState,
-				setUser: (newuser: IServiceUser) => {
-					set({ user: newuser });
-				},
-				setCurrentUser: (newuser: IServiceUser | undefined) => {
-					set({ currentUser: newuser });
-				},
-			})
-	)
+	return create<IServiceUserStore>()(persist(
+		(set, get) => ({
+			...initState,
+			setUser: (newuser: IServiceUser) => {
+				set({ user: newuser });
+			},
+			setCurrentUser: (newuser: IServiceUser | undefined) => {
+				set({ currentUser: newuser });
+			},
+		}),{
+		name:"user_store"
+	}));
 };
 
 export function useUserService(): IUserService {
@@ -68,7 +76,8 @@ export function useUserService(): IUserService {
 		throw new Error(`userservice must be inside an user context provider`);
 	}
 
-	const { users, user, currentUser, setUser, setCurrentUser } = useStore(userStore);
+	const { users, user, currentUser, setUser, setCurrentUser } =
+		useStore(userStore);
 
 	return {
 		users,
@@ -105,20 +114,22 @@ export function useUserService(): IUserService {
 			}
 		},
 
-		getPaginated: async (limit,next) => {
-		    userStore.setState({ users: await fetch.post('/api/user/getpaginated',{limit,next}) });
-			return users
+		getPaginated: async (limit, next) => {
+			userStore.setState({
+				users: await fetch.post("/api/user/getpaginated", { limit, next }),
+			});
+			return users;
 		},
-		getByUUID: async (uuid:string) => {
-		    userStore.setState({ user: undefined });
-		    try {
-		        userStore.setState({ user: await fetch.get(`/api/users/${uuid}`) });
-		    } catch (error: any) {
-		        alertService.error(error);
-		    }
-			return user
+		getByUUID: async (uuid: string) => {
+			userStore.setState({ user: undefined });
+			try {
+				userStore.setState({ user: await fetch.get(`/api/users/${uuid}`) });
+			} catch (error: any) {
+				alertService.error(error);
+			}
+			return user;
 		},
-		getCurrent: async (redirect=true) => {
+		getCurrent: async (redirect = true) => {
 			console.log("getcurrent");
 			console.log(currentUser);
 			if (!currentUser) {
@@ -126,29 +137,54 @@ export function useUserService(): IUserService {
 					setCurrentUser(await fetch.get("/api/user/current"));
 				} catch (error: any) {
 					alertService.error(error);
-					if(redirect){
-						router.push("/login")
+					if (redirect) {
+						router.push("/login");
 					}
 				}
 			}
 
 			return currentUser;
 		},
+		currentHasTeacherRole:async()=>{
+			if(!currentUser){
+				return false;
+			}
+			if(!("isTeacher" in currentUser) ){
+				try{
+					userStore.setState({currentUser:{...currentUser,isTeacher:await fetch.get("/api/user/hasrole/teacher")}})
+				} catch(e){
+
+				}
+			}
+			return currentUser.isTeacher?true:false;
+		}
 	};
 }
 
-export const UserStoreContext = createContext<StoreApi<IServiceUserStore>|null>(null);
+export const UserStoreContext = createContext<
+	StoreApi<IServiceUserStore> | undefined
+>(undefined);
 
 export const UserStoreProvider = ({ children }: { children: ReactNode }) => {
 	const storeRef = useRef<StoreApi<IServiceUserStore>>();
-	console.log("storeRef current")
-	console.log(storeRef.current)
+	// console.log("storeRef current")
+	// console.log(storeRef.current)
+	// React.useEffect(() => {
+	// 	if (!storeRef.current) {
+	// 		const user = localStorage.getItem("user");
+	// 		if (user) {
+	// 			storeRef.current=createUserStore(JSON.parse(user));
+	// 		} else{
+	// 			storeRef.current = createUserStore()
+	// 		}
+	// 		console.log("recreated userstore")
+	// 	}
+	// 	// hydrate on mount
 
+	// }, []);
 	if (!storeRef.current) {
-		storeRef.current = createUserStore()
-		console.log("recreated userstore")
+		storeRef.current = createUserStore();
 	}
-
 	return (
 		<UserStoreContext.Provider value={storeRef.current}>
 			{children}

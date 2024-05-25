@@ -17,9 +17,11 @@ export const User:mongoose.Model<IUser>= (()=> {
         name: { type: String, required: true },
         password: { type: String, required: true },
         email: { type: String,unique: true, required: true },
+        phonenumber: { type: String,unique: true,match:/^(\+84|0)\d{9}$/},
         createdat:{type: Date, required:true},
         uuid:{type: String,unique: true, required:true},
         position:{type: String,default:"user",enum:["user","admin"], required:true},
     });
+
     return mongoose.models.user|| mongoose.model<IUser> ('user', schema);
 })()

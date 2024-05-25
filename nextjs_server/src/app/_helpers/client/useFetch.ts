@@ -14,13 +14,17 @@ function useFetch() {
     };
 
     function request(method: string) {
-        return (url: string, body?: any) => {
-            const requestOptions: any = {
+        return (url: string | URL | Request, body?: any,headers?:any,other_options?:any) => {
+            let requestOptions: any = {
                 method
             };
             if (body) {
-                requestOptions.headers = { 'Content-Type': 'application/json' };
+                requestOptions.headers = { 'Content-Type': 'application/json'};
                 requestOptions.body = JSON.stringify(body);
+            }
+            requestOptions.headers={...requestOptions.headers,...headers}
+            if (other_options){
+                requestOptions={...requestOptions,...other_options}
             }
             return fetch(url, requestOptions).then(handleResponse);
         }
@@ -31,7 +35,6 @@ function useFetch() {
     async function handleResponse(response: Response) {
         const isJson = response.headers?.get('content-type')?.includes('application/json');
         const data = isJson ? await response.json() : null;
-
         // check for error response
         if (!response.ok) {
             if (response.status === 401) {

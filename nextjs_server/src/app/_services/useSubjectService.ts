@@ -23,7 +23,7 @@ const subjectStore = create<ISubjectStore>(() => initialState);
 interface ISubjectAction {
     create:(params:{name:string, abbrev:string, schoolid:string})=>Promise<ISubjectStore|undefined>,
 	getPaginated: (limit:number,next?:string) => Promise<IServiceSubject[]|undefined>,
-
+    clearPage:()=>Promise<void>
 }
 export function useSubjectService(): ISubjectAction&ISubjectStore {
     const userService = useUserService();
@@ -50,6 +50,9 @@ export function useSubjectService(): ISubjectAction&ISubjectStore {
             }
 			return results
 		},
+        clearPage: async ()=>{
+            subjectStore.setState({subjects:[],nextSubjectPage:undefined})
+        }
     }
 };
 

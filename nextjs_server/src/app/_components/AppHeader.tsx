@@ -81,9 +81,13 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 		userService.getCurrent(redirect);
 	}, []);
 	useEffect(() => {
-		console.log("appheader");
-		console.log(userService.currentUser);
-	}, [userService]);
+		console.log("userService.currentUser.isTeacher")
+		console.log(userService?.currentUser?.isTeacher)
+		if(userService.currentUser&&typeof userService.currentUser.isTeacher ==="undefined"){
+
+			userService.currentHasTeacherRole()
+		}
+	}, [userService.currentUser]);
 	return (
 		<div>
 			{warning}
@@ -104,6 +108,19 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 											ChitChat <ChatBubbleLeftIcon style={{ width: "1rem" }} />
 										</div>
 									</Nav.Link>
+									{userService.currentUser?.isTeacher && (
+										<>
+											<NavDropdown title="Giáo viên" id="basic-nav-dropdown">
+												<NavDropdown.Item href="/teacher/dashboard">
+													Thống kê
+												</NavDropdown.Item>
+												<NavDropdown.Divider />
+												<NavDropdown.Item href="/teacher/manage/class">
+													Quản lý lớp học
+												</NavDropdown.Item>
+											</NavDropdown>
+										</>
+									)}
 									{userService.currentUser?.position == "admin" && (
 										<>
 											<NavDropdown title="Quản lý" id="basic-nav-dropdown">

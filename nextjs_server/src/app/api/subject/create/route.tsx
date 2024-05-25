@@ -10,11 +10,10 @@ module.exports = apiHandler({
 });
 
 async function createSubjectInstance(req: Request) {
-	// const userid=req.headers.get("userId")
-	// if(!userid){
-	// 	throw "userid not found"
-	// }
-	const userid="ok"
+	const userid=req.headers.get("userId")
+	if(!userid){
+		throw "userid not found"
+	}
 	const {
 		schoolid,
 		abbrev,
@@ -27,7 +26,6 @@ async function createSubjectInstance(req: Request) {
     let subject=await subjectController.create(name, abbrev, schoolid,userid)
 	return {...subject.toObject(),_id:undefined,__v:undefined};
 }
-createSubjectInstance.ispublic = true;
 createSubjectInstance.position = "admin";
 createSubjectInstance.schema = joi.object({
 	schoolid: joi.string().required(),

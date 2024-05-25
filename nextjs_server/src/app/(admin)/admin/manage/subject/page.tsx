@@ -5,8 +5,10 @@ import { MaterialReactTable } from "material-react-table";
 import { Button, Form, Modal } from "react-bootstrap";
 import { IServiceSubject, useSubjectService } from "@/app/_services";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 const SubjectInstancesPage = () => {
+	const router=useRouter()
 	const subjectService = useSubjectService();
 	const { register, handleSubmit, formState } = useForm();
 	const { errors } = formState;
@@ -23,7 +25,9 @@ const SubjectInstancesPage = () => {
 		console.log({ name, abbrev, schoolid });
 		const res = await subjectService.create({ name, abbrev, schoolid });
 		console.log(res);
-		setShowModal(false)
+		setShowModal(false);
+		await subjectService.clearPage()
+		await subjectService.getPaginated(20)
 	}
 	const [isFetching, setIsFetching] = useState(false);
 	const fetchNextPage = useCallback((containerRefElement?: HTMLDivElement | null) => {
@@ -31,7 +35,6 @@ const SubjectInstancesPage = () => {
 			const { scrollHeight, scrollTop, clientHeight } = containerRefElement;
 
 			//once the user has scrolled within 400px of the bottom of the table, fetch more data if we can
-
 			if (scrollHeight - scrollTop - clientHeight < 400 &&!subjectService.paginationEnded && !isFetching) {
 				setIsFetching(true)
 				subjectService.getPaginated(20).then(
@@ -45,14 +48,7 @@ const SubjectInstancesPage = () => {
 	},[isFetching,subjectService.subjects,subjectService.getPaginated,subjectService.paginationEnded])
 	useEffect(()=>{
 		subjectService.getPaginated(20)
-		console.log(subjectService.subjects)
 	},[])
-	const [subjectTableData, setSubjectTableData]=useState<IServiceSubject[]>([])
-	useEffect(()=>{
-		if(subjectService.subjects){
-			setSubjectTableData(subjectService.subjects)
-		}
-	},[subjectService.subjects])
 	return (
 		<div style={{ margin: "3rem 10rem 0 10rem" }}>
 			<h4 style={{ display: "block", paddingBottom: "1rem" }}>
@@ -62,12 +58,13 @@ const SubjectInstancesPage = () => {
 				columns={[
 					{ accessorKey: "name", header: "Tên" },
 					{ accessorKey: "abbrev", header: "Mã" },
-					{ accessorKey: "uuid", header: "UUID" },
+					// { accessorKey: "uuid", header: "UUID" },
+					{ accessorKey: "authorName", header: "Tên tác giả" },
 					{ accessorKey: "createdat", header: "Tạo lúc" },
-					{ accessorKey: "authorid", header: "ID tác giả" },
+					// { accessorKey: "authorid", header: "ID tác giả" },
 					{ accessorKey: "schoolid", header: "ID trường" },
 				]}
-				data={subjectTableData}
+				data={subjectService.subjects??[]}
 				enablePagination={false}
 				enableRowNumbers={true}
 				state={{
