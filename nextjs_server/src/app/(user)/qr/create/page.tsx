@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import QRCode from 'qrcode';
 
-const Home = () => {
+const QrCreate = () => {
     const [text, setText] = useState('');
     const [qrCodeUrl, setQrCodeUrl] = useState('');
 
@@ -35,4 +35,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default QrCreate;
