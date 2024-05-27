@@ -8,16 +8,21 @@ import { toast } from 'react-toastify';
 interface IProps {
     showModalCreate: boolean;
     setShowModalCreate: (v: boolean) => void;
+    data: ICourses[] | null;
 }
 function CreateModal(props: IProps) {
-    const { showModalCreate, setShowModalCreate } = props;
+    const { showModalCreate, setShowModalCreate, data } = props;
     const [name, setName] = useState<string>("");
     const [code, setCode] = useState<string>("");
     const [link, setLink] = useState<string>("");
     //chua them vao bang
     const handleSubmit = () => {
-        toast.success("Create succeed !");
-        console.log(name, code, link)
+
+        // const newId = data.length > 0 ? data[data.length - 1].id + 1 : 1;
+        // const newData = { id: newId, ...newItem };
+        // setData([...data, newData]);
+        // toast.success("Create succeed !");
+        // console.log(name, code, link)
     }
 
     const handleClose = () => {
@@ -49,7 +54,7 @@ function CreateModal(props: IProps) {
                         </Form.Group>
                         <Form.Group className="mb-3" >
                             <Form.Label>Course Code</Form.Label>
-                            <Form.Control type="text" placeholder=''
+                            <Form.Control type="number" placeholder="Enter code"
                                 value={code}
                                 onChange={(e) => setCode(e.target.value)}
                             />

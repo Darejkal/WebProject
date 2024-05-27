@@ -3,9 +3,19 @@ import Table from "react-bootstrap/Table";
 import { Button, Container } from "react-bootstrap";
 import { useState } from "react";
 import CreateModal from "./ModalTest";
+import { toast } from "react-toastify";
 interface IProps {
-    courses: ICourses[] | null
+    courses: ICourses[] | null;
+    handleAddCourse: (newCourse: Omit<ICourses, 'id'>) => void;
 }
+
+
+const handleAddCourse = (newCourse: Omit<ICourses, 'id'>) => {
+    // const newId = data.length > 0 ? data[data.length - 1].id + 1 : 1;
+    // const newData = { id: newId, ...newCourse };
+    // setData([...data, newData]);
+    toast.success("Create succeeded!");
+};
 
 const AppTable = (props: IProps) => {
     const { courses } = props;
@@ -54,6 +64,7 @@ const AppTable = (props: IProps) => {
                 <CreateModal
                     showModalCreate={showModalCreate}
                     setShowModalCreate={setShowModalCreate}
+                    data={courses}
                 ></CreateModal>
 
             </Container>
