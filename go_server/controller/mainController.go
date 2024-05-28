@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"log"
 	"net/http"
 	"popman/model"
 )
@@ -21,7 +20,7 @@ func Err(writer http.ResponseWriter, request *http.Request) {
 // GET /
 func Index(writer http.ResponseWriter, request *http.Request) {
 	threads, err := model.GetAll[model.ChatThread](model.ChatThread{}.Collection())
-	log.Printf("%+v\n", threads[0])
+	// log.Printf("%+v\n", threads[0])
 	if err != nil {
 		error_message(writer, request, "Cannot get threads")
 	} else {

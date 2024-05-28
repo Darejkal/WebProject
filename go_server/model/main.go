@@ -10,8 +10,8 @@ import (
 )
 
 const dbName = "GO"
-const dbURI = "mongodb+srv://adminHP:bO9Dib4I51Wj@cluster0.bj4rphy.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-const dbURIFallback = "mongodb://adminHP:bO9Dib4I51Wj@ac-rqkr1rn-shard-00-00.bj4rphy.mongodb.net:27017,ac-rqkr1rn-shard-00-01.bj4rphy.mongodb.net:27017,ac-rqkr1rn-shard-00-02.bj4rphy.mongodb.net:27017/?ssl=true&replicaSet=atlas-5pftgu-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0"
+const dbURI = "mongodb://mongo:mongo@localhost:27017"
+const dbURIFallback = ""
 
 var db *mongo.Database
 

@@ -19,6 +19,7 @@ export default function AuthenticationLayout({
         }
     })
 	}catch(e){
+		console.log(e)
         redirect("/")
     }
     return <div className="h-100 w-100 ">

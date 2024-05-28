@@ -51,6 +51,16 @@ const defaultInitState = {
 const createUserStore = (
 	initState: IServiceUserStoreData = defaultInitState
 ) => {
+	return create<IServiceUserStore>(
+		(set, get) => ({
+			...initState,
+			setUser: (newuser: IServiceUser) => {
+				set({ user: newuser });
+			},
+			setCurrentUser: (newuser: IServiceUser | undefined) => {
+				set({ currentUser: newuser });
+			},
+		}));
 	return create<IServiceUserStore>()(persist(
 		(set, get) => ({
 			...initState,
@@ -137,6 +147,7 @@ export function useUserService(): IUserService {
 					setCurrentUser(await fetch.get("/api/user/current"));
 				} catch (error: any) {
 					alertService.error(error);
+					setCurrentUser(undefined);
 					if (redirect) {
 						router.push("/login");
 					}

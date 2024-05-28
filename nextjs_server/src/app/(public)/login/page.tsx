@@ -63,7 +63,7 @@ export default function LoginPage(){
                             <div className={styles.cardline}>
                                 <p className={styles.cardline1}>Chưa có tài khoản?</p>
                             </div>
-                            <Button href="/user/signup" className={styles.cardbtn}>Tạo tài khoản mới</Button>
+                            <Button href="/signup" className={styles.cardbtn}>Tạo tài khoản mới</Button>
                         </div>
                         
                     </form>
