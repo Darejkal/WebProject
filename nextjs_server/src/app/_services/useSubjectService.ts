@@ -52,6 +52,7 @@ export function useSubjectService(): ISubjectAction&ISubjectStore {
 		},
         clearPage: async ()=>{
             subjectStore.setState({subjects:[],nextSubjectPage:undefined})
+            subjectStoreValues.nextSubjectPage=undefined
         }
     }
 };

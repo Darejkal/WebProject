@@ -18,8 +18,8 @@ export const Subject:mongoose.Model<ISubject> =(() =>{
         abbrev: { type: String, required: true },
         createdat:{type: Date, required:true},
         uuid:{type: String,unique: true, required:true},
-        authorid:{type: String,unique: true},
-        schoolid:{type: String}
+        authorid:{type: String,required: true},
+        schoolid:{type: String,required: true}
     });
     return mongoose.models.subject || mongoose.model<ISubject>('subject', schema);
 })()

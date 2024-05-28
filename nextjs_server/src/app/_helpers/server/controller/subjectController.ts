@@ -10,7 +10,8 @@ export const subjectController = {
     create,
     getByUUID,
     getByUUIDs,
-    getNext
+    getNext,
+    search
 };
 async function create(name:string,abbrev:string,schoolid:string,authorid:string){
     let subject= new Subject({
@@ -46,6 +47,12 @@ async function getNext(limit: number, next?: string) {
 		.limit(limit);
     return {results,next:results.length==0?undefined:results[results.length - 1]._id}
 }
-
-
-
+async function search(query:string,limit:number){
+    let results=await Subject.find({
+        $or: [
+            { name:query },
+            { abbrev:query }
+        ]
+    }).limit(limit).exec();
+    return results;
+}

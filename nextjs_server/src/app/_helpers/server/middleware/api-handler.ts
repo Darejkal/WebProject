@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import joi from 'joi';
 import { errorHandler, jwtMiddleware, validateBodyMiddleware } from '.';
 type HandlerFunc={
-    (req:Request,...args:any):any,
+    (req:NextRequest,...args:any):any,
     schema?:joi.ObjectSchema
     position?:string,
     ispublic?:Boolean
@@ -43,6 +43,7 @@ export function apiHandler(handler:APIHandlerType) {
                 const responseBody = await handler[method]!(req, ...args);
                 return NextResponse.json(responseBody || {});
             } catch (err: any) {
+                console.log(err)
                 // global error handler
                 return errorHandler(err);
             }

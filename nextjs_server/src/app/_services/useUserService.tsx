@@ -142,7 +142,8 @@ export function useUserService(): IUserService {
 					}
 				}
 			}
-
+			console.log("aftergetcurrent");
+			console.log(currentUser)
 			return currentUser;
 		},
 		currentHasTeacherRole:async()=>{

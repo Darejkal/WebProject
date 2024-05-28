@@ -21,6 +21,15 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 	const [warning, setWarning] = useState(<></>);
 	const userService = useUserService();
 	const router = useRouter();
+	useLayoutEffect(() => {
+		console.log(redirect);
+		userService.getCurrent(redirect);
+	}, []);
+	useEffect(() => {
+		if(userService.currentUser&&typeof userService.currentUser.isTeacher ==="undefined"){
+			userService.currentHasTeacherRole()
+		}
+	}, [userService.currentUser]);
 	const logoutWarning = (
 		<Alert variant="warning">
 			<Alert.Heading>Xác nhận</Alert.Heading>
@@ -76,23 +85,9 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 			</div>
 		</Alert>
 	);
-	useLayoutEffect(() => {
-		console.log(redirect);
-		userService.getCurrent(redirect);
-	}, []);
-	useEffect(() => {
-		console.log("userService.currentUser.isTeacher")
-		console.log(userService?.currentUser?.isTeacher)
-		if(userService.currentUser&&typeof userService.currentUser.isTeacher ==="undefined"){
-
-			userService.currentHasTeacherRole()
-		}
-	}, [userService.currentUser]);
 	return (
 		<div>
 			{warning}
-			{/* {!show && <Button onClick={() => setShow(true)}>Show Alert</Button>} */}
-
 			<Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
 				<Container>
 					<Navbar.Brand href="/landing">HustServe</Navbar.Brand>
@@ -121,7 +116,7 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 											</NavDropdown>
 										</>
 									)}
-									{userService.currentUser?.position == "admin" && (
+									{userService.currentUser?.position === "admin" && (
 										<>
 											<NavDropdown title="Quản lý" id="basic-nav-dropdown">
 												<NavDropdown.Item href="/admin">
