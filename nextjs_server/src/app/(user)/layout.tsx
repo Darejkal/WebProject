@@ -6,7 +6,7 @@ import AppHeader from "../_components/AppHeader";
 import { Alert } from "../_components";
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from "react-toastify";
-export default function AuthenticationLayout({
+export default async function AuthenticationLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
