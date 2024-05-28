@@ -23,6 +23,7 @@ interface IServiceSubjectInstanceService extends IServiceSubjectInstanceStore {
     create:(subjectid:string,name:string)=>Promise<any>,
     getallCurrent:()=>Promise<any>,
 	getPaginated: (limit:number,next?:string) => Promise<IServiceSubjectInstance[]|undefined>,
+    clearPage:()=>Promise<void>
 }
 export function useSubjectInstanceService(): IServiceSubjectInstanceService {
     const userService = useUserService();
@@ -47,7 +48,9 @@ export function useSubjectInstanceService(): IServiceSubjectInstanceService {
 		        subjectInstanceStore.setState({ subjectinstances: [...(subjectInstanceStoreValues.subjectinstances??[]),...results],nextPage:next });
             }
 			return results
-		},
+		}, clearPage:async ()=>{
+            subjectInstanceStore.setState({subjectinstances:[],nextPage:undefined})
+        }
     }
 };
 

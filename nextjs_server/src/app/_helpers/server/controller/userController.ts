@@ -11,6 +11,7 @@ export const userController = {
 	authenticate,
 	getNext,
 	getByUUID,
+	getByUUIDs,
 	getCurrent,
 	create,
 	update,
@@ -64,6 +65,13 @@ async function getByUUID(uuid: string) {
 		throw "user not found";
 	}
 	return user;
+}
+async function getByUUIDs(uuids: string[]) {
+	let users = await User.find({ uuid:{"$in": uuids} });
+	if (!users) {
+		throw "users not found";
+	}
+	return users;
 }
 
 async function getCurrent() {

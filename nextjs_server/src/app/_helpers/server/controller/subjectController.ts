@@ -9,6 +9,7 @@ const Subject = db.Subject;
 export const subjectController = {
     create,
     getByUUID,
+    getByUUIDs,
     getNext
 };
 async function create(name:string,abbrev:string,schoolid:string,authorid:string){
@@ -29,6 +30,13 @@ async function getByUUID(uuid:string){
         throw "cannot find the subject"
     }
     return subject
+}
+async function getByUUIDs(uuids:string[]){
+    let subjects= await Subject.find({uuid:{$in:uuids}})
+    if(!subjects){
+        throw "cannot find the subjects"
+    }
+    return subjects
 }
 async function getNext(limit: number, next?: string) {
 	let results= await Subject.find(next?{ _id: { $lt: next } }:{})
