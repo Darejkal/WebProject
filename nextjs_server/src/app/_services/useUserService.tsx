@@ -51,6 +51,16 @@ const defaultInitState = {
 const createUserStore = (
 	initState: IServiceUserStoreData = defaultInitState
 ) => {
+	return create<IServiceUserStore>(
+		(set, get) => ({
+			...initState,
+			setUser: (newuser: IServiceUser) => {
+				set({ user: newuser });
+			},
+			setCurrentUser: (newuser: IServiceUser | undefined) => {
+				set({ currentUser: newuser });
+			},
+		}));
 	return create<IServiceUserStore>()(persist(
 		(set, get) => ({
 			...initState,
