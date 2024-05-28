@@ -4,11 +4,12 @@ import { auth, userController } from "@/app/_helpers/server";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "../_components/AppHeader";
 import { Alert } from "../_components";
-
-export default async function AuthenticationLayout({
-	children,
+import 'react-toastify/dist/ReactToastify.css'
+import { ToastContainer } from "react-toastify";
+export default function AuthenticationLayout({
+    children,
 }: Readonly<{
-	children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
 	try{
 	let { id } = auth.verifyToken();
@@ -20,11 +21,10 @@ export default async function AuthenticationLayout({
 	}catch(e){
         redirect("/")
     }
-	return (
-		<div style={{height:"100%",width:"100%",boxSizing:"border-box"}}>
-			<AppHeader redirect={true} />
-			<Alert />
-			{children}
-		</div>
-	);
+    return <div className="h-100 w-100 ">
+        <AppHeader redirect={true} />
+        <Alert />
+        {children}
+        <ToastContainer />
+    </div>
 }
