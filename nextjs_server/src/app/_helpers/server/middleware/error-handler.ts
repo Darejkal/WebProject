@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 export { errorHandler };
 
 function errorHandler(err: Error | string) {
+    console.log(err);
     if (typeof (err) === 'string') {
         // custom application error
         const is404 = err.toLowerCase().endsWith('not found');

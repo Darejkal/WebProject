@@ -137,6 +137,7 @@ export function useUserService(): IUserService {
 					setCurrentUser(await fetch.get("/api/user/current"));
 				} catch (error: any) {
 					alertService.error(error);
+					setCurrentUser(undefined);
 					if (redirect) {
 						router.push("/login");
 					}

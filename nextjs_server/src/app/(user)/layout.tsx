@@ -18,6 +18,7 @@ export default async function AuthenticationLayout({
         }
     })
 	}catch(e){
+		console.log(e)
         redirect("/")
     }
 	return (

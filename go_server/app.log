@@ -89,3 +89,5 @@ ERROR 2024/04/21 23:05:22 utils.go:105: user with the email existed Cannot creat
 ERROR 2024/04/21 23:06:22 utils.go:105: user with the email existed: a121121@a.com Cannot create user
 ERROR 2024/04/21 23:06:56 utils.go:105: user with the email existed: a121121@a.com Cannot create user
 ERROR 2024/04/21 23:06:57 utils.go:105: user with the email existed: a121121@a.com Cannot create user
+ERROR 2024/05/24 16:10:13 utils.go:136: mongo: no documents in result Cannot find user
+ERROR 2024/05/24 16:12:00 utils.go:136: mongo: no documents in result Cannot find user

@@ -27,16 +27,33 @@ var (
 	upgrader = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool { return true },
 	}
-	listLocks       map[string]*sync.RWMutex
-	peerConnections map[string]*[]peerConnectionState
-	trackLocals     map[string]*webrtc.TrackLocalStaticRTP
+	listLocks       map[string]*sync.RWMutex               = make(map[string]*sync.RWMutex)
+	peerConnections map[string]*[]peerConnectionState      = make(map[string]*[]peerConnectionState)
+	trackLocals     map[string]*webrtc.TrackLocalStaticRTP = map[string]*webrtc.TrackLocalStaticRTP{}
 )
+
+func getRoomLock(roomid string) *sync.RWMutex {
+	listLock, ok := listLocks[roomid]
+	if !ok {
+		listLock = new(sync.RWMutex)
+		listLocks[roomid] = listLock
+	}
+	return listLock
+}
+func getPeerRoom(roomid string) *[]peerConnectionState {
+	peerRoom, ok := peerConnections[roomid]
+	if !ok {
+		peerRoom = new([]peerConnectionState)
+		peerConnections[roomid] = peerRoom
+	}
+	return peerRoom
+}
 
 // Add to list of tracks and fire renegotation for all PeerConnections
 func addTrack(t *webrtc.TrackRemote, roomid string) *webrtc.TrackLocalStaticRTP {
-	listLocks[roomid].Lock()
+	getRoomLock(roomid).Lock()
 	defer func() {
-		listLocks[roomid].Unlock()
+		getRoomLock(roomid).Unlock()
 		signalPeerConnections(roomid)
 	}()
 
@@ -52,9 +69,9 @@ func addTrack(t *webrtc.TrackRemote, roomid string) *webrtc.TrackLocalStaticRTP 
 
 // Remove from list of tracks and fire renegotation for all PeerConnections
 func removeTrack(t *webrtc.TrackLocalStaticRTP, roomid string) {
-	listLocks[roomid].Lock()
+	getRoomLock(roomid).Lock()
 	defer func() {
-		listLocks[roomid].Unlock()
+		getRoomLock(roomid).Unlock()
 		signalPeerConnections(roomid)
 	}()
 
@@ -63,14 +80,9 @@ func removeTrack(t *webrtc.TrackLocalStaticRTP, roomid string) {
 
 // signalPeerConnections updates each PeerConnection so that it is getting all the expected media tracks
 func signalPeerConnections(roomid string) {
-	listLock, ok := listLocks[roomid]
-	if !ok {
-		log.Fatalf("lock not found for room %s", roomid)
-	}
-	peerConnRoom, ok := peerConnections[roomid]
-	if !ok {
-		log.Fatalf("peerroom not found for room %s", roomid)
-	}
+	listLock := getRoomLock(roomid)
+	peerConnRoom := getPeerRoom(roomid)
+
 	listLock.Lock()
 	defer func() {
 		listLock.Unlock()
@@ -163,15 +175,8 @@ func signalPeerConnections(roomid string) {
 
 // dispatchKeyFrame sends a keyframe to all PeerConnections, used everytime a new user joins the call
 func dispatchKeyFrame(roomid string) error {
-	listLock, ok := listLocks[roomid]
-	if !ok {
-		return fmt.Errorf("list lock not found for room %s", roomid)
-
-	}
-	peerConnRoom, ok := peerConnections[roomid]
-	if !ok {
-		return fmt.Errorf("peerroom not found for room %s", roomid)
-	}
+	listLock := getRoomLock(roomid)
+	peerConnRoom := getPeerRoom(roomid)
 	listLock.Lock()
 	defer listLock.Unlock()
 	for i := range *peerConnRoom {
@@ -190,22 +195,14 @@ func dispatchKeyFrame(roomid string) error {
 	}
 	return nil
 }
-func init() {
-	trackLocals = map[string]*webrtc.TrackLocalStaticRTP{}
-}
 
 // Handle incoming websockets
 func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
+
 	vars := mux.Vars(r)
 	roomid := vars["roomid"]
 	var peerConnRoom *[]peerConnectionState
-	val, ok := peerConnections[roomid]
-	if ok {
-		peerConnRoom = val
-	} else {
-		peerConnRoom = new([]peerConnectionState)
-		peerConnections[roomid] = peerConnRoom
-	}
+	peerConnRoom = getPeerRoom(roomid)
 	defer func() {
 		// the connection should be removed by onstatechangeevent after connection's closed in defer
 		if len((*peerConnRoom)) == 0 {
@@ -213,19 +210,7 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 			delete(listLocks, roomid)
 		}
 	}()
-	listLock, ok := listLocks[roomid]
-	if !ok {
-		listLock = new(sync.RWMutex)
-		listLocks["roomid"] = listLock
-		go func() {
-			for range time.NewTicker(time.Second * 3).C {
-				err := dispatchKeyFrame(roomid)
-				if err != nil {
-					break
-				}
-			}
-		}()
-	}
+	listLock := getRoomLock(roomid)
 
 	log.Println("received websocket connection.")
 
@@ -235,7 +220,6 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print("upgrade:", err)
 		return
 	}
-
 	ws := &threadSafeWriter{unsafeConn, sync.Mutex{}}
 
 	// When this frame returns close the Websocket
@@ -358,14 +342,21 @@ func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+func APIGetCallIndex(w http.ResponseWriter, r *http.Request) {
+	uuid := generateUUID()
+	log.Printf("created uuid %s \n", uuid)
+	generateJSONResponse(w, struct {
+		UUID string `json:"uuid"`
+	}{UUID: uuid}, http.StatusOK)
+}
 func GetCallIndexPage(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	roomid, ok := vars["roomid"]
 	if ok {
 		generateHTMLPage(w, struct {
-			Roomid string
+			RoomID string
 		}{
-			Roomid: roomid,
+			RoomID: roomid,
 		}, "call_index")
 	} else {
 		http.Redirect(w, r, fmt.Sprintf("/call/%s", generateUUID()), http.StatusSeeOther)
@@ -381,6 +372,5 @@ type threadSafeWriter struct {
 func (t *threadSafeWriter) WriteJSON(v interface{}) error {
 	t.Lock()
 	defer t.Unlock()
-
 	return t.Conn.WriteJSON(v)
 }
