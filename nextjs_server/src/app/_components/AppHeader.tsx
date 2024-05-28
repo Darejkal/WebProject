@@ -108,7 +108,7 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 											ChitChat <ChatBubbleLeftIcon style={{ width: "1rem" }} />
 										</div>
 									</Nav.Link>
-									{userService.currentUser?.isTeacher && (
+									{userService.currentUser?.isTeacher===true && (
 										<>
 											<NavDropdown title="Giáo viên" id="basic-nav-dropdown">
 												<NavDropdown.Item href="/teacher/dashboard">
