@@ -21,24 +21,22 @@ interface ISubjectStore{
 const initialState = {};
 const subjectStore = create<ISubjectStore>(() => initialState);
 interface ISubjectAction {
-    create:(params:{name:string, abbrev:string, schoolid:string})=>Promise<ISubjectStore|undefined>,
+    create:(params:{name:string, abbrev:string, schoolabbrev:string})=>Promise<ISubjectStore|undefined>,
 	getPaginated: (limit:number,next?:string) => Promise<IServiceSubject[]|undefined>,
     clearPage:()=>Promise<void>
 }
 export function useSubjectService(): ISubjectAction&ISubjectStore {
     const userService = useUserService();
-    const alertService = useAlertService();
     const fetch = useFetch();
     const subjectStoreValues=subjectStore()
     return {
         ...subjectStoreValues,
-        create: async function({name,abbrev,schoolid}){
+        create: async function({name,abbrev,schoolabbrev}){
             try{
-            let school=await fetch.post("/api/subject/create",{name,abbrev,schoolid})
+            let school=await fetch.post("/api/subject/create",{name,abbrev,schoolabbrev})
             return school
             } catch(e:any){
-                alertService.error(e);
-                return undefined
+                throw "Tạo môn học mới thất bại."
             }
         },
 		getPaginated: async (limit) => {
@@ -53,6 +51,7 @@ export function useSubjectService(): ISubjectAction&ISubjectStore {
         clearPage: async ()=>{
             subjectStore.setState({subjects:[],nextSubjectPage:undefined})
             subjectStoreValues.nextSubjectPage=undefined
+            subjectStoreValues.subjects=[]
         }
     }
 };

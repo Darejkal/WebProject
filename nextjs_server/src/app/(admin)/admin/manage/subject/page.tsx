@@ -8,6 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Autocomplete, TextField } from "@mui/material";
 import { useFetch } from "@/app/_helpers/client";
+import { toast } from "react-toastify";
 
 const SubjectInstancesPage = () => {
 	const router = useRouter();
@@ -19,35 +20,38 @@ const SubjectInstancesPage = () => {
 	const [subjectValue, setSubjectValue] = useState<string | null>("");
 	const fetch = useFetch();
 	useEffect(() => {
-		console.log(errors);
-	}, [errors]);
-	useEffect(() => {
 		if (!subjectInputValue) {
 			return;
 		}
 		let queryParam = new URLSearchParams();
 		queryParam.set("query", subjectInputValue);
 		console.log(`search?${queryParam.toString()}`);
-		fetch.get(`/api/subject/search?${queryParam.toString()}`).then((v) => {
+		fetch.get(`/api/subject/search?${queryParam.toString()}`).then((v:any) => {
 			setSubjectOptions(v.map(({ name }: any) => name));
 		});
 	}, [subjectInputValue, subjectValue]);
 	const fields = {
 		name: register("name", { required: "name is required" }),
 		abbrev: register("abbrev", { required: "abbrev is required" }),
-		schoolid: register("schoolid", {
-			required: "schoolid is required",
+		schoolabbrev: register("schoolabbrev", {
+			required: "schoolabbrev is required",
 			value: "HUST",
 		}),
 	};
 	const [showModal, setShowModal] = useState(false);
-	async function onSubmit({ name, abbrev, schoolid }: any) {
-		console.log({ name, abbrev, schoolid });
-		const res = await subjectService.create({ name, abbrev, schoolid });
-		console.log(res);
-		await subjectService.clearPage();
-		await subjectService.getPaginated(20);
-		setShowModal(false);
+	async function onSubmit({ name, abbrev, schoolabbrev }: any) {
+		try{
+			console.log({ name, abbrev, schoolabbrev });
+			const res = await subjectService.create({ name, abbrev, schoolabbrev });
+			console.log(res);
+			await subjectService.clearPage();
+			await subjectService.getPaginated(20);
+			setShowModal(false);
+			toast.success("Tạo môn học mới thành công!",{delay:300})
+
+		} catch(e){
+			toast.warning("Tạo môn học mới thất bại!",{delay:300})
+		}
 		
 	}
 	const [isFetching, setIsFetching] = useState(false);
@@ -101,7 +105,7 @@ const SubjectInstancesPage = () => {
 					{ accessorKey: "authorName", header: "Tên tác giả" },
 					{ accessorKey: "createdat", header: "Tạo lúc" },
 					// { accessorKey: "authorid", header: "ID tác giả" },
-					{ accessorKey: "schoolid", header: "ID trường" },
+					{ accessorKey: "schoolabbrev", header: "ID trường" },
 				]}
 				data={subjectService.subjects ?? []}
 				enablePagination={false}
@@ -167,9 +171,9 @@ const SubjectInstancesPage = () => {
 							<Form.Label>Mã</Form.Label>
 							<Form.Control type="text" {...fields.abbrev} />
 						</Form.Group>
-						<Form.Group controlId="schoolid">
+						<Form.Group controlId="schoolabbrev">
 							<Form.Label>Mã trường</Form.Label>
-							<Form.Control type="text" {...fields.schoolid} disabled />
+							<Form.Control type="text" {...fields.schoolabbrev} disabled />
 						</Form.Group>
 						<Button
 							variant="primary"

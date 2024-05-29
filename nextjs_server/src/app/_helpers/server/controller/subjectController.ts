@@ -11,13 +11,15 @@ export const subjectController = {
     getByUUID,
     getByUUIDs,
     getNext,
+    getByAbbrev,
+    getByAbbrevs,
     search
 };
-async function create(name:string,abbrev:string,schoolid:string,authorid:string){
+async function create(name:string,abbrev:string,schoolabbrev:string,authorid:string){
     let subject= new Subject({
         name,
         abbrev,
-        schoolid,
+        schoolabbrev,
         authorid,
         uuid:generateUUID(),
         createdat:new Date()
@@ -32,8 +34,22 @@ async function getByUUID(uuid:string){
     }
     return subject
 }
+async function getByAbbrev(abbrev:string){
+    let subject= await Subject.findOne({abbrev})
+    if(!subject){
+        throw "cannot find the subject"
+    }
+    return subject
+}
 async function getByUUIDs(uuids:string[]){
     let subjects= await Subject.find({uuid:{$in:uuids}})
+    if(!subjects){
+        throw "cannot find the subjects"
+    }
+    return subjects
+}
+async function getByAbbrevs(abbrevs:string[]){
+    let subjects= await Subject.find({abbrev:{$in:abbrevs}})
     if(!subjects){
         throw "cannot find the subjects"
     }
@@ -49,10 +65,14 @@ async function getNext(limit: number, next?: string) {
 }
 async function search(query:string,limit:number){
     let results=await Subject.find({
-        $or: [
-            { name:query },
-            { abbrev:query }
-        ]
+        // $or: [
+        //     { name:query },
+        //     { abbrev:query }
+        // ]
+        $text:{
+            $search:query,
+            $diacriticSensitive:false
+        }
     }).limit(limit).exec();
     return results;
 }

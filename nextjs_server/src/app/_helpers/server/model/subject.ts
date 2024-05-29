@@ -10,22 +10,22 @@ interface ISubject{
     createdat:Date,
     uuid:string,
     authorid:string,
-    schoolid:string
+    schoolabbrev:string
 }
 export const Subject:mongoose.Model<ISubject> =(() =>{
     const schema = new Schema<ISubject>({
         name: { type: String, required: true },
-        abbrev: { type: String, required: true },
+        abbrev: { type: String,unique:true, required: true},
         createdat:{type: Date, required:true},
         uuid:{type: String,unique: true, required:true},
         authorid:{type: String,required: true},
-        schoolid:{type: String,required: true}
+        schoolabbrev:{type: String,required: true}
     });
     schema.index({name:"text",abbrev:"text"})
     return mongoose.models.subject || mongoose.model<ISubject>('subject', schema);
 })()
 interface ISubjectInstance{
-    subjectid:string,
+    subjectabbrev:string,
     name:string,
     createdat:Date,
     uuid:string,
@@ -33,13 +33,13 @@ interface ISubjectInstance{
 }
 export const SubjectInstance:mongoose.Model<ISubjectInstance>=(()=>{
     const schema = new Schema({
-        subjectid: { type: String, required: true },
+        subjectabbrev: { type: String, required: true },
         name:{type: String, required:true},
         uuid:{type: String,unique: true, required:true},
         createdat:{type: Date, required:true},
         authorid:{type: String, required:true},
     });
-    schema.index({name:"text"})
+    schema.index({name:"text",subjectinstance:"text"})
     return mongoose.models.subjectinstance || mongoose.model<ISubjectInstance>('subjectinstance', schema);
 })()
 interface IUserSubjectInstanceRelation{

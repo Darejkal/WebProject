@@ -10,10 +10,10 @@ const SubjectInstance = db.SubjectInstance;
 const UserSubjectInstanceRelation = db.UserSubjectInstanceRelation;
 
 export const subjectInstanceController = {
-	create: async (subjectid: string, name: string, authorid: string) => {
-		return subjectController.getByUUID(subjectid).then(async () => {
+	create: async (subjectabbrev: string, name: string, authorid: string) => {
+		return subjectController.getByAbbrev(subjectabbrev).then(async () => {
 			let subjectinstance = new SubjectInstance({
-				subjectid: subjectid,
+				subjectabbrev: subjectabbrev,
 				name: name,
 				uuid: generateUUID(),
 				createdat: new Date(),
@@ -86,5 +86,14 @@ export const subjectInstanceController = {
 		console.log("r")
 		console.log(r)
 		return r?true:false
+	},
+	search: async function (query:string,limit:number){
+		let results=await SubjectInstance.find({
+			$text:{
+				$search:query,
+				$diacriticSensitive:false
+			}
+		}).limit(limit).exec();
+		return results;
 	}
 };

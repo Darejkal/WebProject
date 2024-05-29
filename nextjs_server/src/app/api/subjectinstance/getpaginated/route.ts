@@ -21,10 +21,11 @@ async function getSubjectPaginated(req: Request) {
         pre[cur.uuid]=cur.name
         return pre
     },{})
-    let subjectids=subjectInstance.results.map((v)=>v.subjectid)
-    let subjects=await subjectController.getByUUIDs(subjectids)
+    let subjectabbrevs=subjectInstance.results.map((v)=>v.subjectabbrev)
+    let subjects=await subjectController.getByAbbrevs(subjectabbrevs)
+    console.log(subjects)
     let subjectsMap=subjects.reduce((pre:any,cur)=>{
-        pre[cur.uuid]={
+        pre[cur.abbrev]={
             abbrev:cur.abbrev,
             name:cur.name
         }
@@ -34,8 +35,8 @@ async function getSubjectPaginated(req: Request) {
         // @ts-ignore
         return {...v.toObject(),
             authorName:authorsMap[v.authorid],
-            subjectName:subjectsMap[v.subjectid].name,
-            subjectAbbrev:subjectsMap[v.subjectid].abbrev,
+            subjectName:subjectsMap[v.subjectabbrev].name,
+            subjectAbbrev:subjectsMap[v.subjectabbrev].abbrev,
         }
     })}
 }
