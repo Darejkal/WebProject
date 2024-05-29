@@ -15,10 +15,10 @@ async function createSubjectInstance(req: Request) {
     if(!userid){
         throw "userid not found in headers"
     }
-    subjectInstanceController.create(body.subjectid,body.name,userid)
+    await subjectInstanceController.create(body.subjectabbrev,body.name,userid)
 }
 createSubjectInstance.position="admin"
 createSubjectInstance.schema = joi.object({
-    subjectid: joi.string().required(),
+    subjectabbrev: joi.string().required(),
     name: joi.string().required(),
 });

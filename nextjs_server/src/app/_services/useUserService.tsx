@@ -39,6 +39,7 @@ interface IUserService extends IServiceUserStoreData {
 	getByUUID: (id: string) => Promise<IServiceUser | undefined>;
 	getCurrent: (redirect?: Boolean) => Promise<IServiceUser | undefined>;
 	currentHasTeacherRole:()=>Promise<Boolean>;
+	updateCurrent:(params:any)=>Promise<void>;
 	// create: (user: IServiceUser) => Promise<void>,
 	// update: (id: string, params: Partial<IServiceUser>) => Promise<void>,
 	// delete: (id: string) => Promise<void>
@@ -61,18 +62,6 @@ const createUserStore = (
 				set({ currentUser: newuser });
 			},
 		}));
-	return create<IServiceUserStore>()(persist(
-		(set, get) => ({
-			...initState,
-			setUser: (newuser: IServiceUser) => {
-				set({ user: newuser });
-			},
-			setCurrentUser: (newuser: IServiceUser | undefined) => {
-				set({ currentUser: newuser });
-			},
-		}),{
-		name:"user_store"
-	}));
 };
 
 export function useUserService(): IUserService {
@@ -94,7 +83,6 @@ export function useUserService(): IUserService {
 		user,
 		currentUser,
 		login: async (email, password) => {
-			alertService.clear();
 			try {
 				const newUser = await fetch.post("/api/user/login", {
 					email,
@@ -106,7 +94,7 @@ export function useUserService(): IUserService {
 				const returnUrl = searchParams.get("returnUrl") || "/";
 				router.push(returnUrl);
 			} catch (error: any) {
-				alertService.error(error);
+				throw "Login failed";
 			}
 		},
 		logout: async () => {
@@ -153,7 +141,8 @@ export function useUserService(): IUserService {
 					}
 				}
 			}
-
+			console.log("aftergetcurrent");
+			console.log(currentUser)
 			return currentUser;
 		},
 		currentHasTeacherRole:async()=>{
@@ -164,10 +153,13 @@ export function useUserService(): IUserService {
 				try{
 					userStore.setState({currentUser:{...currentUser,isTeacher:await fetch.get("/api/user/hasrole/teacher")}})
 				} catch(e){
-
+					userStore.setState({currentUser:{...currentUser,isTeacher:false}})
 				}
 			}
 			return currentUser.isTeacher?true:false;
+		},
+		updateCurrent: async (params)=>{
+			await fetch.post("/api/user/update",params)
 		}
 	};
 }

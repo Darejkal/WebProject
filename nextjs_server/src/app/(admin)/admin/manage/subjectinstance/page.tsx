@@ -5,25 +5,65 @@ import { MaterialReactTable } from "material-react-table";
 import { Button, Form, Modal } from "react-bootstrap";
 import { IServiceSubjectInstance, useSubjectInstanceService } from "@/app/_services";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { useFetch } from "@/app/_helpers/client";
+import { Autocomplete,TextField } from "@mui/material";
 
 const SubjectInstancesPage = () => {
 	const subjectInstanceService = useSubjectInstanceService();
-	const { register, handleSubmit, formState } = useForm();
+	const { register, handleSubmit, formState,setValue } = useForm();
 	const { errors } = formState;
+	const [subjectInstanceOptions, setSubjectInstanceOptions] = useState<string[]>([]);
+	const [subjectInstanceInputValue, setSubjectInstanceInputValue] = useState<string | null>("");
+	const [subjectInstanceValue, setSubjectInstanceValue] = useState<string | null>("");
+	const [subjectOptions, setSubjectOptions] = useState<{name:string,abbrev:string,uuid:string,schoolabbrev:string}[]>([]);
+	const [subjectInputValue, setSubjectInputValue] = useState<string | null>("");
+	const [subjectValue, setSubjectValue] = useState<{name:string,abbrev:string,uuid:string,schoolabbrev:string} | null>(null);
 	const fields = {
 		name: register("name", { required: "name is required" }),
-		subjectid: register("subjectid", {
-			required: "subjectid is required",
+		subjectname: register("subjectname",{disabled:true}),
+		subjectschool: register("subjectschool",{disabled:true}),
+		subjectabbrev: register("subjectabbrev", {
+			required: "subjectabbrev is required",
 		}),
 	};
+	useEffect(() => {
+		if (!subjectInputValue) {
+			return;
+		}
+		let queryParam = new URLSearchParams();
+		queryParam.set("query", subjectInputValue);
+		console.log(`search?${queryParam.toString()}`);
+		fetch.get(`/api/subject/search?${queryParam.toString()}`).then((v:any) => {
+			console.log(v)
+			setSubjectOptions(v);
+		});
+	}, [subjectInputValue, subjectValue]);
+	const fetch = useFetch();
+	useEffect(() => {
+		if (!subjectInstanceInputValue) {
+			return;
+		}
+		let queryParam = new URLSearchParams();
+		queryParam.set("query", subjectInstanceInputValue);
+		console.log(`search?${queryParam.toString()}`);
+		fetch.get(`/api/subjectinstance/search?${queryParam.toString()}`).then((v:any) => {
+			setSubjectInstanceOptions(v.map(({ name }: any) => name));
+		});
+	}, [subjectInstanceInputValue, subjectInstanceValue]);
 	const [showModal, setShowModal] = useState(false);
-	async function onSubmit({ subjectid,name }: any) {
-		const res = await subjectInstanceService.create(subjectid,name);
-		console.log(res);
-		setShowModal(false)
-		subjectInstanceService.clearPage().then(()=>{
-			subjectInstanceService.getPaginated(20)
-		})
+	async function onSubmit({ subjectabbrev,name }: any) {
+		try{
+			console.log({ name, subjectabbrev });
+			const res = await subjectInstanceService.create( subjectabbrev,name);
+			console.log(res);
+			await subjectInstanceService.clearPage();
+			await subjectInstanceService.getPaginated(20);
+			setShowModal(false);
+			toast.success("Tạo môn học mới thành công!",{delay:300})
+		} catch(e){
+			toast.warning("Tạo môn học mới thất bại!",{delay:300})
+		}
 	}
 	const [isFetching, setIsFetching] = useState(false);
 	const fetchNextPage = useCallback((containerRefElement?: HTMLDivElement | null) => {
@@ -59,12 +99,12 @@ const SubjectInstancesPage = () => {
 	return (
 		<div style={{ margin: "3rem 10rem 0 10rem" }}>
 			<h4 style={{ display: "block", paddingBottom: "1rem" }}>
-				Quản lý môn học
+				Quản lý lớp học
 			</h4>
 			<MaterialReactTable
 				columns={[
 					{ accessorKey: "name", header: "Tên" },
-					// { accessorKey: "subjectid", header: "Mã môn" },
+					// { accessorKey: "subjectabbrev", header: "Mã môn" },
 					{ accessorKey: "subjectName", header: "Tên môn" },
 					{ accessorKey: "subjectAbbrev", header: "Mã môn" },
 					// { accessorKey: "uuid", header: "UUID" },
@@ -107,11 +147,63 @@ const SubjectInstancesPage = () => {
 					<Form onSubmit={handleSubmit(onSubmit)}>
 						<Form.Group controlId="name">
 							<Form.Label>Tên</Form.Label>
-							<Form.Control type="text" {...fields.name} />
+							<Autocomplete
+								options={subjectInstanceOptions}
+								filterOptions={(x) => x}
+								onInputChange={(e, value) => setSubjectInstanceInputValue(value)}
+								renderInput={(params) => (
+									<TextField
+										{...params}
+										label="Nhập tên lớp học"
+										fullWidth
+										{...fields.name}
+									/>
+								)}
+								value={subjectInstanceInputValue}
+								onChange={(e, value, ...args) => {
+									setSubjectInstanceOptions(
+										value ? [value, ...subjectInstanceOptions] : subjectInstanceOptions
+									);
+									setSubjectInstanceValue(value);
+								}}
+							/>
 						</Form.Group>
-						<Form.Group controlId="subjectid">
-							<Form.Label>Mã môn</Form.Label>
-							<Form.Control type="text" {...fields.subjectid} />
+						<Form.Group controlId="subjectabbrev">
+							<Form.Label>Mã môn </Form.Label>
+							{/* <Form.Control type="text" {...fields.subjectabbrev} /> */}
+							<Autocomplete
+								options={subjectOptions}
+								filterOptions={(x) => x}
+								onInputChange={(e, value) => setSubjectInputValue(value)}
+								renderInput={(params) => (
+									<TextField
+										{...params}
+										label="Nhập mã môn học của lớp"
+										fullWidth
+										{...fields.subjectabbrev}
+									/>
+								)}
+								getOptionLabel={({abbrev})=>(abbrev??"")}
+								value={subjectValue}
+								isOptionEqualToValue={(option,value)=>option.abbrev==value.abbrev}
+								inputValue={subjectInputValue??undefined}
+								onChange={(e, value, ...args) => {
+									setSubjectOptions(
+										value ? [value, ...subjectOptions] : subjectOptions
+									);
+									setValue("subjectname",value?.name??"")
+									setValue("subjectschool",value?.schoolabbrev??"")
+									setSubjectValue(value);
+								}}
+							/>
+						</Form.Group>
+						<Form.Group controlId="subjectname">
+							<Form.Label>Mã môn </Form.Label>
+							<Form.Control type="text" {...fields.subjectname} />
+						</Form.Group>
+						<Form.Group controlId="subjectschool">
+							<Form.Label>Mã trường </Form.Label>
+							<Form.Control type="text" {...fields.subjectschool} />
 						</Form.Group>
 						<Button
 							variant="primary"

@@ -1,7 +1,9 @@
 import { Be_Vietnam_Pro } from "next/font/google";
 import { UserStoreProvider } from "./_services";
 import AppHeader from "./_components/AppHeader";
-
+import "bootstrap/dist/css/bootstrap.min.css";
+import 'react-toastify/dist/ReactToastify.css'
+import { ToastContainer } from "react-toastify";
 const inter = Be_Vietnam_Pro({ weight: ["400", "700"], subsets: ["latin"] });
 export default function RootLayout({
 	children,
@@ -25,6 +27,7 @@ export default function RootLayout({
 				<div className="h-100 w-100">
 					<UserStoreProvider>
 						{children}
+					<ToastContainer />
 					</UserStoreProvider>
 				</div>
 				<script src="/static/js/jquery-2.1.1.min.js"></script>

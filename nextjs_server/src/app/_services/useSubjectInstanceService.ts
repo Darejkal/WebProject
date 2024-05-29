@@ -20,7 +20,7 @@ const initialState = {
 };
 const subjectInstanceStore = create<IServiceSubjectInstanceStore>(() => initialState);
 interface IServiceSubjectInstanceService extends IServiceSubjectInstanceStore {
-    create:(subjectid:string,name:string)=>Promise<any>,
+    create:(subjectabbrev:string,name:string)=>Promise<any>,
     getallCurrent:()=>Promise<any>,
 	getPaginated: (limit:number,next?:string) => Promise<IServiceSubjectInstance[]|undefined>,
     clearPage:()=>Promise<void>
@@ -32,9 +32,9 @@ export function useSubjectInstanceService(): IServiceSubjectInstanceService {
 
     return {
         ...subjectInstanceStoreValues,
-        create:async function (subjectid:string,name:string) {
+        create:async function (subjectabbrev:string,name:string) {
             return await fetch.post("/api/subjectinstance/create",{
-                subjectid,name
+                subjectabbrev,name
             })     
         },
         getallCurrent:async function () {
@@ -50,6 +50,8 @@ export function useSubjectInstanceService(): IServiceSubjectInstanceService {
 			return results
 		}, clearPage:async ()=>{
             subjectInstanceStore.setState({subjectinstances:[],nextPage:undefined})
+            subjectInstanceStoreValues.subjectinstances=[]
+            subjectInstanceStoreValues.nextPage=undefined
         }
     }
 };
