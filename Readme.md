@@ -21,6 +21,6 @@ Deployment:
 ## Phân công 
 |Tên|MSSV|Công việc|
 |--|--|--|
-|Nguyễn Đại An (Trưởng nhóm)|20215296| Thực hiện Backend, Frontend nền và đảm nhiệm các tính năng phụ như videocall và extension. |
+|Nguyễn Đại An (Trưởng nhóm)|20215296| Thực hiện Backend, Frontend nền và CICD. |
 |Nguyễn Văn An|20215520| Đảm nhiệm Frontend chính|
 |Phạm Công An|20215521| Đảm nhiệm Frontend chính |
