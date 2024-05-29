@@ -11,7 +11,7 @@ export const Exam =(()=> {
         uuid:{type: String,unique: true, required:true},
         name:{type: String, required:true},
         createdat:{type: Date, required:true},
-        questions:[
+        questionids:[
             {
                 type: String
             }

@@ -6,7 +6,6 @@ import { Dropdown, DropdownButton } from "react-bootstrap";
 import { SetStateAction, useState, useEffect } from "react";
 import React from "react";
 import { useUserService } from "@/app/_services";
-import "bootstrap/dist/css/bootstrap.min.css";
 import {toast} from "react-toastify"
 import {
 	FieldValues,

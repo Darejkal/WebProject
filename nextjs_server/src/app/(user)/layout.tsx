@@ -4,8 +4,6 @@ import { auth, userController } from "@/app/_helpers/server";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "../_components/AppHeader";
 import { Alert } from "../_components";
-import 'react-toastify/dist/ReactToastify.css'
-import { ToastContainer } from "react-toastify";
 export default async function AuthenticationLayout({
     children,
 }: Readonly<{
@@ -26,6 +24,5 @@ export default async function AuthenticationLayout({
         <AppHeader redirect={true} />
         <Alert />
         {children}
-        <ToastContainer />
     </div>
 }

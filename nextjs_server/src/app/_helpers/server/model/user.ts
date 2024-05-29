@@ -22,6 +22,6 @@ export const User:mongoose.Model<IUser>= (()=> {
         uuid:{type: String,unique: true, required:true},
         position:{type: String,default:"user",enum:["user","admin"], required:true},
     });
-
+    schema.index({name:"text",email:"text",phonenumber:"text"})
     return mongoose.models.user|| mongoose.model<IUser> ('user', schema);
 })()

@@ -18,6 +18,7 @@ export default function AuthenticationLayout({
 				"position" in user &&
 				user.position === "admin"
 			) {
+				return <>{children}</>;
 			} else {
 				throw "forbidden";
 			}
@@ -26,5 +27,5 @@ export default function AuthenticationLayout({
 		}
 	}
 
-	return <>{children}</>;
+	
 }

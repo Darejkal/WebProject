@@ -16,5 +16,6 @@ async function searchSubject(req: NextRequest) {
 		throw "no query provided"
 	}
 	let results= await subjectController.search(query,5);
+	console.log(results)
 	return results.map(({name,abbrev,uuid})=>({name,abbrev,uuid}));
 }

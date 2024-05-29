@@ -21,6 +21,7 @@ export const Subject:mongoose.Model<ISubject> =(() =>{
         authorid:{type: String,required: true},
         schoolid:{type: String,required: true}
     });
+    schema.index({name:"text",abbrev:"text"})
     return mongoose.models.subject || mongoose.model<ISubject>('subject', schema);
 })()
 interface ISubjectInstance{
@@ -38,6 +39,7 @@ export const SubjectInstance:mongoose.Model<ISubjectInstance>=(()=>{
         createdat:{type: Date, required:true},
         authorid:{type: String, required:true},
     });
+    schema.index({name:"text"})
     return mongoose.models.subjectinstance || mongoose.model<ISubjectInstance>('subjectinstance', schema);
 })()
 interface IUserSubjectInstanceRelation{

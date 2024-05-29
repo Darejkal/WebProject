@@ -13,5 +13,6 @@ export const School =(()=> {
         uuid:{type: String,unique: true, required:true},
         createdat:{type: Date, required:true},
     });
+    schema.index({name:"text"})
     return mongoose.models.school || mongoose.model('school', schema);
 })()

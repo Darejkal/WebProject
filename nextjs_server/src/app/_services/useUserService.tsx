@@ -83,7 +83,6 @@ export function useUserService(): IUserService {
 		user,
 		currentUser,
 		login: async (email, password) => {
-			alertService.clear();
 			try {
 				const newUser = await fetch.post("/api/user/login", {
 					email,
@@ -95,7 +94,7 @@ export function useUserService(): IUserService {
 				const returnUrl = searchParams.get("returnUrl") || "/";
 				router.push(returnUrl);
 			} catch (error: any) {
-				alertService.error(error);
+				throw "Login failed";
 			}
 		},
 		logout: async () => {
