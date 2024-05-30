@@ -28,6 +28,9 @@ function authenticate(required_position:null|string=null) {
 
 function verifyToken() {
     const token = cookies().get('authorization')?.value ?? '';
+    if(!token){
+        throw "no token"
+    }
     const decoded = <jwt.UserJwtPayload>jwt.verify(token, process.env.JWT_SECRET!);
     const id = decoded.sub as string;
     const position = decoded.position as string;

@@ -10,13 +10,14 @@ import (
 )
 
 type User struct {
-	Name      string
-	Uuid      string
-	Password  string
-	Email     string
-	ClassId   string
-	SchoolId  string
-	CreatedAt time.Time
+	Name        string
+	Uuid        string
+	Password    string
+	Email       string
+	ClassId     string
+	SchoolId    string
+	PhoneNumber string
+	CreatedAt   time.Time
 	hasCollection
 }
 

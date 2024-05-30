@@ -5,14 +5,15 @@ import { db } from "../model";
 import { customEncrypt, customEncryptCompare, generateUUID } from "../../utils";
 import { subjectController } from "./subjectController";
 import { userController } from "./userController";
+import { FormatListBulleted } from "@mui/icons-material";
 const SubjectInstance = db.SubjectInstance;
 const UserSubjectInstanceRelation = db.UserSubjectInstanceRelation;
 
 export const subjectInstanceController = {
-	create: async (subjectid: string, name: string, authorid: string) => {
-		return subjectController.getByUUID(subjectid).then(async () => {
+	create: async (subjectabbrev: string, name: string, authorid: string) => {
+		return subjectController.getByAbbrev(subjectabbrev).then(async () => {
 			let subjectinstance = new SubjectInstance({
-				subjectid: subjectid,
+				subjectabbrev: subjectabbrev,
 				name: name,
 				uuid: generateUUID(),
 				createdat: new Date(),
@@ -77,4 +78,22 @@ export const subjectInstanceController = {
 			next: results.length == 0 ? undefined : results[results.length - 1]._id,
 		};
 	},
+	doesUserHaveRole: async (userid:string,role:string)=>{
+		let r=await UserSubjectInstanceRelation.findOne({
+			userid:userid,
+			role:role
+		})
+		console.log("r")
+		console.log(r)
+		return r?true:false
+	},
+	search: async function (query:string,limit:number){
+		let results=await SubjectInstance.find({
+			$text:{
+				$search:query,
+				$diacriticSensitive:false
+			}
+		}).limit(limit).exec();
+		return results;
+	}
 };

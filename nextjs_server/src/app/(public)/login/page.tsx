@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "react-bootstrap";
 import styles from './page.module.css'
+import { toast } from "react-toastify";
 
 
 export default function LoginPage(){
@@ -29,7 +30,14 @@ export default function LoginPage(){
         password: register('password', { required: 'Password is required' })
     };
     async function onSubmit({ email, password }:any) {
-        const res=await userService.login(email, password);
+        let info_toast=toast.info("Logging in")
+        try{
+            const res=await userService.login(email, password);
+            toast.dismiss(info_toast)
+            toast.success("Logged in",{delay:500})
+        } catch(e:any){
+            toast.warning(e);
+        }
     }
     if(loading){
         return <div>Loading</div>
@@ -63,7 +71,7 @@ export default function LoginPage(){
                             <div className={styles.cardline}>
                                 <p className={styles.cardline1}>Chưa có tài khoản?</p>
                             </div>
-                            <Button href="/user/signup" className={styles.cardbtn}>Tạo tài khoản mới</Button>
+                            <Button href="/signup" className={styles.cardbtn}>Tạo tài khoản mới</Button>
                         </div>
                         
                     </form>

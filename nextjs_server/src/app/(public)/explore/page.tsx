@@ -8,6 +8,7 @@ import { useEffect } from "react";
 
 export default function IndexPage(){
     const router = useRouter()
+    router.push("/landing")
     const userService=useUserService()
     useEffect(()=>{
         console.log(userService.currentUser)

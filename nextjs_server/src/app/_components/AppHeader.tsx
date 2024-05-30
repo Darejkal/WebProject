@@ -21,6 +21,15 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 	const [warning, setWarning] = useState(<></>);
 	const userService = useUserService();
 	const router = useRouter();
+	useLayoutEffect(() => {
+		console.log(redirect);
+		userService.getCurrent(redirect);
+	}, []);
+	useEffect(() => {
+		if(userService.currentUser&&typeof userService.currentUser.isTeacher ==="undefined"){
+			userService.currentHasTeacherRole()
+		}
+	}, [userService.currentUser]);
 	const logoutWarning = (
 		<Alert variant="warning">
 			<Alert.Heading>Xác nhận</Alert.Heading>
@@ -76,19 +85,9 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 			</div>
 		</Alert>
 	);
-	useLayoutEffect(() => {
-		console.log(redirect);
-		userService.getCurrent(redirect);
-	}, []);
-	useEffect(() => {
-		console.log("appheader");
-		console.log(userService.currentUser);
-	}, [userService]);
 	return (
 		<div>
 			{warning}
-			{/* {!show && <Button onClick={() => setShow(true)}>Show Alert</Button>} */}
-
 			<Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
 				<Container>
 					<Navbar.Brand href="/landing">HustServe</Navbar.Brand>
@@ -104,7 +103,20 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 											ChitChat <ChatBubbleLeftIcon style={{ width: "1rem" }} />
 										</div>
 									</Nav.Link>
-									{userService.currentUser?.position == "admin" && (
+									{userService.currentUser?.isTeacher===true && (
+										<>
+											<NavDropdown title="Giáo viên" id="basic-nav-dropdown">
+												<NavDropdown.Item href="/teacher/dashboard">
+													Thống kê
+												</NavDropdown.Item>
+												<NavDropdown.Divider />
+												<NavDropdown.Item href="/teacher/manage/class">
+													Quản lý lớp học
+												</NavDropdown.Item>
+											</NavDropdown>
+										</>
+									)}
+									{userService.currentUser?.position === "admin" && (
 										<>
 											<NavDropdown title="Quản lý" id="basic-nav-dropdown">
 												<NavDropdown.Item href="/admin">

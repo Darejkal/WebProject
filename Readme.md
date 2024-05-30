@@ -1,20 +1,26 @@
-# Webapp
+# HustServe
+Hệ thống quản lý sinh viên kèm tiện ích.
+## Các tính năng
+- Videocall
+- Điểm danh QR (+ Web Extension)
+- Quản lý sinh viên và mối quan hệ của sinh viên với các lớp.
+- Giao và nộp test
+## Hệ thống
+### Các công nghệ sử dụng
+Development:
+- ICE Server: Golang (WebRTC + Gorilla)
+- Backend tập trung + Frontend:  Typescript (Nextjs + Zustack)
+- Notification Service: Fastapi + Apprise
+- Message Queue: Redpanda
+- Database: MongoDB
 
-## Startup commands
-```
-cd ./front_server&& npm run dev 
-cd ./go_server&& go run --mod=mod main.go
-```
+Deployment:
+- Docker + K8s
+- Ansible
 
-## Structure
-
-Nextjs -----> Mongo
-
-Go HTTP ----->Mongo
-## Progress
-||Login/logout|Attendance|Exam|Chat
-|--|--|--|--|--|
-|Backend|Dai An|||Dai An|
-|Frontend|Dai An|||Dai An|
-
-Empty means that it is not up and running yet (in this branch)
+## Phân công 
+|Tên|MSSV|Công việc|
+|--|--|--|
+|Nguyễn Đại An (Trưởng nhóm)|20215296| Thực hiện Backend, Frontend nền và CICD. |
+|Nguyễn Văn An|20215520| Đảm nhiệm Frontend chính|
+|Phạm Công An|20215521| Đảm nhiệm Frontend chính |

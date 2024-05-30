@@ -10,27 +10,25 @@ module.exports = apiHandler({
 });
 
 async function createSubjectInstance(req: Request) {
-	// const userid=req.headers.get("userId")
-	// if(!userid){
-	// 	throw "userid not found"
-	// }
-	const userid="ok"
+	const userid=req.headers.get("userId")
+	if(!userid){
+		throw "userid not found"
+	}
 	const {
-		schoolid,
+		schoolabbrev,
 		abbrev,
 		name,
 	}: {
-		schoolid: string;
+		schoolabbrev: string;
 		abbrev: string;
 		name: string;
 	} = await req.json();
-    let subject=await subjectController.create(name, abbrev, schoolid,userid)
+    let subject=await subjectController.create(name, abbrev, schoolabbrev,userid)
 	return {...subject.toObject(),_id:undefined,__v:undefined};
 }
-createSubjectInstance.ispublic = true;
 createSubjectInstance.position = "admin";
 createSubjectInstance.schema = joi.object({
-	schoolid: joi.string().required(),
+	schoolabbrev: joi.string().required(),
 	abbrev: joi.string().required(),
 	name: joi.string().required(),
 });
