@@ -10,7 +10,7 @@ import { useFetch } from "@/app/_helpers/client";
 import { Autocomplete,TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { PaginatedTable } from "@/app/_components/PaginatedTable";
-
+import debounce from "lodash/debounce";
 const SubjectInstancesPage = () => {
 	const router=useRouter();
 	const subjectInstanceService = useSubjectInstanceService();
@@ -31,29 +31,39 @@ const SubjectInstancesPage = () => {
 			required: "subjectabbrev is required",
 		}),
 	};
+	const getSubjectOptionsDelayed=useCallback(
+		debounce((input:string|null,callback:(v:any)=>any)=>{
+			if (!input) {
+				return;
+			}
+			let queryParam = new URLSearchParams();
+			queryParam.set("query", input);
+			console.log(`search?${queryParam.toString()}`);
+			fetch.get(`/api/subject/search?${queryParam.toString()}`).then(callback)
+		},200),[]
+	)
+	const getSubjectOptionsInstanceDelayed=useCallback(
+		debounce((input:string|null,callback:(v:any)=>any)=>{
+			if (!input) {
+				return;
+			}
+			let queryParam = new URLSearchParams();
+			queryParam.set("query", input);
+			console.log(`search?${queryParam.toString()}`);
+			fetch.get(`/api/subjectinstance/search?${queryParam.toString()}`).then(callback);
+		},200),[]
+	)
 	useEffect(() => {
-		if (!subjectInputValue) {
-			return;
-		}
-		let queryParam = new URLSearchParams();
-		queryParam.set("query", subjectInputValue);
-		console.log(`search?${queryParam.toString()}`);
-		fetch.get(`/api/subject/search?${queryParam.toString()}`).then((v:any) => {
+		getSubjectOptionsDelayed(subjectInputValue,(v:any) => {
 			console.log(v)
 			setSubjectOptions(v);
 		});
 	}, [subjectInputValue, subjectValue]);
 	const fetch = useFetch();
 	useEffect(() => {
-		if (!subjectInstanceInputValue) {
-			return;
-		}
-		let queryParam = new URLSearchParams();
-		queryParam.set("query", subjectInstanceInputValue);
-		console.log(`search?${queryParam.toString()}`);
-		fetch.get(`/api/subjectinstance/search?${queryParam.toString()}`).then((v:any) => {
+		getSubjectOptionsInstanceDelayed(subjectInstanceInputValue,(v:any) => {
 			setSubjectInstanceOptions(v.map(({ name }: any) => name));
-		});
+		})
 	}, [subjectInstanceInputValue, subjectInstanceValue]);
 	const [showModal, setShowModal] = useState(false);
 	async function onSubmit({ subjectabbrev,name }: any) {
@@ -69,36 +79,6 @@ const SubjectInstancesPage = () => {
 			toast.warning("Tạo môn học mới thất bại!",{delay:300})
 		}
 	}
-	// const [isFetching, setIsFetching] = useState(false);
-	// const fetchNextPage = useCallback((containerRefElement?: HTMLDivElement | null) => {
-	// 	if (containerRefElement) {
-	// 		const { scrollHeight, scrollTop, clientHeight } = containerRefElement;
-
-	// 		//once the user has scrolled within 400px of the bottom of the table, fetch more data if we can
-
-	// 		if (scrollHeight - scrollTop - clientHeight < 400 &&!subjectInstanceService.paginationEnded && !isFetching) {
-	// 			setIsFetching(true)
-	// 			subjectInstanceService.getPaginated(20).then(
-	// 				()=>{
-	// 					setIsFetching(false)
-	// 					console.log(subjectInstanceService.subjectinstances)
-	// 				}
-	// 			)
-	// 		}
-	// 	}
-	// },[isFetching,subjectInstanceService.subjectinstances,subjectInstanceService.getPaginated,subjectInstanceService.paginationEnded])
-	// useEffect(()=>{
-	// 	subjectInstanceService.getPaginated(20)
-	// 	console.log(subjectInstanceService.subjectinstances)
-	// },[])
-	// useEffect(()=>{
-	// 	console.log("changes")
-	// 	console.log(subjectInstanceService.subjectinstances)
-	// 	if(subjectInstanceService.subjectinstances){
-	// 		console.log(subjectInstanceService.subjectinstances)
-	// 		setSubjectInstanceTableData(subjectInstanceService.subjectinstances)
-	// 	}
-	// },[subjectInstanceService.subjectinstances])
 	return (
 		<div style={{ margin: "3rem 10rem 0 10rem" }}>
 			<h4 style={{ display: "block", paddingBottom: "1rem" }}>
@@ -122,39 +102,6 @@ const SubjectInstancesPage = () => {
                     data:subjectInstanceService.subjectinstances
                 }}
             />
-			{/* <MaterialReactTable
-				columns={[
-					{ accessorKey: "name", header: "Tên" },
-					// { accessorKey: "subjectabbrev", header: "Mã môn" },
-					{ accessorKey: "subjectName", header: "Tên môn" },
-					{ accessorKey: "subjectAbbrev", header: "Mã môn" },
-					// { accessorKey: "uuid", header: "UUID" },
-					{ accessorKey: "createdat", header: "Tạo lúc" },
-					// { accessorKey: "authorid", header: "ID tác giả" },
-					{ accessorKey: "authorName", header: "Tên tác giả" },
-				]}
-				muiTableBodyRowProps={({row})=>({
-					onClick:(event)=>{
-						router.push(`/admin/manage/subjectinstance/${row.original.subjectAbbrev}`)
-					},
-					
-				})}
-				data={subjectTableInstanceData}
-				enablePagination={false}
-				enableRowNumbers={true}
-				state={{
-					showProgressBars:isFetching
-				}}
-				muiTableContainerProps={
-					{
-						sx:{
-							maxHeight:"20rem"
-						},
-						onScroll:(event: UIEvent<HTMLDivElement>)=>fetchNextPage(event.target as HTMLDivElement)
-					}
-				}
-                
-			/> */}
 			<div
 				style={{
 					margin: "1rem 0 0 0",
