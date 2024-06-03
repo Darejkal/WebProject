@@ -48,6 +48,13 @@ export const subjectInstanceController = {
 		});
 		return usersubject;
 	},
+	getByUUID: async (uuid: string) => {
+		let subjectInstance=await SubjectInstance.findOne({uuid})
+		if(!subjectInstance){
+			throw "subject instance not found";
+		}
+		return subjectInstance;
+	},
 	getall: async (userid: string) => {
 		let user = await userController.getByUUID(userid);
 		if (!user) {

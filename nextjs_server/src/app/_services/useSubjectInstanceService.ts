@@ -61,7 +61,7 @@ export function useSubjectInstanceService(): IServiceSubjectInstanceService {
 		        subjectInstanceStore.setState({ 
                     subjectinstances: [...(subjectInstanceStoreValues.subjectinstances??[]),...results]
                         .sort(
-                            (a,b)=>(a.subjectid>b.subjectid?1:0)
+                            (a,b)=>(a.uuid>b.uuid?1:0)
                         ).reduce((pre,cur)=>{
                             if(pre.length==0||pre[pre.length-1].uuid!=cur.uuid){
                                 pre.push(cur);

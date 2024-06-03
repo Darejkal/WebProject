@@ -1,9 +1,9 @@
 "use client"
 import { ChipTypeMap, TextField, TextFieldProps, TextFieldVariants, useAutocomplete } from "@mui/material";
-import Autocomplete, { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteProps } from "@mui/material/Autocomplete";
+import Autocomplete, { AutocompleteChangeDetails, AutocompleteChangeReason, AutocompleteInputChangeReason, AutocompleteProps } from "@mui/material/Autocomplete";
 import { Variant } from "@mui/material/styles/createTypography";
 import debounce from "lodash/debounce";
-import { SyntheticEvent, useCallback, useEffect, useState } from "react";
+import { HTMLAttributes, RefObject, SyntheticEvent, useCallback, useEffect, useRef, useState } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 import { useFetch } from "../_helpers/client";
 
@@ -16,6 +16,8 @@ export default function SearchableInput<
     formRegister,
     fetchData,
     afterOnChange,
+    afterOnInputChange,
+    afterGetOptions,
     props
     // getOptionLabel
 }:{
@@ -24,9 +26,12 @@ export default function SearchableInput<
     textFieldProps?:{variant?: Variant;} & Omit<TextFieldProps, 'variant'>,
     formRegister:UseFormRegisterReturn<any>,
     fetchData:(input:string)=>Promise<Value[]>,
-    afterOnChange?:(event: SyntheticEvent<Element, Event>, value: Value|string|null , reason: AutocompleteChangeReason, details?: AutocompleteChangeDetails<Value|string> | undefined) => void
+    afterOnChange?:(props:{event: SyntheticEvent<Element, Event>, value: Value|string|null , reason: AutocompleteChangeReason, details?: AutocompleteChangeDetails<Value|string> | undefined,options:(Value|string)[]} ) => void
+    afterOnInputChange?:(props:{event: SyntheticEvent<Element, Event>, value: Value|string|null , reason: AutocompleteInputChangeReason,options:(Value|string)[]} ) => void
+    afterGetOptions?:(props:{inputValue: Value|string|null,options:(Value|string)[]} ) => void
     props?:{
         optionLabel?:keyof Value,
+        // optionID?:keyof Value,
     }
 }){
     const [options,setOptions]=useState<(Value|string)[]>([]);
@@ -47,8 +52,10 @@ export default function SearchableInput<
             } else{
                 setOptions([]);
             }
+            afterGetOptions&&afterGetOptions({inputValue,options:v})
 		})
 	}, [inputValue]);
+    const {ref:formRegisterRef,...formRegisterNoRef}=formRegister;
     return (
         <Autocomplete
             options={options}
@@ -61,23 +68,37 @@ export default function SearchableInput<
                     return option[props!.optionLabel!] as string
                 }
             }}:{})}
-            onInputChange={(e, value) => setInputValue(value)}
+            // {...(props?.optionID?{
+            //         renderOption:(props:HTMLAttributes<HTMLLIElement>, option:string | Value) => (
+            //                 <li {...props} key={(typeof option==="string")?option:option[props.optionID]}>
+            //                     {typeof option==="string"?option:option[props!.optionLabel!]}
+            //                 </li>
+            //         )
+            //     }:{}
+            //     )
+            // }
+            onInputChange={(event, value,reason) => {
+                setInputValue(value)
+                afterOnInputChange&&afterOnInputChange({event, value,reason,options})
+            }}
             renderInput={(params) => (
                 <TextField
                     {...params}
                     fullWidth
                     autoComplete='off'
                     {...textFieldProps}
-                    {...formRegister}
+                    inputRef={formRegisterRef}
+                    {...formRegisterNoRef}
                 />
             )}
-            onChange={(e, value, ...args) => {
+            onChange={(event,value,reason,details) => {
                 console.log("onchanged")
-                setOptions(value?[value,...options]:options);
+                console.log(value)
                 if(value){
+                    setOptions([value,...options])
                     setValue(value);
                 }
-                afterOnChange&&afterOnChange(e, value, ...args)
+                afterOnChange&&afterOnChange({event,value,reason,details,options})
             }}
             {...autocompleteProps}
         />

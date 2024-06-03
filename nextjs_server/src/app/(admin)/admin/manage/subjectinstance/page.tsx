@@ -72,8 +72,8 @@ const SubjectInstancesPage = () => {
 			console.log({ name, subjectabbrev });
 			const res = await subjectInstanceService.create( subjectabbrev,name);
 			console.log(res);
-			// await subjectInstanceService.clearPage();
-			// await subjectInstanceService.getPaginated(20);
+			await subjectInstanceService.clearPage();
+			await subjectInstanceService.getPaginated({limit:20,next:""});
 			setShowModal(false);
 			toast.success("Tạo môn học mới thành công!",{delay:300})
 		} catch(e){
@@ -96,7 +96,13 @@ const SubjectInstancesPage = () => {
                         { accessorKey: "createdat", header: "Tạo lúc" },
                         // { accessorKey: "authorid", header: "ID tác giả" },
                         { accessorKey: "authorName", header: "Tên tác giả" },
-                    ]
+                    ],
+					muiTableBodyRowProps:({row})=>({
+						onClick:(e)=>{
+							router.push(`/admin/manage/subjectinstance/${row.original.uuid}`)
+						},
+						sx:{cursor: "pointer"}
+					})
                 }}
                 pagination={{
                     getPaginated:subjectInstanceService.getPaginated,
@@ -153,8 +159,10 @@ const SubjectInstancesPage = () => {
 									optionLabel:"abbrev"
 								}}
 								afterOnChange={(e, value, ...args) => {
-									setValue("subjectname",value?.name??"")
-									setValue("subjectschool",value?.schoolabbrev??"")
+									if(typeof value !=="string"){
+										setValue("subjectname",(value?.name)??"")
+										setValue("subjectschool",value?.schoolabbrev??"")
+									}
 								}}
 							/>
 						</Form.Group>

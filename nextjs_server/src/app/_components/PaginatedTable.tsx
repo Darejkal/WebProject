@@ -17,7 +17,7 @@ export function PaginatedTable<TData extends MRT_RowData>(
     const [isFetching, setIsFetching] = useState(false);
 	const [data, setData]=useState<TData[]>([])
     const [isError, setIsError] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     // const [pagination, setPagination] = useState<{limit: number, next?: string | undefined}>({limit:20});
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<MRT_SortingState>([]);
@@ -52,11 +52,6 @@ export function PaginatedTable<TData extends MRT_RowData>(
             const response=await getPaginated(
                 {limit:20,next:"",...(globalFilter&&{query:globalFilter})}
             )
-            // if(response){
-            //     setData(response);
-            // } else{
-            //     setData([]);
-            // }
         } catch (error) {
           setIsError(true);
           console.error(error);

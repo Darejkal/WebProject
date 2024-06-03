@@ -55,13 +55,37 @@ async function getByAbbrevs(abbrevs:string[]){
     }
     return subjects
 }
-async function getNext(limit: number, next?: string) {
-	let results= await Subject.find(next?{ _id: { $lt: next } }:{})
-		.sort({
-			_id: -1,
-		})
-		.limit(limit);
-    return {results,next:results.length==0?undefined:results[results.length - 1]._id}
+async function getNext({limit,next,query}:{limit:number,next?:string,query?:string}) {
+    let searchprops={}
+    if(next){
+        searchprops={...searchprops,
+            _id: { $lt: next } 
+        }
+    }
+    if(query){
+        searchprops={...searchprops,
+            $text:{
+                $search:query,
+                $diacriticSensitive:false
+            },
+        }
+    } 
+    console.log(searchprops)
+    let results;
+    if(query){
+        results=await Subject.find(searchprops)
+        .limit(limit);
+    } else{
+        results=await Subject.find(searchprops)
+        .sort({
+            _id: -1,
+        })
+        .limit(limit);
+    }
+    return {
+        results,
+        next: results.length == 0 ? undefined : results[results.length - 1]._id,
+    };
 }
 async function search(query:string,limit:number){
     let results=await Subject.find({

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAlertService,useUserService } from '.';
 import { useFetch } from '@/app/_helpers/client';
+import { result } from 'lodash';
 
 
 export interface IServiceSubject{
@@ -15,14 +16,14 @@ export interface IServiceSubject{
 interface ISubjectStore{
     subject?:IServiceSubject,
     subjects?:IServiceSubject[],
-    nextSubjectPage?:string,
+    nextPage?:string,
     paginationEnded?:Boolean
 }
 const initialState = {};
 const subjectStore = create<ISubjectStore>(() => initialState);
 interface ISubjectAction {
     create:(params:{name:string, abbrev:string, schoolabbrev:string})=>Promise<ISubjectStore|undefined>,
-	getPaginated: (limit:number,next?:string) => Promise<IServiceSubject[]|undefined>,
+	getPaginated: (props:{limit:number,next?:string|undefined,query?:string}) => Promise<IServiceSubject[]|undefined>,
     clearPage:()=>Promise<void>
 }
 export function useSubjectService(): ISubjectAction&ISubjectStore {
@@ -39,18 +40,45 @@ export function useSubjectService(): ISubjectAction&ISubjectStore {
                 throw "Tạo môn học mới thất bại."
             }
         },
-		getPaginated: async (limit) => {
-            let {results,next}=await fetch.post('/api/subject/getpaginated',{limit,next:subjectStoreValues.nextSubjectPage})
+		getPaginated: async (props) => {
+            let {limit,query}=props
+            if(props.next===""){
+                subjectStore.setState({subjects:[],nextPage:undefined})
+                subjectStoreValues.subjects=[]
+                subjectStoreValues.nextPage=undefined
+            }
+            let {results,next}:{next:string, results:IServiceSubject[] }=await fetch.post('/api/subject/getpaginated',
+                {
+                    limit,
+                    next:props.next??subjectStoreValues.nextPage,
+                    query:query
+                }
+            )
             if(results.length==0){
                 subjectStore.setState({paginationEnded:true})
             } else{
-		        subjectStore.setState({ subjects: [...(subjectStoreValues.subjects??[]),...results],nextSubjectPage:next });
+		        subjectStore.setState({ 
+                    subjects: [...(subjectStoreValues.subjects??[]),...results]
+                        .sort(
+                            (a,b)=>(a.uuid>b.uuid?1:0)
+                        ).reduce((pre,cur)=>{
+                            if(pre.length==0||pre[pre.length-1].uuid!=cur.uuid){
+                                pre.push(cur);
+                            }
+                            return pre;
+                        },[] as IServiceSubject[]),
+                    nextPage:next 
+                });
+                // subjectInstanceStore.setState({ 
+                //     subjectinstances: Array.from(new Set([...(subjectInstanceStoreValues.subjectinstances??[]),...results])),
+                //     nextPage:next 
+                // });
             }
-			return results
-		},
+            return results;
+        },
         clearPage: async ()=>{
-            subjectStore.setState({subjects:[],nextSubjectPage:undefined})
-            subjectStoreValues.nextSubjectPage=undefined
+            subjectStore.setState({subjects:[],nextPage:undefined})
+            subjectStoreValues.nextPage=undefined
             subjectStoreValues.subjects=[]
         }
     }

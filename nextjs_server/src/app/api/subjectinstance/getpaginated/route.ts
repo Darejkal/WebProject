@@ -14,14 +14,14 @@ async function getSubjectPaginated(req: Request) {
     let {limit,next,query}:{limit:number,next?:string,query?:string}=await req.json()
     limit=Math.min(Math.floor(limit),MAX_RANGE)
     console.log(limit)
-    let subjectInstance=await subjectInstanceController.getNext({limit,next,query})
-    let authorids=subjectInstance.results.map((v)=>v.authorid)
+    let subjectInstances=await subjectInstanceController.getNext({limit,next,query})
+    let authorids=subjectInstances.results.map((v)=>v.authorid)
     let authors=await userController.getByUUIDs(authorids)
     let authorsMap=authors.reduce((pre:any,cur)=>{
         pre[cur.uuid]=cur.name
         return pre
     },{})
-    let subjectabbrevs=subjectInstance.results.map((v)=>v.subjectabbrev)
+    let subjectabbrevs=subjectInstances.results.map((v)=>v.subjectabbrev)
     let subjects=await subjectController.getByAbbrevs(subjectabbrevs)
     console.log(subjects)
     let subjectsMap=subjects.reduce((pre:any,cur)=>{
@@ -31,7 +31,7 @@ async function getSubjectPaginated(req: Request) {
         }
         return pre
     },{})
-    return {...subjectInstance,results:subjectInstance.results.map((v)=>{
+    return {...subjectInstances,results:subjectInstances.results.map((v)=>{
         // @ts-ignore
         return {...v.toObject(),
             authorName:authorsMap[v.authorid],
