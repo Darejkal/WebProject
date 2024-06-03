@@ -2,26 +2,37 @@
 import { MRT_RowData, MRT_TableOptions, MaterialReactTable, MaterialReactTableProps, useMaterialReactTable,MRT_ColumnFiltersState,MRT_SortingState } from "material-react-table"
 import { useState,useEffect,type UIEvent } from "react";
 import { useFetch } from "../_helpers/client";
+type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 export function PaginatedTable<TData extends MRT_RowData>(
-    {tableProps,getPaginated}:{
-        tableProps: MRT_TableOptions<MRT_RowData>,
-        getPaginated: (props:{limit: number, next?: string | undefined}) => Promise<TData[] | undefined>
+    {tableProps,pagination}:{
+        tableProps: Omit<MRT_TableOptions<TData>,"data">,
+        // getPaginated: (props:{limit: number, next?: string | undefined,query?:string|undefined}) => Promise<TData[] | undefined>
+        pagination: {
+            getPaginated:(props:{limit: number,next?: string | undefined,query?:string|undefined}) => Promise<TData[] | undefined>,
+            data?:TData[],
+        }
     }
 ){
+    const {getPaginated}=pagination;
     const [isFetching, setIsFetching] = useState(false);
 	const [data, setData]=useState<TData[]>([])
     const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [pagination, setPagination] = useState<{limit: number, next?: string | undefined}>({limit:20});
+    // const [pagination, setPagination] = useState<{limit: number, next?: string | undefined}>({limit:20});
     const [globalFilter, setGlobalFilter] = useState('');
     const [sorting, setSorting] = useState<MRT_SortingState>([]);
     const fetch=useFetch();
+    useEffect(()=>{
+        if(pagination.data){
+            setData(pagination.data)
+        }
+    },[pagination.data])
 	const fetchNextPage = (containerRefElement?: HTMLDivElement | null) => {
 		if (containerRefElement) {
 			const { scrollHeight, scrollTop, clientHeight } = containerRefElement;
 			if (scrollHeight - scrollTop - clientHeight < 400 && !isFetching) {
 				setIsFetching(true)
-				getPaginated({...pagination,...(globalFilter&&{query:globalFilter})}).then(
+				getPaginated({limit:20,...(globalFilter&&{query:globalFilter})}).then(
 					()=>{
 						setIsFetching(false)
 					}
@@ -37,14 +48,15 @@ export function PaginatedTable<TData extends MRT_RowData>(
         }
 
         try {
+            console.log("okkk");
             const response=await getPaginated(
-                {...pagination,...(globalFilter&&{query:globalFilter})}
+                {limit:20,next:"",...(globalFilter&&{query:globalFilter})}
             )
-            if(response){
-                setData(response);
-            } else{
-                setData([]);
-            }
+            // if(response){
+            //     setData(response);
+            // } else{
+            //     setData([]);
+            // }
         } catch (error) {
           setIsError(true);
           console.error(error);
@@ -54,6 +66,9 @@ export function PaginatedTable<TData extends MRT_RowData>(
         setIsLoading(false);
         setIsFetching(false);
     };
+    useEffect(()=>{
+        fetchData();
+    },[])
     useEffect(() => {
         fetchData();
       }, [

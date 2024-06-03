@@ -23,7 +23,7 @@ const subjectInstanceStore = create<IServiceSubjectInstanceStore>(() => initialS
 interface IServiceSubjectInstanceService extends IServiceSubjectInstanceStore {
     create:(subjectabbrev:string,name:string)=>Promise<any>,
     getallCurrent:()=>Promise<any>,
-	getPaginated: (limit:number,next?:string) => Promise<IServiceSubjectInstance[]|undefined>,
+	getPaginated: (props:{limit:number,next?:string|undefined,query?:string}) => Promise<IServiceSubjectInstance[]|undefined>,
     clearPage:()=>Promise<void>
 }
 export function useSubjectInstanceService(): IServiceSubjectInstanceService {
@@ -41,12 +41,39 @@ export function useSubjectInstanceService(): IServiceSubjectInstanceService {
         getallCurrent:async function () {
             return await fetch.get("/api/subjectinstance/getallcurrent")     
         },
-		getPaginated: async (limit) => {
-            let {results,next}=await fetch.post('/api/subjectinstance/getpaginated',{limit,next:subjectInstanceStoreValues.nextPage})
+		getPaginated: async (props) => {
+            let {limit,query}=props
+            if(props.next===""){
+                subjectInstanceStore.setState({subjectinstances:[],nextPage:undefined})
+                subjectInstanceStoreValues.subjectinstances=[]
+                subjectInstanceStoreValues.nextPage=undefined
+            }
+            let {results,next}:{next:string, results:IServiceSubjectInstance[] }=await fetch.post('/api/subjectinstance/getpaginated',
+                {
+                    limit,
+                    next:props.next??subjectInstanceStoreValues.nextPage,
+                    query:query
+                }
+            )
             if(results.length==0){
                 subjectInstanceStore.setState({paginationEnded:true})
             } else{
-		        subjectInstanceStore.setState({ subjectinstances: [...(subjectInstanceStoreValues.subjectinstances??[]),...results],nextPage:next });
+		        subjectInstanceStore.setState({ 
+                    subjectinstances: [...(subjectInstanceStoreValues.subjectinstances??[]),...results]
+                        .sort(
+                            (a,b)=>(a.subjectid>b.subjectid?1:0)
+                        ).reduce((pre,cur)=>{
+                            if(pre.length==0||pre[pre.length-1].uuid!=cur.uuid){
+                                pre.push(cur);
+                            }
+                            return pre;
+                        },[] as IServiceSubjectInstance[]),
+                    nextPage:next 
+                });
+                // subjectInstanceStore.setState({ 
+                //     subjectinstances: Array.from(new Set([...(subjectInstanceStoreValues.subjectinstances??[]),...results])),
+                //     nextPage:next 
+                // });
             }
 			return results
 		}, clearPage:async ()=>{

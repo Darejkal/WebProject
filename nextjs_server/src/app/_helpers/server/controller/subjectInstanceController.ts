@@ -69,19 +69,20 @@ export const subjectInstanceController = {
 	},
 	getNext: async ({limit,next,query}:{limit: number, next?: string,query?: string}) => {
 		let searchprops={}
-		if(query){
-			searchprops={...searchprops,
-				$text:{
-					$search:query,
-					$diacriticSensitive:false
-				}
-			}
-		} 
 		if(next){
 			searchprops={...searchprops,
 				_id: { $lt: next } 
 			}
 		}
+		if(query){
+			searchprops={...searchprops,
+				$text:{
+					$search:query,
+					$diacriticSensitive:false
+				},
+			}
+		} 
+		console.log(searchprops)
 		let results;
 		if(query){
 			results=await SubjectInstance.find(searchprops)
