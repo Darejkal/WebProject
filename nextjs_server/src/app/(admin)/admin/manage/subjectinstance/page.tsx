@@ -11,6 +11,7 @@ import { Autocomplete,TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { PaginatedTable } from "@/app/_components/PaginatedTable";
 import debounce from "lodash/debounce";
+import SearchableInput from "@/app/_components/SearchableInput";
 const SubjectInstancesPage = () => {
 	const router=useRouter();
 	const subjectInstanceService = useSubjectInstanceService();
@@ -122,31 +123,23 @@ const SubjectInstancesPage = () => {
 					<Form onSubmit={handleSubmit(onSubmit)}>
 						<Form.Group controlId="name">
 							<Form.Label>Tên</Form.Label>
-							<Autocomplete
-								options={subjectInstanceOptions}
-								filterOptions={(x) => x}
-								onInputChange={(e, value) => setSubjectInstanceInputValue(value)}
-								renderInput={(params) => (
-									<TextField
-										{...params}
-										label="Nhập tên lớp học"
-										fullWidth
-										{...fields.name}
-									/>
-								)}
-								value={subjectInstanceInputValue}
-								onChange={(e, value, ...args) => {
-									setSubjectInstanceOptions(
-										value ? [value, ...subjectInstanceOptions] : subjectInstanceOptions
-									);
-									setSubjectInstanceValue(value);
-								}}
+							<SearchableInput
+								fetchData={
+									(input:string)=>{
+										let queryParam = new URLSearchParams();
+										queryParam.set("query", input);
+										console.log(`search?${queryParam.toString()}`);
+										return fetch.get(`/api/subjectinstance/search?${queryParam.toString()}`)
+									}
+								}
+								formRegister={fields.name}
+								textFieldProps={{label:"Nhập tên lớp học"}}
 							/>
 						</Form.Group>
 						<Form.Group controlId="subjectabbrev">
 							<Form.Label>Mã môn </Form.Label>
 							{/* <Form.Control type="text" {...fields.subjectabbrev} /> */}
-							<Autocomplete
+							{/* <Autocomplete
 								options={subjectOptions}
 								filterOptions={(x) => x}
 								onInputChange={(e, value) => setSubjectInputValue(value)}
@@ -169,6 +162,25 @@ const SubjectInstancesPage = () => {
 									setValue("subjectname",value?.name??"")
 									setValue("subjectschool",value?.schoolabbrev??"")
 									setSubjectValue(value);
+								}}
+							/> */}
+							<SearchableInput
+								fetchData={
+									(input:string)=>{
+										let queryParam = new URLSearchParams();
+										queryParam.set("query", input);
+										console.log(`search?${queryParam.toString()}`);
+										return fetch.get(`/api/subject/search?${queryParam.toString()}`) as Promise<{name:string,abbrev:string,uuid:string,schoolabbrev:string}[]>
+									}
+								}
+								formRegister={fields.subjectabbrev}
+								textFieldProps={{label:"Nhập mã môn học của lớp"}}
+								autocompleteProps={{
+									getOptionLabel:({abbrev})=>(abbrev??"")
+								}}
+								afterOnChange={(e, value, ...args) => {
+									setValue("subjectname",value?.name??"")
+									setValue("subjectschool",value?.schoolabbrev??"")
 								}}
 							/>
 						</Form.Group>
