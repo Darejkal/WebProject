@@ -16,18 +16,22 @@ export default function SearchableInput<
     formRegister,
     fetchData,
     afterOnChange,
+    props
     // getOptionLabel
 }:{
-    autocompleteProps?:Partial<AutocompleteProps<Value, false, false, false>>,
+    autocompleteProps?:Partial<Omit<AutocompleteProps<Value|string, false,false,boolean>,"getOptionLabel">>,
     // getOptionLabel:(item:Value)=>string,
     textFieldProps?:{variant?: Variant;} & Omit<TextFieldProps, 'variant'>,
     formRegister:UseFormRegisterReturn<any>,
     fetchData:(input:string)=>Promise<Value[]>,
-    afterOnChange?:(event: SyntheticEvent<Element, Event>, value: Value|null , reason: AutocompleteChangeReason, details?: AutocompleteChangeDetails<Value> | undefined) => void
+    afterOnChange?:(event: SyntheticEvent<Element, Event>, value: Value|string|null , reason: AutocompleteChangeReason, details?: AutocompleteChangeDetails<Value|string> | undefined) => void
+    props?:{
+        optionLabel?:keyof Value,
+    }
 }){
-    const [options,setOptions]=useState<Value[]>([]);
+    const [options,setOptions]=useState<(Value|string)[]>([]);
     const [inputValue,setInputValue]=useState<string>("");
-    const [value,setValue]=useState<Value|null>(null);
+    const [value,setValue]=useState<Value|string|null>(null);
 	const getOptionsDelayed=useCallback(
 		debounce((input:string|null,callback:(v:any)=>any)=>{
 			if (!input) {
@@ -48,23 +52,28 @@ export default function SearchableInput<
     return (
         <Autocomplete
             options={options}
-            filterOptions={(x) => x}
             value={value}
             inputValue={inputValue}
-            // getOptionLabel={getOptionLabel}
+            {...(props?.optionLabel?{getOptionLabel:(option:string | Value)=>{
+                if(typeof option==="string"){
+                    return option
+                } else{
+                    return option[props!.optionLabel!] as string
+                }
+            }}:{})}
             onInputChange={(e, value) => setInputValue(value)}
             renderInput={(params) => (
                 <TextField
                     {...params}
                     fullWidth
+                    autoComplete='off'
                     {...textFieldProps}
                     {...formRegister}
                 />
             )}
             onChange={(e, value, ...args) => {
-                setOptions(
-                    value ? [value, ...options] : options
-                );
+                console.log("onchanged")
+                setOptions(value?[value,...options]:options);
                 if(value){
                     setValue(value);
                 }

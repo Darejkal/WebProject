@@ -138,32 +138,6 @@ const SubjectInstancesPage = () => {
 						</Form.Group>
 						<Form.Group controlId="subjectabbrev">
 							<Form.Label>Mã môn </Form.Label>
-							{/* <Form.Control type="text" {...fields.subjectabbrev} /> */}
-							{/* <Autocomplete
-								options={subjectOptions}
-								filterOptions={(x) => x}
-								onInputChange={(e, value) => setSubjectInputValue(value)}
-								renderInput={(params) => (
-									<TextField
-										{...params}
-										label="Nhập mã môn học của lớp"
-										fullWidth
-										{...fields.subjectabbrev}
-									/>
-								)}
-								getOptionLabel={({abbrev})=>(abbrev??"")}
-								value={subjectValue}
-								isOptionEqualToValue={(option,value)=>option.abbrev==value.abbrev}
-								inputValue={subjectInputValue??undefined}
-								onChange={(e, value, ...args) => {
-									setSubjectOptions(
-										value ? [value, ...subjectOptions] : subjectOptions
-									);
-									setValue("subjectname",value?.name??"")
-									setValue("subjectschool",value?.schoolabbrev??"")
-									setSubjectValue(value);
-								}}
-							/> */}
 							<SearchableInput
 								fetchData={
 									(input:string)=>{
@@ -175,18 +149,14 @@ const SubjectInstancesPage = () => {
 								}
 								formRegister={fields.subjectabbrev}
 								textFieldProps={{label:"Nhập mã môn học của lớp"}}
-								autocompleteProps={{
-									getOptionLabel:({abbrev})=>(abbrev??"")
+								props={{
+									optionLabel:"abbrev"
 								}}
 								afterOnChange={(e, value, ...args) => {
 									setValue("subjectname",value?.name??"")
 									setValue("subjectschool",value?.schoolabbrev??"")
 								}}
 							/>
-						</Form.Group>
-						<Form.Group controlId="subjectname">
-							<Form.Label>Mã môn </Form.Label>
-							<Form.Control type="text" {...fields.subjectname} />
 						</Form.Group>
 						<Form.Group controlId="subjectschool">
 							<Form.Label>Mã trường </Form.Label>

@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Autocomplete, TextField } from "@mui/material";
 import { useFetch } from "@/app/_helpers/client";
 import { toast } from "react-toastify";
+import SearchableInput from "@/app/_components/SearchableInput";
 
 const SubjectInstancesPage = () => {
 	const router = useRouter();
@@ -141,35 +142,37 @@ const SubjectInstancesPage = () => {
 					<Form onSubmit={handleSubmit(onSubmit)}>
 						<Form.Group controlId="name">
 							<Form.Label>Tên</Form.Label>
-							{/* <Form.Control type="text" {...fields.name} /> */}
-
-							<Autocomplete
-								options={subjectOptions}
-								filterOptions={(x) => x}
-								// getOptionLabel={{}}
-								// renderOption={{}}
-
-								onInputChange={(e, value) => setSubjectInputValue(value)}
-								renderInput={(params) => (
-									<TextField
-										{...params}
-										label="Nhập tên môn học"
-										fullWidth
-										{...fields.name}
-									/>
-								)}
-								value={subjectInputValue}
-								onChange={(e, value, ...args) => {
-									setSubjectOptions(
-										value ? [value, ...subjectOptions] : subjectOptions
-									);
-									setSubjectValue(value);
-								}}
+							<SearchableInput
+								fetchData={
+									(input:string)=>{
+										let queryParam = new URLSearchParams();
+										queryParam.set("query", input);
+										console.log(`search?${queryParam.toString()}`);
+										return fetch.get(`/api/subjectinstance/search?${queryParam.toString()}`)
+									}
+								}
+								formRegister={fields.name}
+								textFieldProps={{label:"Nhập tên lớp học"}}
 							/>
 						</Form.Group>
 						<Form.Group controlId="abbrev">
-							<Form.Label>Mã</Form.Label>
-							<Form.Control type="text" {...fields.abbrev} />
+							<Form.Label>Mã môn học mới</Form.Label>
+							<SearchableInput
+								fetchData={
+									(input:string)=>{
+										let queryParam = new URLSearchParams();
+										queryParam.set("query", input);
+										console.log(`search?${queryParam.toString()}`);
+										return fetch.get(`/api/subject/search?${queryParam.toString()}`) as Promise<{name:string,abbrev:string,uuid:string,schoolabbrev:string}[]>
+									}
+								}
+								formRegister={fields.abbrev}
+								textFieldProps={{label:"Nhập mã môn học của lớp"}}
+								autocompleteProps={{freeSolo:true}}
+								props={{
+									optionLabel:"abbrev"
+								}}
+							/>
 						</Form.Group>
 						<Form.Group controlId="schoolabbrev">
 							<Form.Label>Mã trường</Form.Label>
