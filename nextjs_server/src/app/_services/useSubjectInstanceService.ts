@@ -9,6 +9,7 @@ export interface IServiceSubjectInstance{
     createdat:Date,
     uuid:string,
     authorid:string
+    subjectAbbrev:string
 }
 interface IServiceSubjectInstanceStore {
     subjectinstance?:IServiceSubjectInstance,

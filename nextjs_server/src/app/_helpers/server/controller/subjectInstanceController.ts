@@ -67,12 +67,32 @@ export const subjectInstanceController = {
 		}
 		return subjects;
 	},
-	getNext: async (limit: number, next?: string) => {
-		let results = await SubjectInstance.find(next ? { _id: { $lt: next } } : {})
+	getNext: async ({limit,next,query}:{limit: number, next?: string,query?: string}) => {
+		let searchprops={}
+		if(query){
+			searchprops={...searchprops,
+				$text:{
+					$search:query,
+					$diacriticSensitive:false
+				}
+			}
+		} 
+		if(next){
+			searchprops={...searchprops,
+				_id: { $lt: next } 
+			}
+		}
+		let results;
+		if(query){
+			results=await SubjectInstance.find(searchprops)
+			.limit(limit);
+		} else{
+			results=await SubjectInstance.find(searchprops)
 			.sort({
 				_id: -1,
 			})
 			.limit(limit);
+		}
 		return {
 			results,
 			next: results.length == 0 ? undefined : results[results.length - 1]._id,

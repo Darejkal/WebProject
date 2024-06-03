@@ -18,6 +18,7 @@ const SubjectInstancesPage = () => {
 	const [subjectInstanceOptions, setSubjectInstanceOptions] = useState<string[]>([]);
 	const [subjectInstanceInputValue, setSubjectInstanceInputValue] = useState<string | null>("");
 	const [subjectInstanceValue, setSubjectInstanceValue] = useState<string | null>("");
+	const [subjectTableInstanceData, setSubjectInstanceTableData]=useState<IServiceSubjectInstance[]>([])
 	const [subjectOptions, setSubjectOptions] = useState<{name:string,abbrev:string,uuid:string,schoolabbrev:string}[]>([]);
 	const [subjectInputValue, setSubjectInputValue] = useState<string | null>("");
 	const [subjectValue, setSubjectValue] = useState<{name:string,abbrev:string,uuid:string,schoolabbrev:string} | null>(null);
@@ -89,7 +90,6 @@ const SubjectInstancesPage = () => {
 		subjectInstanceService.getPaginated(20)
 		console.log(subjectInstanceService.subjectinstances)
 	},[])
-	const [subjectTableInstanceData, setSubjectInstanceTableData]=useState<IServiceSubjectInstance[]>([])
 	useEffect(()=>{
 		console.log("changes")
 		console.log(subjectInstanceService.subjectinstances)
@@ -134,6 +134,7 @@ const SubjectInstancesPage = () => {
 						onScroll:(event: UIEvent<HTMLDivElement>)=>fetchNextPage(event.target as HTMLDivElement)
 					}
 				}
+                
 			/>
 			<div
 				style={{
