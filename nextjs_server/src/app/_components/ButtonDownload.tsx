@@ -8,15 +8,16 @@ interface ButtonDownloadProps {
 const ButtonDownload: React.FC<ButtonDownloadProps> = ({ fileUrl, label }) => {
     return (
         <a href={fileUrl} download>
-            <button style={{minWidth: '180px',
-                            color: '#171717',
-                            marginRight: '16px',
-                            fontWeight: '500',
-                            border: '3px solid #D1D1D1',
-                            borderRadius: '8px',
-                            padding: '10px',
-                            background: '#fff'}}
-            >
+            <button style={{
+                minWidth: '11.25rem', // 180px / 16
+                color: '#171717',
+                marginRight: '1rem', // 16px / 16
+                fontWeight: '500',
+                border: '0.1875rem solid #D1D1D1', // 3px / 16
+                borderRadius: '0.5rem', // 8px / 16
+                padding: '0.625rem', // 10px / 16
+                background: '#fff'
+            }}>
                 <span>{label}</span>
             </button>
         </a>
