@@ -20,7 +20,7 @@ async function getSubjectPaginated(req: Request) {
 getSubjectPaginated.position="admin"
 getSubjectPaginated.schema=joi.object({
     limit:joi.number().required(),
-    role:joi.number(),
+    role:joi.string(),
     next:joi.string().allow(""),
     query:joi.string(),
 })

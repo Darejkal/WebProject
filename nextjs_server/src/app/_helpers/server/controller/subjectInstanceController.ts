@@ -5,7 +5,7 @@ import { db } from "../model";
 import { customEncrypt, customEncryptCompare, generateUUID } from "../../utils";
 import { subjectController } from "./subjectController";
 import { userController } from "./userController";
-import { FormatListBulleted } from "@mui/icons-material";
+import { DataObjectSharp, FormatListBulleted } from "@mui/icons-material";
 const SubjectInstance = db.SubjectInstance;
 const UserSubjectInstanceRelation = db.UserSubjectInstanceRelation;
 const UserSubjectInstanceFullView = db.UserSubjectInstanceFullView;
@@ -22,6 +22,17 @@ export const subjectInstanceController = {
 			});
 			return await subjectinstance.save();
 		});
+	},
+	updateOne:async ({name,uuid,subjectAbbrev}:{name:string,uuid:string,subjectAbbrev:string})=>{
+		let subjectinstance=await SubjectInstance.findOne({uuid})
+		if(!subjectinstance){
+			throw "no subject instance found";
+		}
+		Object.assign(subjectinstance,{
+			name,
+			subjectabbrev:subjectAbbrev
+		})
+		return await subjectinstance.save()
 	},
 	addMember: async (
 		userid: string,
@@ -193,6 +204,29 @@ export const subjectInstanceController = {
 			subjectinstanceid:subjectinstance.uuid,userid:user.uuid,createdat:new Date(),role
 		})
 		return await subjectInstanceUserRelation.save()
+	},
+	createSubjectInstanceUserRelationBatch: async(
+		{userids, subjectinstanceid,role}:{userids:string[],subjectinstanceid:string,role:string}
+	)=>{
+		if(!["student","teacher"].includes(role)){
+			throw "invalid role"
+		}
+		userids=Array.from(new Set(userids))
+		let users= await userController.getByUUIDs(userids);
+		if(users.length<userids.length){
+			throw "some users not found"
+		}
+		let subjectinstance=await subjectInstanceController.getByUUID(subjectinstanceid);
+		let subjectInstanceUserRelations= await UserSubjectInstanceRelation.insertMany(users.map(({uuid})=>(
+			{
+				uuid:generateUUID(),
+				subjectinstanceid:subjectinstance.uuid,
+				userid:uuid,
+				createdat:new Date(),
+				role
+			}
+		)))
+		return subjectInstanceUserRelations
 	},
 	search: async function (query:string,limit:number){
 		let results=await SubjectInstance.find({

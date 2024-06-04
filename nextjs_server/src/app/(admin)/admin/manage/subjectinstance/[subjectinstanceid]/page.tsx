@@ -10,9 +10,13 @@ import { MaterialReactTable } from "material-react-table";
 import { notFound } from "next/navigation";
 
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { DeleteSubjectInstanceModalButton, ModifySubjectInstanceModalButton } from "./components";
+import {
+	AddUserSubjectInstanceRelationModal,
+	DeleteSubjectInstanceModalButton,
+	ModifySubjectInstanceModalButton,
+} from "./components";
 import { toast } from "react-toastify";
 
 export default function SubjectInstancesSinglePage() {
@@ -23,7 +27,7 @@ export default function SubjectInstancesSinglePage() {
 	const router = useRouter();
 	const [subjectinstance, setSubjectInstance] =
 		useState<IServiceSubjectInstance>();
-	useEffect(() => {
+	const getSubjectInstance = useCallback(() => {
 		console.log(subjectinstanceid);
 		subjectInstanceService
 			.getOne(subjectinstanceid)
@@ -31,12 +35,15 @@ export default function SubjectInstancesSinglePage() {
 				setSubjectInstance(v);
 			})
 			.catch((e) => {
-				toast.info("Không tìm thấy lớp học được chỉ định. Đang điều hướng...")
+				toast.info("Không tìm thấy lớp học được chỉ định. Đang điều hướng...");
 				router.push("/admin/manage/subjectinstance");
 			})
 			.finally(() => {
 				setIsLoading(false);
 			});
+	}, [subjectinstanceid, subjectInstanceService, isLoading]);
+	useEffect(() => {
+		getSubjectInstance();
 	}, []);
 	return (
 		<div style={{ margin: "3rem 10rem" }}>
@@ -73,8 +80,15 @@ export default function SubjectInstancesSinglePage() {
 					margin: "1rem 0",
 				}}
 			>
-				{subjectinstance&&<DeleteSubjectInstanceModalButton subjectinstance={subjectinstance}/>}
-				{subjectinstance&&<ModifySubjectInstanceModalButton subjectinstance={subjectinstance}/>}
+				{subjectinstance && (
+					<DeleteSubjectInstanceModalButton subjectinstance={subjectinstance} />
+				)}
+				{subjectinstance && (
+					<ModifySubjectInstanceModalButton
+						subjectinstance={subjectinstance}
+						afterSubmit={getSubjectInstance}
+					/>
+				)}
 			</div>
 			<div>
 				<h4 style={{ margin: "1rem 0" }}>Danh sách giảng viên</h4>
@@ -82,18 +96,24 @@ export default function SubjectInstancesSinglePage() {
 				<PaginatedTable
 					tableProps={{
 						columns: [
-							{ accessorKey: "name", header: "Tên" },
-							{ accessorKey: "abbrev", header: "Mã" },
+							{ accessorKey: "username", header: "Tên" },
+							{ accessorKey: "useremail", header: "Email" },
 							// { accessorKey: "uuid", header: "UUID" },
-							{ accessorKey: "authorName", header: "Tên tác giả" },
+							{ accessorKey: "role", header: "Vai trò" },
 							{ accessorKey: "createdat", header: "Tạo lúc" },
 							// { accessorKey: "authorid", header: "ID tác giả" },
-							{ accessorKey: "schoolabbrev", header: "ID trường" },
+							// { accessorKey: "schoolabbrev", header: "ID trường" },
 						],
 					}}
 					pagination={{
-						getPaginated: (props)=>subjectInstanceUserService.getPaginated({...props,role:"teacher"}),
-						data: subjectInstanceUserService.subjectinstanceusers.get("teacher"),
+						getPaginated: (props) =>
+							subjectInstanceUserService.getPaginated({
+								...props,
+								role: "teacher",
+							}),
+						data: subjectInstanceUserService.subjectinstanceusers.get(
+							"teacher"
+						),
 					}}
 				/>
 			</div>
@@ -107,9 +127,21 @@ export default function SubjectInstancesSinglePage() {
 					margin: "1rem 0",
 				}}
 			>
-				<Button onClick={() => {}} variant="outline-success" className="m-1">
-					Thêm giảng viên
-				</Button>
+				{subjectinstance && (
+					<AddUserSubjectInstanceRelationModal
+						label="Thêm giảng viên"
+						role="teacher"
+						subjectinstance={subjectinstance}
+						afterSubmit={()=>{
+							subjectInstanceUserService.clearPage({role:"teacher"})
+							subjectInstanceUserService.getPaginated({
+								limit:20,
+								next:"",
+								role:"teacher"
+							})
+						}}
+					/>
+				)}
 			</div>
 			<div>
 				<h4 style={{ margin: "1rem 0" }}>Danh sách sinh viên</h4>
@@ -117,18 +149,24 @@ export default function SubjectInstancesSinglePage() {
 				<PaginatedTable
 					tableProps={{
 						columns: [
-							{ accessorKey: "name", header: "Tên" },
-							{ accessorKey: "abbrev", header: "Mã" },
+							{ accessorKey: "username", header: "Tên" },
+							{ accessorKey: "useremail", header: "Email" },
 							// { accessorKey: "uuid", header: "UUID" },
-							{ accessorKey: "authorName", header: "Tên tác giả" },
+							{ accessorKey: "role", header: "Vai trò" },
 							{ accessorKey: "createdat", header: "Tạo lúc" },
 							// { accessorKey: "authorid", header: "ID tác giả" },
-							{ accessorKey: "schoolabbrev", header: "ID trường" },
+							// { accessorKey: "schoolabbrev", header: "ID trường" },
 						],
 					}}
 					pagination={{
-						getPaginated: (props)=>subjectInstanceUserService.getPaginated({...props,role:"student"}),
-						data: subjectInstanceUserService.subjectinstanceusers.get("student"),
+						getPaginated: (props) =>
+							subjectInstanceUserService.getPaginated({
+								...props,
+								role: "student",
+							}),
+						data: subjectInstanceUserService.subjectinstanceusers.get(
+							"student"
+						),
 					}}
 				/>
 			</div>
@@ -142,9 +180,21 @@ export default function SubjectInstancesSinglePage() {
 					margin: "1rem 0",
 				}}
 			>
-				<Button onClick={() => {}} variant="outline-success" className="m-1">
-					Thêm sinh viên
-				</Button>
+				{subjectinstance && (
+					<AddUserSubjectInstanceRelationModal
+						label="Thêm sinh viên"
+						role="student"
+						subjectinstance={subjectinstance}
+						afterSubmit={() => {
+							subjectInstanceUserService.clearPage({role:"student"})
+							subjectInstanceUserService.getPaginated({
+								limit:20,
+								next:"",
+								role:"student"
+							})
+						}}
+					/>
+				)}
 			</div>
 		</div>
 	);

@@ -10,12 +10,17 @@ module.exports = apiHandler({
 });
 
 async function addMembers(req: Request) {
-    const {members}:{members:[{userid:string}]}=await req.json()
-    
+    const {userids,subjectinstanceid,role}:{userids:string[],subjectinstanceid:string,role:string}=await req.json()
+    if(!userids|| userids.length==0){
+        throw "invalid arguments"
+    }
+    await subjectInstanceController.createSubjectInstanceUserRelationBatch({
+        userids,subjectinstanceid,role
+    })
 }
 addMembers.position="admin"
 addMembers.schema = joi.object({
-    members: joi.array().items({
-        userid:joi.string().required()
-    })
+    subjectinstanceid: joi.string().required(),
+    role: joi.string().required(),
+    userids: joi.array().items(joi.string()).required()
 });

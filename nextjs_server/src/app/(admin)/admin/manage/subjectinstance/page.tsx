@@ -166,6 +166,10 @@ const SubjectInstancesPage = () => {
 								}}
 							/>
 						</Form.Group>
+						<Form.Group controlId="subjectname">
+							<Form.Label>Tên môn học </Form.Label>
+							<Form.Control type="text" {...fields.subjectname} />
+						</Form.Group>
 						<Form.Group controlId="subjectschool">
 							<Form.Label>Mã trường </Form.Label>
 							<Form.Control type="text" {...fields.subjectschool} />
