@@ -51,13 +51,48 @@ async function authenticate({
 	};
 }
 
-async function getNext(limit: number, next?: string) {
-	let results= await User.find(next?{ _id: { $lt: next } }:{})
+async function getNext({limit,next,query}:{limit: number, next?: string,query?: string}) {
+	let searchprops={}
+	if(next){
+		searchprops={...searchprops,
+			_id: { $lt: next } 
+		}
+	}
+	if(query){
+		searchprops={...searchprops,
+			$text:{
+				$search:query,
+				$diacriticSensitive:false
+			},
+			
+		}
+	} 
+	console.log(searchprops)
+	let results;
+	if(query){
+		let nextVal=Number(next);
+		if(!nextVal){
+			nextVal=0;
+		}
+		results=await User.find(searchprops)
+		.skip(nextVal)
+		.limit(limit);
+		return {
+			results,
+			next: results.length == 0 ? undefined : `${nextVal+results.length}`,
+		};
+	} else{
+		results=await User.find(searchprops)
 		.sort({
 			_id: -1,
 		})
 		.limit(limit);
-    return {results,next:results.length==0?undefined:results[results.length - 1]._id}
+		return {
+			results,
+			next: results.length == 0 ? undefined : results[results.length - 1]._id,
+		};
+	}
+
 }
 
 async function getByUUID(uuid: string) {
@@ -91,10 +126,12 @@ async function getCurrent() {
 }
 
 async function create(
+{email,password,name,position}:{
 	email: string,
 	password: string,
 	name: StringExpressionOperator,
-	position: "user" | "admin" = "user"
+	position: "user" | "admin"
+}
 ) {
 	if (await User.findOne({ email: email })) {
 		throw 'Email "' + email + '" is already taken';
