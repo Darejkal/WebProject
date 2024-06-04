@@ -158,7 +158,7 @@ const SubjectInstancesPage = () => {
 								props={{
 									optionLabel:"abbrev"
 								}}
-								afterOnChange={(e, value, ...args) => {
+								afterOnChange={({value}) => {
 									if(typeof value !=="string"){
 										setValue("subjectname",(value?.name)??"")
 										setValue("subjectschool",value?.schoolabbrev??"")

@@ -1,9 +1,8 @@
 import { cookies } from 'next/headers';
 import joi from 'joi';
 
-import { apiHandler } from '@/app/_helpers/server/middleware';
 import { userController } from '@/app/_helpers/server';
-import { NextResponse } from 'next/server';
+import { apiHandler } from '@/app/_helpers/server/middleware/api-handler';
 
 module.exports = apiHandler({
     POST: login

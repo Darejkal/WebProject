@@ -73,19 +73,28 @@ async function getNext({limit,next,query}:{limit:number,next?:string,query?:stri
     console.log(searchprops)
     let results;
     if(query){
+        let nextVal=Number(next);
+        if(!nextVal){
+            nextVal=0;
+        }
         results=await Subject.find(searchprops)
+        .skip(nextVal)
         .limit(limit);
+        return {
+            results,
+            next: results.length == 0 ? undefined : `${nextVal+results.length}`,
+        };
     } else{
         results=await Subject.find(searchprops)
         .sort({
             _id: -1,
         })
         .limit(limit);
+        return {
+            results,
+            next: results.length == 0 ? undefined : results[results.length - 1]._id,
+        };
     }
-    return {
-        results,
-        next: results.length == 0 ? undefined : results[results.length - 1]._id,
-    };
 }
 async function search(query:string,limit:number){
     let results=await Subject.find({

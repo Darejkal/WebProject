@@ -6,10 +6,11 @@ import { useFetch } from '@/app/_helpers/client';
 export interface IServiceSubjectInstance{
     subjectid:string,
     name:string,
-    createdat:Date,
+    createdat:string,
     uuid:string,
-    authorid:string
-    subjectAbbrev:string
+    authorName:string,
+    subjectName:string,
+    subjectAbbrev:string,
 }
 interface IServiceSubjectInstanceStore {
     subjectinstance?:IServiceSubjectInstance,
@@ -22,7 +23,8 @@ const initialState = {
 const subjectInstanceStore = create<IServiceSubjectInstanceStore>(() => initialState);
 interface IServiceSubjectInstanceService extends IServiceSubjectInstanceStore {
     create:(subjectabbrev:string,name:string)=>Promise<any>,
-    getallCurrent:()=>Promise<any>,
+    getallCurrent:()=>Promise<IServiceSubjectInstance[]>,
+    getOne:(uuid:string)=>Promise<IServiceSubjectInstance>,
 	getPaginated: (props:{limit:number,next?:string|undefined,query?:string}) => Promise<IServiceSubjectInstance[]|undefined>,
     clearPage:()=>Promise<void>
 }
@@ -40,6 +42,9 @@ export function useSubjectInstanceService(): IServiceSubjectInstanceService {
         },
         getallCurrent:async function () {
             return await fetch.get("/api/subjectinstance/getallcurrent")     
+        },
+        getOne:async function (uuid) {
+            return await fetch.get(`/api/subjectinstance/get/${uuid}`)     
         },
 		getPaginated: async (props) => {
             let {limit,query}=props

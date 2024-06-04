@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import joi from 'joi';
 import {auth} from '@/app/_helpers/server/auth'
 import { apiHandler } from '@/app/_helpers/server/middleware';
-import { subjectInstanceController } from '@/app/_helpers/server';
+import { subjectController, subjectInstanceController, userController } from '@/app/_helpers/server';
 import { NextResponse } from 'next/server';
 import { JsonWebTokenError } from 'jsonwebtoken';
 
@@ -11,6 +11,14 @@ module.exports = apiHandler({
 });
 async function getOne(req: Request,{params}:{params:{uuid:string}}) {
     const {uuid}=params
-    let subjectinstances=await subjectInstanceController.getByUUID(uuid)
-    return subjectinstances
+    let subjectinstance=await subjectInstanceController.getByUUID(uuid)
+    let authorprom=userController.getByUUID(subjectinstance.authorid)
+    let subjectprom=subjectController.getByAbbrev(subjectinstance.subjectabbrev)
+    let [author,subject]=await Promise.all([authorprom,subjectprom])
+
+    return  {...subjectinstance.toObject(),
+            authorName:author.name,
+            subjectName:subject.name,
+            subjectAbbrev:subject.abbrev,
+        }
 }

@@ -87,24 +87,86 @@ export const subjectInstanceController = {
 					$search:query,
 					$diacriticSensitive:false
 				},
+				
 			}
 		} 
 		console.log(searchprops)
 		let results;
 		if(query){
+			let nextVal=Number(next);
+			if(!nextVal){
+				nextVal=0;
+			}
 			results=await SubjectInstance.find(searchprops)
+			.skip(nextVal)
 			.limit(limit);
+			return {
+				results,
+				next: results.length == 0 ? undefined : `${nextVal+results.length}`,
+			};
 		} else{
 			results=await SubjectInstance.find(searchprops)
 			.sort({
 				_id: -1,
 			})
 			.limit(limit);
+			return {
+				results,
+				next: results.length == 0 ? undefined : results[results.length - 1]._id,
+			};
 		}
-		return {
-			results,
-			next: results.length == 0 ? undefined : results[results.length - 1]._id,
-		};
+
+	},
+	getUserSubjectInstanceRelationNext: async ({limit,next,query}:{limit: number, next?: string,query?:string}) => {
+		let searchprops={}
+		if(next){
+			searchprops={...searchprops,
+				_id: { $lt: next } 
+			}
+		}
+		// if(userids){
+		// 	searchprops={...searchprops,
+		// 		userid:{"$in": userids} 
+		// 	}
+		// } 
+		// if(subjectinstanceids){
+		// 	searchprops={...searchprops,
+		// 		subjectinstanceid:{"$in": subjectinstanceids} 
+		// 	}
+		// } 
+		if(query){
+			searchprops={...searchprops,
+				$text:{
+					$search:query,
+					$diacriticSensitive:false
+				},
+			}
+		} 
+		console.log(searchprops)
+		let results;
+		if(query){
+			let nextVal=Number(next);
+			if(!nextVal){
+				nextVal=0;
+			}
+			results=await UserSubjectInstanceRelation.find(searchprops)
+			.skip(nextVal)
+			.limit(limit);
+			return {
+				results,
+				next: results.length == 0 ? undefined : `${nextVal+results.length}`,
+			};
+		} else{
+			results=await UserSubjectInstanceRelation.find(searchprops)
+			.sort({
+				_id: -1,
+			})
+			.limit(limit);
+			return {
+				results,
+				next: results.length == 0 ? undefined : results[results.length - 1]._id,
+			};
+		}
 	},
 	doesUserHaveRole: async (userid:string,role:string)=>{
 		let r=await UserSubjectInstanceRelation.findOne({
@@ -114,6 +176,26 @@ export const subjectInstanceController = {
 		console.log("r")
 		console.log(r)
 		return r?true:false
+	},
+	createSubjectInstanceUserRelation: async(
+		{useremail,userid, subjectinstanceid,role}:{useremail?:string,userid?:string,subjectinstanceid:string,role:string}
+	)=>{
+		if(!["student","teacher"].includes(role)){
+			throw "invalid role"
+		}
+		let user;
+		if(userid){
+			user= await userController.getByUUID(userid);
+		} else if(useremail){
+			user=await userController.getByEmail(useremail);
+		} else {
+			throw "no email or id provided for user"
+		}
+		let subjectinstance=await subjectInstanceController.getByUUID(subjectinstanceid);
+		let subjectInstanceUserRelation=new UserSubjectInstanceRelation({
+			subjectinstanceid:subjectinstance.uuid,userid:user.uuid,createdat:new Date(),role
+		})
+		return await subjectInstanceUserRelation.save()
 	},
 	search: async function (query:string,limit:number){
 		let results=await SubjectInstance.find({
