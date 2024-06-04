@@ -1,5 +1,5 @@
 import {User} from "./user"
-import {Subject, SubjectInstance,UserSubjectInstanceRelation} from "./subject"
+import {Subject, SubjectInstance,UserSubjectInstanceFullView,UserSubjectInstanceRelation} from "./subject"
 import {Attendance} from "./attendance"
 import {School} from "./school"
 import { Exam, ExamAnswer, ExamInstance, Question } from "./exam";
@@ -14,6 +14,6 @@ export const db = {
     "Question":Question,
     "ExamInstance":ExamInstance,
     "ExamAnswer":ExamAnswer,
-    // "UserSubjectInstanceFullView":UserSubjectInstanceFullView
+    "UserSubjectInstanceFullView":UserSubjectInstanceFullView
 };
 export default db

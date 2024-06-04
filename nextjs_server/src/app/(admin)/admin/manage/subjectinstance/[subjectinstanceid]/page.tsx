@@ -12,10 +12,12 @@ import { notFound } from "next/navigation";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
+import { DeleteSubjectInstanceModalButton } from "./components";
+import { toast } from "react-toastify";
 
 export default function SubjectInstancesSinglePage() {
 	const subjectInstanceService = useSubjectInstanceService();
-	const subjectUserService = useSubjectInstanceUserService();
+	const subjectInstanceUserService = useSubjectInstanceUserService();
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const { subjectinstanceid }: { subjectinstanceid: string } = useParams();
 	const router = useRouter();
@@ -29,6 +31,7 @@ export default function SubjectInstancesSinglePage() {
 				setSubjectInstance(v);
 			})
 			.catch((e) => {
+				toast.info("Không tìm thấy lớp học được chỉ định. Đang điều hướng...")
 				router.push("/admin/manage/subjectinstance");
 			})
 			.finally(() => {
@@ -70,9 +73,7 @@ export default function SubjectInstancesSinglePage() {
 					margin: "1rem 0",
 				}}
 			>
-				<Button onClick={() => {}} variant="outline-danger" className="m-1">
-					Xóa lớp học
-				</Button>
+				{subjectinstance&&<DeleteSubjectInstanceModalButton subjectinstance={subjectinstance}/>}
 				<Button onClick={() => {}} variant="outline-success" className="m-1">
 					Chỉnh sửa
 				</Button>
@@ -93,8 +94,8 @@ export default function SubjectInstancesSinglePage() {
 						],
 					}}
 					pagination={{
-						getPaginated: subjectUserService.getPaginated,
-						data: subjectUserService.subjectinstanceusers,
+						getPaginated: (props)=>subjectInstanceUserService.getPaginated({...props,role:"teacher"}),
+						data: subjectInstanceUserService.subjectinstanceusers.get("teacher"),
 					}}
 				/>
 			</div>
@@ -128,8 +129,8 @@ export default function SubjectInstancesSinglePage() {
 						],
 					}}
 					pagination={{
-						getPaginated: subjectUserService.getPaginated,
-						data: subjectUserService.subjectinstanceusers,
+						getPaginated: (props)=>subjectInstanceUserService.getPaginated({...props,role:"student"}),
+						data: subjectInstanceUserService.subjectinstanceusers.get("student"),
 					}}
 				/>
 			</div>

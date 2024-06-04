@@ -4,29 +4,33 @@ import { useAlertService,useUserService } from '.';
 import { useFetch } from '@/app/_helpers/client';
 
 export interface IServiceSubjectInstanceUser{
-    subjectid:string,
-    name:string,
-    createdat:string,
-    uuid:string,
-    authorName:string,
-    subjectName:string,
-    subjectAbbrev:string,
+    uuid: string,
+    userid: string,
+    subjectinstanceid: string,
+    role: string,
+    createdat: string,
+    username: string,
+    useremail:string,
+    subjectinstancename: string,
+    subjectabbrev: string,
 }
 interface IServiceSubjectInstanceUserStore {
     subjectinstanceuser?:IServiceSubjectInstanceUser,
-    subjectinstanceusers?:IServiceSubjectInstanceUser[],
-    nextPage?:string,
+    subjectinstanceusers:Map<string, IServiceSubjectInstanceUser[]>,
+    nextPage:Map<string,string>,
     paginationEnded?:Boolean
 }
 const initialState = {
+    subjectinstanceusers: new Map(),
+    nextPage: new Map()
 };
 const subjectUserStore = create<IServiceSubjectInstanceUserStore>(() => initialState);
 interface IServiceSubjectInstanceUserservice extends IServiceSubjectInstanceUserStore {
     create:(subjectabbrev:string,name:string)=>Promise<any>,
     // getallCurrent:()=>Promise<IServiceSubjectUser[]>,
     // getOne:(uuid:string)=>Promise<IServiceSubjectUser>,
-	getPaginated: (props:{limit:number,next?:string|undefined,query?:string}) => Promise<IServiceSubjectInstanceUser[]|undefined>,
-    clearPage:()=>Promise<void>
+	getPaginated: (props:{limit:number,next?:string|undefined,query?:string,role:string}) => Promise<IServiceSubjectInstanceUser[]|undefined>,
+    clearPage:(props:{role:string})=>Promise<void>
 }
 export function useSubjectInstanceUserService(): IServiceSubjectInstanceUserservice {
     const subjectUserStoreValues=subjectUserStore()
@@ -40,41 +44,45 @@ export function useSubjectInstanceUserService(): IServiceSubjectInstanceUserserv
             })     
         },
 		getPaginated: async (props) => {
-            let {limit,query}=props
+            let {limit,query,role}=props
             if(props.next===""){
-                subjectUserStore.setState({subjectinstanceusers:[],nextPage:undefined})
-                subjectUserStoreValues.subjectinstanceusers=[]
-                subjectUserStoreValues.nextPage=undefined
+                subjectUserStoreValues.subjectinstanceusers.delete(role)
+                subjectUserStoreValues.nextPage.delete(role)
+                subjectUserStore.setState({subjectinstanceusers:subjectUserStoreValues.subjectinstanceusers,nextPage:subjectUserStoreValues.nextPage})
             }
             let {results,next}:{next:string, results:IServiceSubjectInstanceUser[] }=await fetch.post('/api/subjectinstance/user/getpaginated',
                 {
                     limit,
-                    next:props.next??subjectUserStoreValues.nextPage,
+                    next:props.next??subjectUserStoreValues.nextPage.get(role),
                     query:query
                 }
             )
             if(results.length==0){
                 subjectUserStore.setState({paginationEnded:true})
             } else{
-		        subjectUserStore.setState({ 
-                    subjectinstanceusers: [...(subjectUserStoreValues.subjectinstanceusers??[]),...results]
-                        .sort(
+                subjectUserStoreValues
+                    .subjectinstanceusers
+                    .set(role,[...subjectUserStoreValues.subjectinstanceusers
+                        .get(role)??[],...results].sort(
                             (a,b)=>(a.uuid>b.uuid?1:0)
                         ).reduce((pre,cur)=>{
                             if(pre.length==0||pre[pre.length-1].uuid!=cur.uuid){
                                 pre.push(cur);
                             }
                             return pre;
-                        },[] as IServiceSubjectInstanceUser[]),
-                    nextPage:next 
+                        },[] as IServiceSubjectInstanceUser[]))
+                    subjectUserStoreValues.nextPage.set(role,next)
+		        subjectUserStore.setState({ 
+                    subjectinstanceusers: subjectUserStoreValues.subjectinstanceusers,
+                    nextPage:subjectUserStoreValues.nextPage 
                 });
             }
 			return results
 		}, 
-        clearPage:async ()=>{
-            subjectUserStore.setState({subjectinstanceusers:[],nextPage:undefined})
-            subjectUserStoreValues.subjectinstanceusers=[]
-            subjectUserStoreValues.nextPage=undefined
+        clearPage:async ({role}:{role:string})=>{
+            subjectUserStoreValues.subjectinstanceusers.delete(role,)
+            subjectUserStoreValues.nextPage.delete(role)
+            subjectUserStore.setState({subjectinstanceusers:subjectUserStoreValues.subjectinstanceusers,nextPage:subjectUserStoreValues.nextPage})
         }
     }
 };

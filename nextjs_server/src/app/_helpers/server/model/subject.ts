@@ -47,6 +47,7 @@ export const SubjectInstance: mongoose.Model<ISubjectInstance> = (() => {
 	);
 })();
 interface IUserSubjectInstanceRelation {
+	uuid:string;
 	userid: string;
 	subjectinstanceid: string;
 	createdat: Date;
@@ -55,6 +56,7 @@ interface IUserSubjectInstanceRelation {
 export const UserSubjectInstanceRelation: mongoose.Model<IUserSubjectInstanceRelation> =
 	(() => {
 		const schema = new Schema({
+			uuid:{ type: String, required: true,unique:true },
 			userid: { type: String, required: true },
 			subjectinstanceid: { type: String, required: true },
 			role: { type: String, required: true, default: "guest" },
@@ -70,6 +72,7 @@ export const UserSubjectInstanceRelation: mongoose.Model<IUserSubjectInstanceRel
 		);
 	})();
 interface IUserSubjectInstanceFullView{
+	uuid:string;
     userid: string,
     subjectinstanceid: string,
     role: string,
@@ -81,6 +84,7 @@ interface IUserSubjectInstanceFullView{
 }
 export const UserSubjectInstanceFullView:mongoose.Model<IUserSubjectInstanceFullView> =  (() => {
 	const schema = new Schema({
+		uuid:{ type: String, required: true,unique:true },
 		userid: { type: String, required: true },
 		subjectinstanceid: { type: String, required: true },
 		role: { type: String, required: true, default: "guest" },
@@ -113,6 +117,7 @@ export const UserSubjectInstanceFullView:mongoose.Model<IUserSubjectInstanceFull
 			{ $unwind: "$subjectinstanceinfo" },
 			{
 				$project: {
+					uuid: 1,
 					userid: 1,
 					subjectinstanceid: 1,
 					role: 1,

@@ -8,6 +8,7 @@ import { userController } from "./userController";
 import { FormatListBulleted } from "@mui/icons-material";
 const SubjectInstance = db.SubjectInstance;
 const UserSubjectInstanceRelation = db.UserSubjectInstanceRelation;
+const UserSubjectInstanceFullView = db.UserSubjectInstanceFullView;
 
 export const subjectInstanceController = {
 	create: async (subjectabbrev: string, name: string, authorid: string) => {
@@ -117,23 +118,13 @@ export const subjectInstanceController = {
 		}
 
 	},
-	getUserSubjectInstanceRelationNext: async ({limit,next,query}:{limit: number, next?: string,query?:string}) => {
+	getUserSubjectInstanceRelationNext: async ({limit,next,query,role}:{limit: number, next?: string,role?: string,query?:string}) => {
 		let searchprops={}
 		if(next){
 			searchprops={...searchprops,
 				_id: { $lt: next } 
 			}
 		}
-		// if(userids){
-		// 	searchprops={...searchprops,
-		// 		userid:{"$in": userids} 
-		// 	}
-		// } 
-		// if(subjectinstanceids){
-		// 	searchprops={...searchprops,
-		// 		subjectinstanceid:{"$in": subjectinstanceids} 
-		// 	}
-		// } 
 		if(query){
 			searchprops={...searchprops,
 				$text:{
@@ -142,6 +133,11 @@ export const subjectInstanceController = {
 				},
 			}
 		} 
+		if(role){
+			searchprops={...searchprops,
+				role: role 
+			}
+		}
 		console.log(searchprops)
 		let results;
 		if(query){
@@ -149,7 +145,7 @@ export const subjectInstanceController = {
 			if(!nextVal){
 				nextVal=0;
 			}
-			results=await UserSubjectInstanceRelation.find(searchprops)
+			results=await UserSubjectInstanceFullView.find(searchprops)
 			.skip(nextVal)
 			.limit(limit);
 			return {
@@ -157,7 +153,7 @@ export const subjectInstanceController = {
 				next: results.length == 0 ? undefined : `${nextVal+results.length}`,
 			};
 		} else{
-			results=await UserSubjectInstanceRelation.find(searchprops)
+			results=await UserSubjectInstanceFullView.find(searchprops)
 			.sort({
 				_id: -1,
 			})
@@ -193,6 +189,7 @@ export const subjectInstanceController = {
 		}
 		let subjectinstance=await subjectInstanceController.getByUUID(subjectinstanceid);
 		let subjectInstanceUserRelation=new UserSubjectInstanceRelation({
+			uuid:generateUUID(),
 			subjectinstanceid:subjectinstance.uuid,userid:user.uuid,createdat:new Date(),role
 		})
 		return await subjectInstanceUserRelation.save()
@@ -205,5 +202,8 @@ export const subjectInstanceController = {
 			}
 		}).limit(limit).exec();
 		return results;
+	},
+	deleteByUUID: async function(uuid:string){
+		return await SubjectInstance.findOneAndDelete({uuid});
 	}
 };
