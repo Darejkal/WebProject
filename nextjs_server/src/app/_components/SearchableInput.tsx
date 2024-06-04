@@ -18,6 +18,7 @@ export default function SearchableInput<
     afterOnChange,
     afterOnInputChange,
     afterGetOptions,
+    defaultValue,
     props
     // getOptionLabel
 }:{
@@ -28,7 +29,8 @@ export default function SearchableInput<
     fetchData:(input:string)=>Promise<Value[]>,
     afterOnChange?:(props:{event: SyntheticEvent<Element, Event>, value: Value|string|null , reason: AutocompleteChangeReason, details?: AutocompleteChangeDetails<Value|string> | undefined,options:(Value|string)[]} ) => void
     afterOnInputChange?:(props:{event: SyntheticEvent<Element, Event>, value: Value|string|null , reason: AutocompleteInputChangeReason,options:(Value|string)[]} ) => void
-    afterGetOptions?:(props:{inputValue: Value|string|null,options:(Value|string)[]} ) => void
+    afterGetOptions?:(props:{inputValue: Value|string|null,options:(Value|string)[]} ) => void,
+    defaultValue?:string|Value,
     props?:{
         optionLabel?:keyof Value,
         // optionID?:keyof Value,
@@ -37,6 +39,11 @@ export default function SearchableInput<
     const [options,setOptions]=useState<(Value|string)[]>([]);
     const [inputValue,setInputValue]=useState<string>("");
     const [value,setValue]=useState<Value|string|null>(null);
+    useEffect(()=>{
+        if(typeof defaultValue !== "undefined"){
+            setValue(defaultValue);
+        }
+    },[defaultValue])
 	const getOptionsDelayed=useCallback(
 		debounce((input:string|null,callback:(v:any)=>any)=>{
 			if (!input) {
@@ -87,8 +94,8 @@ export default function SearchableInput<
                     fullWidth
                     autoComplete='off'
                     {...textFieldProps}
-                    inputRef={formRegisterRef}
-                    {...formRegisterNoRef}
+                    inputRef={formRegister.ref}
+                    {...formRegister}
                 />
             )}
             onChange={(event,value,reason,details) => {

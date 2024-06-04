@@ -12,7 +12,7 @@ import { notFound } from "next/navigation";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { DeleteSubjectInstanceModalButton } from "./components";
+import { DeleteSubjectInstanceModalButton, ModifySubjectInstanceModalButton } from "./components";
 import { toast } from "react-toastify";
 
 export default function SubjectInstancesSinglePage() {
@@ -74,9 +74,7 @@ export default function SubjectInstancesSinglePage() {
 				}}
 			>
 				{subjectinstance&&<DeleteSubjectInstanceModalButton subjectinstance={subjectinstance}/>}
-				<Button onClick={() => {}} variant="outline-success" className="m-1">
-					Chỉnh sửa
-				</Button>
+				{subjectinstance&&<ModifySubjectInstanceModalButton subjectinstance={subjectinstance}/>}
 			</div>
 			<div>
 				<h4 style={{ margin: "1rem 0" }}>Danh sách giảng viên</h4>
