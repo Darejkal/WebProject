@@ -36,6 +36,7 @@ export default function LoginPage(){
             toast.dismiss(info_toast)
             toast.success("Logged in",{delay:500})
         } catch(e:any){
+            toast.dismiss(info_toast)
             toast.warning(e);
         }
     }

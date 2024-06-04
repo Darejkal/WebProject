@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "bcryptjs": "^2.4.3"
+    "@types/lodash": "^4.17.4",
+    "bcryptjs": "^2.4.3",
+    "lodash": "^4.17.21"
   }
 }

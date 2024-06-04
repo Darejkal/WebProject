@@ -13,6 +13,7 @@ export const userController = {
 	getByUUID,
 	getByUUIDs,
 	getCurrent,
+	getByEmail,
 	create,
 	update,
 	delete: _delete,
@@ -61,6 +62,13 @@ async function getNext(limit: number, next?: string) {
 
 async function getByUUID(uuid: string) {
 	let user = await User.findOne({ uuid });
+	if (!user) {
+		throw "user not found";
+	}
+	return user;
+}
+async function getByEmail(email: string) {
+	let user = await User.findOne({ email });
 	if (!user) {
 		throw "user not found";
 	}
