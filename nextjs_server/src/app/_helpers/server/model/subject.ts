@@ -69,62 +69,62 @@ export const UserSubjectInstanceRelation: mongoose.Model<IUserSubjectInstanceRel
 			)
 		);
 	})();
-// interface IUserSubjectInstanceFullView{
-//     userid: string,
-//     subjectinstanceid: string,
-//     role: string,
-//     createdat: string,
-//     username: string,
-//     useremail:string,
-//     subjectinstancename: string,
-//     subjectabbrev: string,
-// }
-// export const UserSubjectInstanceFullView:mongoose.Model<IUserSubjectInstanceFullView> = await (async () => {
-// 	const schema = new Schema({
-// 		userid: { type: String, required: true },
-// 		subjectinstanceid: { type: String, required: true },
-// 		role: { type: String, required: true, default: "guest" },
-// 		createdat: { type: Date, required: true },
-// 	});
-// 	schema.index({ userid: 1, subjectinstanceid: 1 });
-// 	let userSubjectInstanceFullView =
-// 		mongoose.models.usersubjectinstancefullview ||
-// 		mongoose.model("usersubjectinstancefullview", schema);
-// 	await userSubjectInstanceFullView.createCollection<IUserSubjectInstanceFullView>({
-// 		viewOn: UserSubjectInstanceRelation.modelName,
-// 		pipeline: [
-// 			{
-// 				$lookup: {
-// 					from: User.modelName,
-// 					localField: "userid",
-// 					foreignField: "uuid",
-// 					as: "userinfo",
-// 				},
-// 			},
-// 			{
-// 				$lookup: {
-// 					from: SubjectInstance.modelName,
-// 					localField: "subjectinstanceid",
-// 					foreignField: "uuid",
-// 					as: "subjectinstanceinfo",
-// 				},
-// 			},
-// 			{ $unwind: "$userinfo" },
-// 			{ $unwind: "$subjectinstanceinfo" },
-// 			{
-// 				$project: {
-// 					userid: 1,
-// 					subjectinstanceid: 1,
-// 					role: 1,
-// 					createdat: 1,
-// 					username: "$userinfo.name",
-// 					useremail: "$userinfo.email",
-// 					subjectinstancename: "$subjectinstanceinfo.name",
-// 					subjectabbrev: "$subjectinstanceinfo.subjectabbrev",
-// 				},
-// 			},
-// 		],
-// 	});
+interface IUserSubjectInstanceFullView{
+    userid: string,
+    subjectinstanceid: string,
+    role: string,
+    createdat: string,
+    username: string,
+    useremail:string,
+    subjectinstancename: string,
+    subjectabbrev: string,
+}
+export const UserSubjectInstanceFullView:mongoose.Model<IUserSubjectInstanceFullView> =  (() => {
+	const schema = new Schema({
+		userid: { type: String, required: true },
+		subjectinstanceid: { type: String, required: true },
+		role: { type: String, required: true, default: "guest" },
+		createdat: { type: Date, required: true },
+	});
+	schema.index({ userid: 1, subjectinstanceid: 1 });
+	let userSubjectInstanceFullView =
+		mongoose.models.usersubjectinstancefullview ||
+		mongoose.model("usersubjectinstancefullview", schema);
+	userSubjectInstanceFullView.createCollection<IUserSubjectInstanceFullView>({
+		viewOn: UserSubjectInstanceRelation.modelName,
+		pipeline: [
+			{
+				$lookup: {
+					from: User.modelName,
+					localField: "userid",
+					foreignField: "uuid",
+					as: "userinfo",
+				},
+			},
+			{
+				$lookup: {
+					from: SubjectInstance.modelName,
+					localField: "subjectinstanceid",
+					foreignField: "uuid",
+					as: "subjectinstanceinfo",
+				},
+			},
+			{ $unwind: "$userinfo" },
+			{ $unwind: "$subjectinstanceinfo" },
+			{
+				$project: {
+					userid: 1,
+					subjectinstanceid: 1,
+					role: 1,
+					createdat: 1,
+					username: "$userinfo.name",
+					useremail: "$userinfo.email",
+					subjectinstancename: "$subjectinstanceinfo.name",
+					subjectabbrev: "$subjectinstanceinfo.subjectabbrev",
+				},
+			},
+		],
+	});
     
-//     return userSubjectInstanceFullView as mongoose.Model<IUserSubjectInstanceFullView>;
-// })();
+    return userSubjectInstanceFullView as mongoose.Model<IUserSubjectInstanceFullView>;
+})();
