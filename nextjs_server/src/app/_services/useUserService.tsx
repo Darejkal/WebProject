@@ -9,20 +9,20 @@ import React from "react";
 
 // interfaces
 
-interface IServiceUser {
+export interface IServiceUser {
 	name: string;
 	password: string;
 	email: string;
 	uuid: string;
 	position: string;
 }
-interface IMightBeTeacher{
-	isTeacher?:Boolean;
+interface IMightBeTeacher {
+	isTeacher?: Boolean;
 }
 interface IServiceUserStoreData {
 	users?: IServiceUser[];
 	user?: IServiceUser;
-	currentUser?: IServiceUser&IMightBeTeacher;
+	currentUser?: IServiceUser & IMightBeTeacher;
 }
 interface IServiceUserStore extends IServiceUserStoreData {
 	setUser: (newuser: IServiceUser) => void;
@@ -38,7 +38,7 @@ interface IUserService extends IServiceUserStoreData {
 	) => Promise<IServiceUser[] | undefined>;
 	getByUUID: (id: string) => Promise<IServiceUser | undefined>;
 	getCurrent: (redirect?: Boolean) => Promise<IServiceUser | undefined>;
-	currentHasTeacherRole:()=>Promise<Boolean>;
+	currentHasTeacherRole: () => Promise<Boolean>;
 	// create: (user: IServiceUser) => Promise<void>,
 	// update: (id: string, params: Partial<IServiceUser>) => Promise<void>,
 	// delete: (id: string) => Promise<void>
@@ -60,8 +60,8 @@ const createUserStore = (
 			setCurrentUser: (newuser: IServiceUser | undefined) => {
 				set({ currentUser: newuser });
 			},
-		}),{
-		name:"user_store"
+		}), {
+		name: "user_store"
 	}));
 };
 
@@ -145,18 +145,18 @@ export function useUserService(): IUserService {
 
 			return currentUser;
 		},
-		currentHasTeacherRole:async()=>{
-			if(!currentUser){
+		currentHasTeacherRole: async () => {
+			if (!currentUser) {
 				return false;
 			}
-			if(!("isTeacher" in currentUser) ){
-				try{
-					userStore.setState({currentUser:{...currentUser,isTeacher:await fetch.get("/api/user/hasrole/teacher")}})
-				} catch(e){
+			if (!("isTeacher" in currentUser)) {
+				try {
+					userStore.setState({ currentUser: { ...currentUser, isTeacher: await fetch.get("/api/user/hasrole/teacher") } })
+				} catch (e) {
 
 				}
 			}
-			return currentUser.isTeacher?true:false;
+			return currentUser.isTeacher ? true : false;
 		}
 	};
 }
