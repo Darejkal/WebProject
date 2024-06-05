@@ -11,10 +11,10 @@ import React from "react";
 
 interface IServiceUser {
 	name: string;
-	password: string;
 	email: string;
 	uuid: string;
 	position: string;
+	createdat:string;
 }
 interface IMightBeTeacher{
 	isTeacher?:Boolean;
@@ -23,19 +23,18 @@ interface IServiceUserStoreData {
 	users?: IServiceUser[];
 	user?: IServiceUser;
 	currentUser?: IServiceUser&IMightBeTeacher;
+	nextPage?:string
 }
 interface IServiceUserStore extends IServiceUserStoreData {
 	setUser: (newuser: IServiceUser) => void;
 	setCurrentUser: (currentUser: IServiceUser | undefined) => void;
+    paginationEnded?:Boolean;
 }
 interface IUserService extends IServiceUserStoreData {
 	login: (email: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
 	register: (user: IServiceUser) => Promise<void>;
-	getPaginated: (
-		limit: number,
-		next?: string
-	) => Promise<IServiceUser[] | undefined>;
+	getPaginated: (props:{limit:number,next?:string|undefined,query?:string}) => Promise<IServiceUser[] | undefined>;
 	getByUUID: (id: string) => Promise<IServiceUser | undefined>;
 	getCurrent: (redirect?: Boolean) => Promise<IServiceUser | undefined>;
 	currentHasTeacherRole:()=>Promise<Boolean>;
@@ -75,8 +74,8 @@ export function useUserService(): IUserService {
 		throw new Error(`userservice must be inside an user context provider`);
 	}
 
-	const { users, user, currentUser, setUser, setCurrentUser } =
-		useStore(userStore);
+	const userStoreValues = useStore(userStore);
+	const { users, user, currentUser, setUser, setCurrentUser }=userStoreValues;
 
 	return {
 		users,
@@ -112,11 +111,41 @@ export function useUserService(): IUserService {
 			}
 		},
 
-		getPaginated: async (limit, next) => {
-			userStore.setState({
-				users: await fetch.post("/api/user/getpaginated", { limit, next }),
-			});
-			return users;
+		getPaginated: async (props) => {
+            let {limit,query}=props
+            if(props.next===""){
+                userStore.setState({users:[],nextPage:undefined})
+                userStoreValues.users=[]
+                userStoreValues.nextPage=undefined
+            }
+            let {results,next}:{next:string, results:IServiceUser[] }=await fetch.post('/api/user/getpaginated',
+                {
+                    limit,
+                    next:props.next??userStoreValues.nextPage,
+                    query:query
+                }
+            )
+            if(results.length==0){
+                userStore.setState({paginationEnded:true})
+            } else{
+		        userStore.setState({ 
+                    users: [...(userStoreValues.users??[]),...results]
+                        .sort(
+                            (a,b)=>(a.uuid>b.uuid?1:0)
+                        ).reduce((pre,cur)=>{
+                            if(pre.length==0||pre[pre.length-1].uuid!=cur.uuid){
+                                pre.push(cur);
+                            }
+                            return pre;
+                        },[] as IServiceUser[]),
+                    nextPage:next 
+                });
+                // subjectInstanceStore.setState({ 
+                //     subjectinstances: Array.from(new Set([...(subjectInstanceStoreValues.subjectinstances??[]),...results])),
+                //     nextPage:next 
+                // });
+            }
+            return results;
 		},
 		getByUUID: async (uuid: string) => {
 			userStore.setState({ user: undefined });
