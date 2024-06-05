@@ -16,7 +16,7 @@ interface IServiceSubjectInstanceStore {
     subjectinstance?:IServiceSubjectInstance,
     subjectinstances?:IServiceSubjectInstance[],
     nextPage?:string,
-    paginationEnded?:Boolean
+    paginationEnded?:boolean
 }
 const initialState = {
 };
@@ -63,6 +63,7 @@ export function useSubjectInstanceService(): IServiceSubjectInstanceService {
                 }
             )
             if(results.length==0){
+                console.log("subjectInstanceStore paginationended")
                 subjectInstanceStore.setState({paginationEnded:true})
             } else{
 		        subjectInstanceStore.setState({ 

@@ -117,6 +117,7 @@ export const UserSubjectInstanceFullView:mongoose.Model<IUserSubjectInstanceFull
 			{ $unwind: "$subjectinstanceinfo" },
 			{
 				$project: {
+					_id:1,
 					uuid: 1,
 					userid: 1,
 					subjectinstanceid: 1,

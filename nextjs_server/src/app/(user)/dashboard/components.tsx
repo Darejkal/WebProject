@@ -1,4 +1,6 @@
-// import CardMedia from "@mui/material/CardMedia";
+'use client'
+import { IServiceSubjectInstance } from "@/app/_services/useSubjectInstanceService";
+import { useRouter } from "next/navigation";
 import {
 	Card,
 	CardBody,
@@ -8,7 +10,8 @@ import {
 	Button,
 } from "react-bootstrap";
 
-export const SubjectInstanceCard = () => {
+export const SubjectInstanceCard = ({subjectName,subjectAbbrev,name,createdat,uuid}:IServiceSubjectInstance) => {
+	const router=useRouter();
 	return (
 		<Card
 			style={{
@@ -31,15 +34,17 @@ export const SubjectInstanceCard = () => {
 				}}
 			/>
 			<CardBody>
-				<h5>SubjectInstanceName</h5>
+				<h5>{name}</h5>
 				<div className="text-muted">
 					<p>
-						<span>School</span>-<span>SubjectID</span>
+						<span>{subjectName}</span>-<span>{subjectAbbrev}</span>
 						<br />
-						<span>Createdat</span>
+						<span>{createdat}</span>
 					</p>
 				</div>
-				<Button>Xem khoá học</Button>
+				<Button onClick={()=>{
+					router.push("/subjectinstance/"+uuid)
+				}}>Xem khoá học</Button>
 			</CardBody>
 		</Card>
 	);

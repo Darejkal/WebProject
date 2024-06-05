@@ -17,5 +17,5 @@ async function searchSubject(req: NextRequest) {
 	}
 	let results= await subjectInstanceController.search(query,5);
 	console.log(results)
-	return results.map(({name,subjectid})=>({name,subjectid}));
+	return results.map(({name,subjectabbrev,uuid})=>({name,subjectabbrev,uuid}));
 }

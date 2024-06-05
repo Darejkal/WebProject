@@ -9,7 +9,6 @@ import { DataObjectSharp, FormatListBulleted } from "@mui/icons-material";
 const SubjectInstance = db.SubjectInstance;
 const UserSubjectInstanceRelation = db.UserSubjectInstanceRelation;
 const UserSubjectInstanceFullView = db.UserSubjectInstanceFullView;
-
 export const subjectInstanceController = {
 	create: async (subjectabbrev: string, name: string, authorid: string) => {
 		return subjectController.getByAbbrev(subjectabbrev).then(async () => {
@@ -40,10 +39,10 @@ export const subjectInstanceController = {
 		role: string
 	) => {
 		let user = await userController.getByUUID(userid);
-		let subject = await subjectController.getByUUID(subjectinstanceid);
+		let subjectinstance = await subjectInstanceController.getByUUID(subjectinstanceid);
 		let relation = new UserSubjectInstanceRelation({
-			userid: user.id,
-			subjectinstanceid: subject!.id,
+			userid: user.uuid,
+			subjectinstanceid: subjectinstance.uuid,
 			role: role,
 		});
 		return await relation.save();
@@ -53,10 +52,10 @@ export const subjectInstanceController = {
 		subjectinstanceid: string
 	) => {
 		let user = await userController.getByUUID(userid);
-		let subject = await subjectController.getByUUID(subjectinstanceid);
+		let subjectinstance = await subjectInstanceController.getByUUID(subjectinstanceid);
 		let usersubject = await UserSubjectInstanceRelation.findOne({
-			userid: user.id,
-			subjectinstanceid: subject!.id,
+			userid: user.uuid,
+			subjectinstanceid: subjectinstance.uuid,
 		});
 		return usersubject;
 	},
@@ -85,6 +84,24 @@ export const subjectInstanceController = {
 			throw "subjects not found";
 		}
 		return subjects;
+	},
+	getNextOfUser: async (props:{userid: string,limit: number, next?: string}) => {
+		let {userid,limit,next}=props
+		let user = await userController.getByUUID(userid);
+		if (!user) {
+			throw "user not found";
+		}
+		let results = await UserSubjectInstanceFullView.find({
+			...(next&&{_id: { $lt: next }}),
+			userid: userid,
+		}).sort({
+			_id: -1,
+		})
+		.limit(limit);
+		return {
+			results,
+			next: results.length == 0 ? undefined : results[results.length - 1]._id,
+		};
 	},
 	getNext: async ({limit,next,query}:{limit: number, next?: string,query?: string}) => {
 		let searchprops={}
@@ -175,11 +192,20 @@ export const subjectInstanceController = {
 			};
 		}
 	},
-	doesUserHaveRole: async (userid:string,role:string)=>{
-		let r=await UserSubjectInstanceRelation.findOne({
-			userid:userid,
-			role:role
-		})
+	doesUserHaveRole: async (userid:string,role:string,subjectinstanceid:string="")=>{
+		let r;
+		if(subjectinstanceid){
+			r=await UserSubjectInstanceRelation.findOne({
+				userid:userid,
+				role:role,
+				subjectinstanceid:subjectinstanceid
+			})
+		} else{
+			r=await UserSubjectInstanceRelation.findOne({
+				userid:userid,
+				role:role
+			})
+		}
 		console.log("r")
 		console.log(r)
 		return r?true:false

@@ -56,7 +56,15 @@ export default function SubjectInstancesSinglePage() {
 					enableSorting={false}
 					enableTopToolbar={false}
 					enableBottomToolbar={false}
-					muiTableBodyRowProps={{ hover: false }}
+					muiTableBodyRowProps={{ 
+						hover: false,
+						style:{
+							border:"none"
+						}
+					}}
+					muiTableContainerProps={{
+						
+					}}
 					columns={[
 						{ accessorKey: "subjectAbbrev", header: "Mã môn học" },
 						{ accessorKey: "subjectName", header: "Tên môn học" },

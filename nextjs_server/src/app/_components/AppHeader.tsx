@@ -8,11 +8,8 @@ import Alert from "react-bootstrap/Alert";
 import { Button, Spinner } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
-	UserStoreContext,
-	UserStoreProvider,
 	useUserService,
 } from "@/app/_services";
-import { useStore } from "zustand";
 import { useRouter } from "next/navigation";
 import {} from "@heroicons/react/16/solid";
 import { QrCodeIcon, ChatBubbleLeftIcon } from "@heroicons/react/24/outline";

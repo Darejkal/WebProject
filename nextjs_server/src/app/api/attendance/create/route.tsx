@@ -3,20 +3,21 @@ import joi from 'joi';
 
 import { apiHandler } from '@/app/_helpers/server/middleware';
 import { attendanceController, subjectInstanceController } from '@/app/_helpers/server';
-import { NextResponse } from 'next/server';
 module.exports = apiHandler({
     POST: createAttendance
 });
 
 async function createAttendance(req: Request) {
-    const body= await req.json()
-    const classRole=await subjectInstanceController.getUserSubjectInstanceRelation(body.userid!,body.subjectinstanceid!)
-    if(!classRole){
-        throw "no role found"
-    }else if (classRole.role!="teacher"){
+    const body:{subjectinstanceid:string}= await req.json()
+    const userid=req.headers.get("userId")
+    if(!userid){
+        throw "not permitted"
+    }
+    const isTeacher=await subjectInstanceController.doesUserHaveRole(userid,"teacher",body.subjectinstanceid!)
+    if (!isTeacher){
         throw "not permitted"
     } else{
-        let attendance= await attendanceController.create(body.subjectinstanceid,body.creatorid)
+        let attendance= await attendanceController.create(body.subjectinstanceid,userid)
         return {
             "uuid":attendance.uuid
         }
@@ -24,7 +25,7 @@ async function createAttendance(req: Request) {
 }
 createAttendance.schema = joi.object({
     subjectinstanceid:joi.string().required(),
-    userid:joi.string().required()
+    // userid:joi.string().required()
     // email: joi.string().required(),
     // password: joi.string().required()
 });
