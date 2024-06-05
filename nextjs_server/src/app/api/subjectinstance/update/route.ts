@@ -10,10 +10,14 @@ module.exports = apiHandler({
 });
 
 async function update(req: Request) {
-    const {members}:{members:[{userid:string}]}=await req.json()
-    
+    const props:{
+        name:string,uuid:string,subjectAbbrev:string
+    }=await req.json()
+    await subjectInstanceController.updateOne(props)
 }
 update.position="admin"
 update.schema = joi.object({
-    subjectabbrev: joi.string().required(),
+    name:joi.string(),
+    uuid:joi.string().required(),
+    subjectAbbrev:joi.string(),
 });

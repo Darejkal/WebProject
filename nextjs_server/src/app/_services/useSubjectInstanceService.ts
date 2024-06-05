@@ -27,7 +27,8 @@ interface IServiceSubjectInstanceService extends IServiceSubjectInstanceStore {
     getOne:(uuid:string)=>Promise<IServiceSubjectInstance>,
 	getPaginated: (props:{limit:number,next?:string|undefined,query?:string}) => Promise<IServiceSubjectInstance[]|undefined>,
     clearPage:()=>Promise<void>,
-    deleteByUUID:(uuid:string)=>Promise<void>;
+    deleteByUUID:(uuid:string)=>Promise<void>,
+    updateOne:(props:{name:string,uuid:string,subjectAbbrev:string})=>Promise<void>;
 }
 export function useSubjectInstanceService(): IServiceSubjectInstanceService {
     const userService = useUserService();
@@ -89,6 +90,9 @@ export function useSubjectInstanceService(): IServiceSubjectInstanceService {
         },
         deleteByUUID:async(uuid:string)=>{
             return await fetch.post("/api/subjectinstance/delete",{uuid});
+        },
+        updateOne: async(props)=>{
+            return await fetch.post("/api/subjectinstance/update",props)
         }
     }
 };

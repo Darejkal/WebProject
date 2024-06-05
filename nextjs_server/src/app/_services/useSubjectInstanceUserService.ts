@@ -30,7 +30,8 @@ interface IServiceSubjectInstanceUserservice extends IServiceSubjectInstanceUser
     // getallCurrent:()=>Promise<IServiceSubjectUser[]>,
     // getOne:(uuid:string)=>Promise<IServiceSubjectUser>,
 	getPaginated: (props:{limit:number,next?:string|undefined,query?:string,role:string}) => Promise<IServiceSubjectInstanceUser[]|undefined>,
-    clearPage:(props:{role:string})=>Promise<void>
+    clearPage:(props:{role:string})=>Promise<void>,
+    addMembers:(props:{userids:string[],subjectinstanceid:string,role:string})=>Promise<void>,
 }
 export function useSubjectInstanceUserService(): IServiceSubjectInstanceUserservice {
     const subjectUserStoreValues=subjectUserStore()
@@ -54,7 +55,8 @@ export function useSubjectInstanceUserService(): IServiceSubjectInstanceUserserv
                 {
                     limit,
                     next:props.next??subjectUserStoreValues.nextPage.get(role),
-                    query:query
+                    query:query,
+                    role:role
                 }
             )
             if(results.length==0){
@@ -83,6 +85,9 @@ export function useSubjectInstanceUserService(): IServiceSubjectInstanceUserserv
             subjectUserStoreValues.subjectinstanceusers.delete(role,)
             subjectUserStoreValues.nextPage.delete(role)
             subjectUserStore.setState({subjectinstanceusers:subjectUserStoreValues.subjectinstanceusers,nextPage:subjectUserStoreValues.nextPage})
+        },
+        addMembers:async (props)=>{
+            return await fetch.post("/api/subjectinstance/addmembers",props)
         }
     }
 };
