@@ -156,7 +156,7 @@ export default function LandingPage(){
                         lineHeight: '60px',
                         color: 'white',
                         fontSize: '30px',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
                         }}
                     >
                         &lt;
@@ -212,7 +212,7 @@ export default function LandingPage(){
                                 <Card.Body>
                                     <Card.Title>{carouselcards.title}</Card.Title>
                                     <Card.Text>
-                                        <p style={{marginBottom: 0}}>SoICT</p>
+                                        <span style={{marginBottom: 0}}>SoICT</span>
                                         <span>Sẽ bắt đầu: {carouselcards.time}</span>
                                     </Card.Text>
                                     <Button variant="primary">Tìm hiểu thêm</Button>
