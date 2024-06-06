@@ -21,7 +21,7 @@ async function create(name:string,abbrev:string,schoolabbrev:string,authorid:str
         abbrev,
         schoolabbrev,
         authorid,
-        uuid:generateUUID(),
+        uuid: await generateUUID(),
         createdat:new Date()
     })
     await subject.save()

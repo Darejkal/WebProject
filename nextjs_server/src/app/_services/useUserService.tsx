@@ -9,7 +9,7 @@ import React from "react";
 
 // interfaces
 
-interface IServiceUser {
+export interface IServiceUser {
 	name: string;
 	email: string;
 	uuid: string;
@@ -34,6 +34,7 @@ interface IUserService extends IServiceUserStoreData {
 	login: (email: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
 	register: (user: IServiceUser) => Promise<void>;
+    clearPage:()=>Promise<void>
 	getPaginated: (props:{limit:number,next?:string|undefined,query?:string}) => Promise<IServiceUser[] | undefined>;
 	getByUUID: (id: string) => Promise<IServiceUser | undefined>;
 	getCurrent: (redirect?: Boolean) => Promise<IServiceUser | undefined>;
@@ -189,7 +190,12 @@ export function useUserService(): IUserService {
 		},
 		updateCurrent: async (params)=>{
 			await fetch.post("/api/user/update",params)
-		}
+		},
+		clearPage: async ()=>{
+            userStore.setState({users:[],nextPage:undefined})
+            userStoreValues.nextPage=undefined
+            userStoreValues.users=[]
+        }
 	};
 }
 

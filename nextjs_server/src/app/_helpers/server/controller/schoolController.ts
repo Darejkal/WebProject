@@ -13,7 +13,7 @@ async function create(name:string,abbrev:string){
     let school= new School({
         name,
         abbrev,
-        uuid:generateUUID(),
+        uuid:await generateUUID(),
         createdat:new Date(),
     })
     return await school.save()

@@ -40,7 +40,7 @@ export const SubjectInstance: mongoose.Model<ISubjectInstance> = (() => {
 		createdat: { type: Date, required: true },
 		authorid: { type: String, required: true },
 	});
-	schema.index({ name: "text", subjectinstance: "text" });
+	schema.index({ name: "text", subjectabbrev: "text" });
 	return (
 		mongoose.models.subjectinstance ||
 		mongoose.model<ISubjectInstance>("subjectinstance", schema)

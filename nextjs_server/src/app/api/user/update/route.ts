@@ -14,7 +14,10 @@ async function update(req: Request) {
         throw "userid not found";
     }
     const body = await req.json();
-    await userController.update(userid,body);
+    await userController.update(userid,{
+        name:body?.name,
+        email:body?.email
+    });
 }
 
 update.schema = joi.object({

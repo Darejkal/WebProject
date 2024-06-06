@@ -10,10 +10,10 @@ interface IAttendance{
     creatorid:String,
     uuid:String,
     createdat:Date,
-    report:[{
+    report:{
         userid:String,
         attended: Boolean
-    }]
+    }[]
 }
 export const Attendance:mongoose.Model<IAttendance> =(()=> {
     const schema = new Schema({

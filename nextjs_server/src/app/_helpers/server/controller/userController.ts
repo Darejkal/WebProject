@@ -27,7 +27,7 @@ async function authenticate({
 	password: string;
 }) {
 	const user = await User.findOne({ email: email });
-	if (!(user && customEncryptCompare(password, user.password))) {
+	if (!(user && (await customEncryptCompare(password, user.password)))) {
 		throw "Email or password is incorrect";
 	}
 	const token = jwt.sign(
@@ -143,12 +143,12 @@ async function create(
 		position,
 		name,
 	});
-	user.uuid = generateUUID();
+	user.uuid = await generateUUID();
 	user.createdat = new Date();
 
 	// hash password
 	if (password) {
-		user.password = customEncrypt(password);
+		user.password = await  customEncrypt(password);
 	}
 
 	// save user
@@ -169,7 +169,7 @@ async function update(uuid: string, params: any) {
 
 	// hash password if it was entered
 	if (params.password) {
-		params.hash = customEncrypt(params.password);
+		params.hash = await  customEncrypt(params.password);
 	}
 
 	// copy params properties to user

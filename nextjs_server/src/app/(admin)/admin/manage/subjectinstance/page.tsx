@@ -130,6 +130,10 @@ const SubjectInstancesPage = () => {
 						<Form.Group controlId="name">
 							<Form.Label>Tên</Form.Label>
 							<SearchableInput
+								autocompleteProps={{
+									freeSolo:true,
+									filterOptions:(x)=>x
+								}}
 								fetchData={
 									(input:string)=>{
 										let queryParam = new URLSearchParams();

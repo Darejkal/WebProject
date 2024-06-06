@@ -1,5 +1,6 @@
+'use server'
 import bcrypt from 'bcryptjs';
-export function generateUUID() {
+export async function generateUUID() {
     let u = new Uint8Array(16);
     crypto.getRandomValues(u);
     // 0x40 is reserved variant from RFC 4122
@@ -23,9 +24,28 @@ export function generateUUID() {
         byteArrayToHexString(u.subarray(10))
     ].join('-');
 }
-export function customEncrypt(plaintext:string) {
+export async  function customEncrypt(plaintext:string) {
     return bcrypt.hashSync(plaintext, 10)
 }
-export function customEncryptCompare(plaintext:string,hashed:string) {
+export async  function customEncryptCompare(plaintext:string,hashed:string) {
     return bcrypt.compareSync(plaintext, hashed)
+}
+export async function getPublicIP(){
+    const pc = new RTCPeerConnection({ iceServers: [ {urls: 'stun:stun.l.google.com:19302'} ] });
+    pc.createDataChannel('');
+    pc.createOffer().then(offer => pc.setLocalDescription(offer))
+    pc.onicecandidate = (ice) => {
+        if (!ice || !ice.candidate || !ice.candidate.candidate) {
+            console.log("all done.");
+            pc.close();   
+            return;
+        }
+        let split = ice.candidate.candidate.split(" ");
+        if (split[7] === "host") {
+            console.log(`Local IP : ${split[4]}`);
+        } else {
+            console.log(`External IP : ${split[4]}`);
+            return split[4]
+        }
+    };
 }

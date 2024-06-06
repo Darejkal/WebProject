@@ -65,6 +65,7 @@ export default function SearchableInput<
     const {ref:formRegisterRef,...formRegisterNoRef}=formRegister;
     return (
         <Autocomplete
+            filterOptions={(x)=>x}
             options={options}
             value={value}
             inputValue={inputValue}
@@ -75,15 +76,6 @@ export default function SearchableInput<
                     return option[props!.optionLabel!] as string
                 }
             }}:{})}
-            // {...(props?.optionID?{
-            //         renderOption:(props:HTMLAttributes<HTMLLIElement>, option:string | Value) => (
-            //                 <li {...props} key={(typeof option==="string")?option:option[props.optionID]}>
-            //                     {typeof option==="string"?option:option[props!.optionLabel!]}
-            //                 </li>
-            //         )
-            //     }:{}
-            //     )
-            // }
             onInputChange={(event, value,reason) => {
                 setInputValue(value)
                 afterOnInputChange&&afterOnInputChange({event, value,reason,options})
@@ -102,7 +94,30 @@ export default function SearchableInput<
                 console.log("onchanged")
                 console.log(value)
                 if(value){
-                    setOptions([value,...options])
+                    let valueText:any="";
+                    if(typeof value==="string"){
+                        valueText=value;
+                    } else if(props?.optionLabel){
+                        valueText=(value as Value)[props.optionLabel]
+                    } else{
+                        valueText=value
+                    }
+                    if(options.findIndex((v)=>{
+                        let vText:any="";
+                        if(typeof value==="string"){
+                            vText=value;
+                        } else if(props?.optionLabel){
+                            vText=(value as Value)[props.optionLabel]
+                        } else {
+                            vText=v;
+                        }
+                        return vText===valueText
+                    })<0){
+                        setOptions([value,...options])
+
+                    } else{
+                        setOptions(options)
+                    }
                     setValue(value);
                 }
                 afterOnChange&&afterOnChange({event,value,reason,details,options})

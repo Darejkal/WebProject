@@ -15,7 +15,7 @@ export const subjectInstanceController = {
 			let subjectinstance = new SubjectInstance({
 				subjectabbrev: subjectabbrev,
 				name: name,
-				uuid: generateUUID(),
+				uuid: await generateUUID(),
 				createdat: new Date(),
 				authorid,
 			});
@@ -226,12 +226,12 @@ export const subjectInstanceController = {
 		}
 		let subjectinstance=await subjectInstanceController.getByUUID(subjectinstanceid);
 		let subjectInstanceUserRelation=new UserSubjectInstanceRelation({
-			uuid:generateUUID(),
+			uuid:await  generateUUID(),
 			subjectinstanceid:subjectinstance.uuid,userid:user.uuid,createdat:new Date(),role
 		})
 		return await subjectInstanceUserRelation.save()
 	},
-	createSubjectInstanceUserRelationBatch: async(
+	createSubjectInstanceUserRelationBatch: async (
 		{userids, subjectinstanceid,role}:{userids:string[],subjectinstanceid:string,role:string}
 	)=>{
 		if(!["student","teacher"].includes(role)){
@@ -243,15 +243,15 @@ export const subjectInstanceController = {
 			throw "some users not found"
 		}
 		let subjectinstance=await subjectInstanceController.getByUUID(subjectinstanceid);
-		let subjectInstanceUserRelations= await UserSubjectInstanceRelation.insertMany(users.map(({uuid})=>(
+		let subjectInstanceUserRelations= await UserSubjectInstanceRelation.insertMany(await Promise.all(users.map(async ({uuid})=>(
 			{
-				uuid:generateUUID(),
+				uuid: await generateUUID(),
 				subjectinstanceid:subjectinstance.uuid,
 				userid:uuid,
 				createdat:new Date(),
 				role
 			}
-		)))
+		))))
 		return subjectInstanceUserRelations
 	},
 	search: async function (query:string,limit:number){

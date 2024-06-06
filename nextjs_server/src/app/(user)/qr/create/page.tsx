@@ -51,7 +51,7 @@ export default function QRPage() {
 				subjectinstanceid: props.subjectinstanceid,
 			})
 			.then((v: { uuid: string }) => {
-				setUrlText(window.location.host+"/qr/scan/"+v.uuid);
+				setUrlText(window.location.protocol+'//'+window.location.host+"/qr/check/"+v.uuid);
 				toast.dismiss();
 			})
 			.catch((e) => {

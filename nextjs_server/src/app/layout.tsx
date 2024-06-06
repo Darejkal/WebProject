@@ -1,10 +1,14 @@
+// @ts-ignore
+import "./style.css"
 import { Be_Vietnam_Pro } from "next/font/google";
 import { UserStoreProvider } from "./_services";
 import AppHeader from "./_components/AppHeader";
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from "react-toastify";
-const inter = Be_Vietnam_Pro({ weight: ["400", "700"], subsets: ["latin"] });
+import createTheme from "@mui/material/styles/createTheme";
+import { ThemeProvider } from "react-bootstrap";
+const inter = Be_Vietnam_Pro({ weight: ["400","500","600", "700"], subsets: ["latin"] });
 export default function RootLayout({
 	children,
 }: Readonly<{

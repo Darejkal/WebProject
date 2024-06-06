@@ -4,6 +4,7 @@ import { auth, userController } from "@/app/_helpers/server";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "../_components/AppHeader";
 import { Alert } from "../_components";
+
 export default async function AuthenticationLayout({
     children,
 }: Readonly<{
@@ -18,6 +19,7 @@ export default async function AuthenticationLayout({
     })
 	}catch(e){
 		console.log(e)
+        
         redirect("/")
     }
     return <div className="h-100 w-100 ">
