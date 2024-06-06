@@ -8,7 +8,8 @@ declare module 'jsonwebtoken' {
 
 export const auth = {
     authenticate,
-    verifyToken
+    verifyToken,
+    setToken
 }
 
 function authenticate(required_position:null|string=null) {
@@ -37,4 +38,16 @@ function verifyToken() {
     return {
         id,position
     }
+}
+function setToken(user:{uuid:string, position:string}) {
+	const token = jwt.sign(
+		{
+			sub: user.uuid,
+			position: user.position,
+		},
+		process.env.JWT_SECRET!,
+		{ expiresIn: "7d" }
+	);
+    cookies().set('authorization', token, { httpOnly: true });cookies().set('authorization', token, { httpOnly: true });
+    return token
 }

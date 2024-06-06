@@ -16,8 +16,12 @@ async function getCurrent(req: Request) {
     if(!userid){
         throw new JsonWebTokenError("userid is null");
     }
+    const {position}=auth.verifyToken()
     try{
         const user = await userController.getByUUID(userid)
+        if(position!=user.position){
+            auth.setToken({uuid:user.uuid,position:user.position})
+        }
         return {...user.toObject(),_id:undefined,password:undefined,"__v":undefined}
     } catch (e:any){
         throw new JsonWebTokenError(e?.message||"error");
