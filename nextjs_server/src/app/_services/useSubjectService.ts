@@ -11,7 +11,9 @@ export interface IServiceSubject{
     createdat:Date,
     uuid:string,
     authorid:string,
-    schoolid:string
+    schoolid:string,
+    imgurl?:string,
+    description?:string
 }
 interface ISubjectStore{
     subject?:IServiceSubject,
@@ -22,9 +24,9 @@ interface ISubjectStore{
 const initialState = {};
 const subjectStore = create<ISubjectStore>(() => initialState);
 interface ISubjectAction {
-    create:(params:{name:string, abbrev:string, schoolabbrev:string})=>Promise<ISubjectStore|undefined>,
+    create:(params:{name:string, abbrev:string, schoolabbrev:string,imgurl?:string,description?:string})=>Promise<ISubjectStore|undefined>,
 	getPaginated: (props:{limit:number,next?:string|undefined,query?:string}) => Promise<IServiceSubject[]|undefined>,
-    clearPage:()=>Promise<void>
+    clearPage:()=>Promise<void>,
 }
 export function useSubjectService(): ISubjectAction&ISubjectStore {
     const userService = useUserService();
@@ -32,10 +34,11 @@ export function useSubjectService(): ISubjectAction&ISubjectStore {
     const subjectStoreValues=subjectStore()
     return {
         ...subjectStoreValues,
-        create: async function({name,abbrev,schoolabbrev}){
+        create: async function({name,abbrev,schoolabbrev,imgurl,description}){
             try{
-            let school=await fetch.post("/api/subject/create",{name,abbrev,schoolabbrev})
-            return school
+            console.log({name,abbrev,schoolabbrev,imgurl,description})
+            let subject=await fetch.post("/api/subject/create",{name,abbrev,schoolabbrev,imgurl,description})
+            return subject
             } catch(e:any){
                 throw "Tạo môn học mới thất bại."
             }

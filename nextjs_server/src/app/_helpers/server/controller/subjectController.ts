@@ -15,12 +15,24 @@ export const subjectController = {
     getByAbbrevs,
     search
 };
-async function create(name:string,abbrev:string,schoolabbrev:string,authorid:string){
+async function create(props:{name:string,abbrev:string,schoolabbrev:string,authorid:string,description?:string,imgurl?:string}){
+    let {
+        name,
+        abbrev,
+        schoolabbrev,
+        authorid,
+        description,
+        imgurl
+    }=props;
+    console.log("subjectcontroller")
+    console.log(props)
     let subject= new Subject({
         name,
         abbrev,
         schoolabbrev,
         authorid,
+        description:description??"",
+        imgurl:imgurl??"",
         uuid: await generateUUID(),
         createdat:new Date()
     })
@@ -98,10 +110,6 @@ async function getNext({limit,next,query}:{limit:number,next?:string,query?:stri
 }
 async function search(query:string,limit:number){
     let results=await Subject.find({
-        // $or: [
-        //     { name:query },
-        //     { abbrev:query }
-        // ]
         $text:{
             $search:query,
             $diacriticSensitive:false

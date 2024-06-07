@@ -29,7 +29,7 @@ interface IServiceSubjectInstanceUserservice extends IServiceSubjectInstanceUser
     create:(subjectabbrev:string,name:string)=>Promise<any>,
     // getallCurrent:()=>Promise<IServiceSubjectUser[]>,
     // getOne:(uuid:string)=>Promise<IServiceSubjectUser>,
-	getPaginated: (props:{limit:number,next?:string|undefined,query?:string,role:string}) => Promise<IServiceSubjectInstanceUser[]|undefined>,
+	getPaginated: (props:{limit:number,next?:string|undefined,query?:string,role:string,subjectinstanceid?:string}) => Promise<IServiceSubjectInstanceUser[]|undefined>,
     clearPage:(props:{role:string})=>Promise<void>,
     addMembers:(props:{userids:string[],subjectinstanceid:string,role:string})=>Promise<void>,
 }
@@ -40,23 +40,24 @@ export function useSubjectInstanceUserService(): IServiceSubjectInstanceUserserv
     return {
         ...subjectUserStoreValues,
         create:async function (subjectabbrev:string,name:string) {
-            return await fetch.post("/api/subjectinstance/user/create",{
+            return await fetch.post("/api/subjectinstance/userrelation/create",{
                 subjectabbrev,name
             })     
         },
 		getPaginated: async (props) => {
-            let {limit,query,role}=props
+            let {limit,query,role,subjectinstanceid}=props
             if(props.next===""){
                 subjectUserStoreValues.subjectinstanceusers.delete(role)
                 subjectUserStoreValues.nextPage.delete(role)
                 subjectUserStore.setState({subjectinstanceusers:subjectUserStoreValues.subjectinstanceusers,nextPage:subjectUserStoreValues.nextPage})
             }
-            let {results,next}:{next:string, results:IServiceSubjectInstanceUser[] }=await fetch.post('/api/subjectinstance/user/getpaginated',
+            let {results,next}:{next:string, results:IServiceSubjectInstanceUser[] }=await fetch.post('/api/subjectinstance/userrelation/getpaginated',
                 {
                     limit,
                     next:props.next??subjectUserStoreValues.nextPage.get(role),
                     query:query,
-                    role:role
+                    role:role,
+                    subjectinstanceid:subjectinstanceid
                 }
             )
             if(results.length==0){

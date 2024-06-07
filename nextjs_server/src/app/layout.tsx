@@ -27,13 +27,14 @@ export default function RootLayout({
 				<link href="/static/css/bootstrap.min.css" rel="stylesheet"></link>
 				<link href="/static/css/font-awesome.min.css" rel="stylesheet"></link>
 			</head>
-			<body className={inter.className + " h-100 w-100"}>
-				<div className="h-100 w-100">
+			<body className={inter.className + " h-100 w-100"} style={{
+				  display: "flex",
+				  flexDirection: "column",
+			}}>
 					<UserStoreProvider>
 						{children}
 					<ToastContainer />
 					</UserStoreProvider>
-				</div>
 				<script src="/static/js/jquery-2.1.1.min.js"></script>
 				<script src="/static/js/bootstrap.min.js"></script>
 			</body>

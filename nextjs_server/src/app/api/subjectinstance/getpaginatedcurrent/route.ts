@@ -7,12 +7,12 @@ import { NextResponse } from "next/server";
 import { JsonWebTokenError } from "jsonwebtoken";
 
 module.exports = apiHandler({
-	GET: getPaginatedCurrent,
+	POST: getPaginatedCurrent,
 });
 const MAX_RANGE = 30;
 async function getPaginatedCurrent(req: Request) {
 	const userid = req.headers.get("userId");
-	let { limit, next }: { limit: number; next?: string } = await req.json();
+	let { limit, next,role,query }: { limit: number; next?: string,role?:string,query?:string } = await req.json();
 	limit = Math.min(Math.floor(limit), MAX_RANGE);
 	if (!userid) {
 		throw "userid not found";
@@ -21,27 +21,14 @@ async function getPaginatedCurrent(req: Request) {
 		userid,
 		next,
 		limit,
+		role,
+		query
 	});
-	return {
-		results: subjectinstances.results.map(
-			({
-				subjectinstanceid,
-				role,
-				createdat,
-				subjectinstancename,
-				subjectabbrev,
-			}) => ({
-				subjectinstanceid,
-				role,
-				createdat,
-				subjectinstancename,
-				subjectabbrev,
-			})
-		),
-		next: subjectinstances.next,
-	};
+	return subjectinstances
 }
 getPaginatedCurrent.schema = joi.object({
 	limit: joi.number().required(),
-	next: joi.string(),
+	next: joi.string().allow(""),
+	role: joi.string(),
+	query: joi.string().allow(""),
 });

@@ -18,6 +18,7 @@ import {
 	ModifySubjectInstanceModalButton,
 } from "./components";
 import { toast } from "react-toastify";
+import { formatDateString } from "@/app/_helpers/clientutils";
 
 export default function SubjectInstancesSinglePage() {
 	const subjectInstanceService = useSubjectInstanceService();
@@ -69,7 +70,7 @@ export default function SubjectInstancesSinglePage() {
 						{ accessorKey: "subjectAbbrev", header: "Mã môn học" },
 						{ accessorKey: "subjectName", header: "Tên môn học" },
 						{ accessorKey: "name", header: "Tên" },
-						{ accessorKey: "createdat", header: "Ngày tạo" },
+						{ accessorKey: "createdat",Cell:({cell})=>(formatDateString(cell.getValue<string>())), header: "Ngày tạo" },
 						{ accessorKey: "authorName", header: "Tên tác giả" },
 					]}
 					data={subjectinstance ? [subjectinstance] : []}
@@ -108,7 +109,7 @@ export default function SubjectInstancesSinglePage() {
 							{ accessorKey: "useremail", header: "Email" },
 							// { accessorKey: "uuid", header: "UUID" },
 							{ accessorKey: "role", header: "Vai trò" },
-							{ accessorKey: "createdat", header: "Tạo lúc" },
+							{ accessorKey: "createdat",Cell:({cell})=>(formatDateString(cell.getValue<string>())), header: "Tạo lúc" },
 							// { accessorKey: "authorid", header: "ID tác giả" },
 							// { accessorKey: "schoolabbrev", header: "ID trường" },
 						],
@@ -118,6 +119,7 @@ export default function SubjectInstancesSinglePage() {
 							subjectInstanceUserService.getPaginated({
 								...props,
 								role: "teacher",
+								subjectinstanceid:subjectinstanceid
 							}),
 						data: subjectInstanceUserService.subjectinstanceusers.get(
 							"teacher"
@@ -145,7 +147,8 @@ export default function SubjectInstancesSinglePage() {
 							subjectInstanceUserService.getPaginated({
 								limit:20,
 								next:"",
-								role:"teacher"
+								role:"teacher",
+								subjectinstanceid
 							})
 						}}
 					/>
@@ -161,7 +164,7 @@ export default function SubjectInstancesSinglePage() {
 							{ accessorKey: "useremail", header: "Email" },
 							// { accessorKey: "uuid", header: "UUID" },
 							{ accessorKey: "role", header: "Vai trò" },
-							{ accessorKey: "createdat", header: "Tạo lúc" },
+							{ accessorKey: "createdat",Cell:({cell})=>(formatDateString(cell.getValue<string>())), header: "Tạo lúc" },
 							// { accessorKey: "authorid", header: "ID tác giả" },
 							// { accessorKey: "schoolabbrev", header: "ID trường" },
 						],
@@ -171,6 +174,7 @@ export default function SubjectInstancesSinglePage() {
 							subjectInstanceUserService.getPaginated({
 								...props,
 								role: "student",
+								subjectinstanceid:subjectinstanceid
 							}),
 						data: subjectInstanceUserService.subjectinstanceusers.get(
 							"student"
@@ -198,7 +202,8 @@ export default function SubjectInstancesSinglePage() {
 							subjectInstanceUserService.getPaginated({
 								limit:20,
 								next:"",
-								role:"student"
+								role:"student",
+								subjectinstanceid
 							})
 						}}
 					/>

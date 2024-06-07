@@ -2,9 +2,19 @@ import { create } from 'zustand';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAlertService,useUserService } from '.';
 import { useFetch } from '@/app/_helpers/client';
-
+export interface IServiceUserSubjectViewInstance {
+    uuid: string;
+    userid: string;
+    subjectinstanceid: string;
+    role: string;
+    createdat: string;
+    username: string;
+    useremail: string;
+    subjectinstancename: string;
+    subjectabbrev: string;
+}
+  
 export interface IServiceSubjectInstance{
-    subjectid:string,
     name:string,
     createdat:string,
     uuid:string,

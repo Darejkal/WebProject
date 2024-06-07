@@ -26,7 +26,6 @@ async function getSubjectPaginated(req: Request) {
         return {...v.toObject(),authorName:authorsMap[v.authorid]}
     })}
 }
-getSubjectPaginated.position="admin"
 getSubjectPaginated.schema=joi.object({
     limit:joi.number().required(),
     next:joi.string().allow(""),

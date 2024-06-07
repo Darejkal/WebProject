@@ -7,11 +7,12 @@ import { IServiceSubjectInstance, useSubjectInstanceService } from "@/app/_servi
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useFetch } from "@/app/_helpers/client";
-import { Autocomplete,TextField } from "@mui/material";
+import { Autocomplete,Box,TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { PaginatedTable } from "@/app/_components/PaginatedTable";
 import debounce from "lodash/debounce";
 import SearchableInput from "@/app/_components/SearchableInput";
+import { formatDateString } from "@/app/_helpers/clientutils";
 const SubjectInstancesPage = () => {
 	const router=useRouter();
 	const subjectInstanceService = useSubjectInstanceService();
@@ -93,7 +94,7 @@ const SubjectInstancesPage = () => {
                         { accessorKey: "subjectName", header: "Tên môn" },
                         { accessorKey: "subjectAbbrev", header: "Mã môn" },
                         // { accessorKey: "uuid", header: "UUID" },
-                        { accessorKey: "createdat", header: "Tạo lúc" },
+                        { accessorKey: "createdat",Cell:({cell})=>(formatDateString(cell.getValue<string>())), header: "Tạo lúc"},
                         // { accessorKey: "authorid", header: "ID tác giả" },
                         { accessorKey: "authorName", header: "Tên tác giả" },
                     ],
@@ -101,7 +102,7 @@ const SubjectInstancesPage = () => {
 						onClick:(e)=>{
 							router.push(`/admin/manage/subjectinstance/${row.original.uuid}`)
 						},
-						sx:{cursor: "pointer"}
+						sx:{cursor: "pointer"},
 					})
                 }}
                 pagination={{
@@ -132,16 +133,35 @@ const SubjectInstancesPage = () => {
 							<SearchableInput
 								autocompleteProps={{
 									freeSolo:true,
-									filterOptions:(x)=>x
+									filterOptions:(x)=>x,
+									renderOption:(props,option,state,ownerState)=>(
+										<Box
+											component="li"
+											{...props}
+											key={(typeof option ==="string")?option:option.name}
+										>
+											{(typeof option==="string")?option:(`Lớp: ${option["name"]} | Mã môn: ${option["subjectabbrev"]}`)}
+										</Box>
+										)
 								}}
 								fetchData={
 									(input:string)=>{
 										let queryParam = new URLSearchParams();
 										queryParam.set("query", input);
 										console.log(`search?${queryParam.toString()}`);
-										return fetch.get(`/api/subjectinstance/search?${queryParam.toString()}`)
+										return fetch.get(`/api/subjectinstance/search?${queryParam.toString()}`).then((v)=>{
+											if(!v&&!Array.isArray(v)){
+												return []
+											}
+											return v
+										}).catch((e)=>{
+											return []
+										}) as Promise<{name:string,subjectabbrev:string,uuid:string}[]>
 									}
 								}
+								props={{
+									optionLabel:"uuid"
+								}}
 								formRegister={fields.name}
 								textFieldProps={{label:"Nhập tên lớp học"}}
 							/>

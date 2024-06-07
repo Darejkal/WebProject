@@ -3,7 +3,7 @@
 import { auth, userController } from "@/app/_helpers/server";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "../_components/AppHeader";
-import { Alert } from "../_components";
+import AppFooter from "../_components/AppFooter";
 
 export default async function AuthenticationLayout({
     children,
@@ -19,12 +19,13 @@ export default async function AuthenticationLayout({
     })
 	}catch(e){
 		console.log(e)
-        
         redirect("/")
     }
-    return <div className="h-100 w-100 ">
+    return (
+<>
         <AppHeader redirect={true} />
-        <Alert />
-        {children}
-    </div>
+        <div style={{flex:1}}>{children}</div>
+		<AppFooter/>
+    </>
+    )
 }

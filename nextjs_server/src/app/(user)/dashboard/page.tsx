@@ -1,66 +1,131 @@
 "use client";
 
-import { sign } from "crypto";
+import React, { type UIEvent, useCallback, useEffect, useState } from "react";
+import { MaterialReactTable } from "material-react-table";
+import { Button, Form, Modal } from "react-bootstrap";
+import {
+	IServiceSubjectInstance,
+	IServiceUserSubjectViewInstance,
+	useSubjectInstanceService,
+} from "@/app/_services";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { useFetch } from "@/app/_helpers/client";
+import { Autocomplete, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { useUserService } from "../../_services";
-import { useEffect, useState } from "react";
-import { SubjectInstanceCard } from "./components";
-import { Button, Form, ListGroup, ListGroupItem } from "react-bootstrap";
-import { IServiceSubjectInstance, useSubjectInstanceService } from "@/app/_services/useSubjectInstanceService";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { json } from "stream/consumers";
-
+import { PaginatedTable } from "@/app/_components/PaginatedTable";
+import debounce from "lodash/debounce";
+import SearchableInput from "@/app/_components/SearchableInput";
+import { CustomInfiniteScroll } from "@/app/_components/CustomInfiniteScroll";
+import { UserSubjectDataCard } from "./components";
 export default function IndexPage() {
 	const router = useRouter();
-	const userService = useUserService();
 	const subjectInstanceService = useSubjectInstanceService();
-	const [subjectInstances, setSubjectInstances] = useState<IServiceSubjectInstance[]>([]);
-	useEffect(() => {
-		// subjectInstanceService.getallCurrent().then((vals) => {
-		// 	setSubjectInstances(vals);
-		// 	console.log("vals");
-		// 	console.log(vals);
-		// });
-		subjectInstanceService.getPaginated({limit:30})
-	}, []);
+	const { register, handleSubmit, formState, setValue,getValues } = useForm();
+	const { errors } = formState;
+	const [nextPage, setNextPage] = useState<string | undefined>();
+	const [loading, setLoading] = useState<boolean>(true);
+	const [subjectInstanceState,setSubjectInstanceState]=useState<IServiceUserSubjectViewInstance[]>([]);
+	const fetch = useFetch();
+	const [userSubjectQuery, setUserSubjectQuery] = useState<string>("");
+	const fetchData=useCallback(({ limit, next, query }:{ limit: number; next?: string | undefined; query?: string | undefined; }) => {
+		if (typeof next === "undefined") {
+			next = nextPage;
+		}
+		return fetch
+			.post("/api/subjectinstance/getpaginatedcurrent", {
+				limit,
+				next,
+				query,
+				role: "student",
+			})
+			.then((v) => {
+				if (v) {
+					setNextPage(v.next);
+					if(next){
+						setSubjectInstanceState(pre=>[...pre,...(v.results ?? [])]);
+					} else{
+						setSubjectInstanceState(v.results ?? []);
+					}
+					return v.results as IServiceUserSubjectViewInstance[];
+				}
+				throw "exception";
+			})
+			.catch((e) => {
+				return [];
+			});
+	},[userSubjectQuery,subjectInstanceState,nextPage])
 	useEffect(()=>{
-		console.log("subjectInstanceService.paginationEnded===true")
-		console.log(subjectInstanceService.paginationEnded===true)
-	},[subjectInstanceService.paginationEnded])
+		setLoading(true)
+		fetchData({limit:20,next:"",query:userSubjectQuery}).finally(()=>{
+			setLoading(false);
+		})
+	},[userSubjectQuery])
+	const fields={
+		usersubjectquery:register("usersubjectquery")
+	}
+	const onSubmit=(props:any)=>{
+		let value=getValues(fields.usersubjectquery.name)
+		setUserSubjectQuery(value)
+	}
 	return (
-		<div style={{ margin: "0 10rem" }}>
-			<div style={{ display: "flex", flexDirection: "column", }}>
-				<div style={{ padding: "2rem 0" }}>
-					<h3 style={{ fontWeight: "bold" }}>Lớp học của tôi</h3>
-				</div>
-				<div style={{ display: "flex", flexDirection: "row" }}>
-					<div style={{ flex:3 }}>
-						{/* {subjectInstances.length == 0
-							? "No class found!"
-							: subjectInstances.map((val) => {
-									return <SubjectInstanceCard />;
-						})} */}
-						<InfiniteScroll
-							dataLength={subjectInstanceService.subjectinstances?.length??0}
-							next={()=>{
-								console.log("ok")
-								subjectInstanceService.getPaginated({limit:30})}}
-							hasMore={subjectInstanceService.paginationEnded!==true}
-							loader={<h4>Loading...</h4>}
-						>
-							{subjectInstanceService.subjectinstances?.map((val, index) => (
-								<div key={index} style={{marginBottom:"1rem"}}>
-									<SubjectInstanceCard {...val}/>
+		<div
+			style={{
+				margin: "3rem 10rem 0 10rem",
+				display: "flex",
+				flexDirection: "column",
+			}}
+		>
+			<h4 style={{ display: "block", paddingBottom: "1rem" }}>
+				Lớp học của bạn
+			</h4>
+			<div
+				style={{
+					display: "flex",
+					flexDirection: "row",
+				}}
+			>
+				<div style={{ flex: 3 }}>
+					<div>
+						{
+							!loading&&subjectInstanceState.length>0&&<CustomInfiniteScroll
+							pagination={{
+								getPaginated: fetchData ,
+								data: subjectInstanceState,
+							}}
+							renderItem={({ data, index }) => (
+								<div key={data.uuid}>
+									<UserSubjectDataCard data={data} />
 								</div>
-							))}
-						</InfiniteScroll>
+							)}
+						/>
+						}
+						{
+							!loading&&subjectInstanceState.length==0&&<>
+								<p>
+									{`Không tìm thấy lớp liên quan đến truy vấn ' ${userSubjectQuery} '.`}
+								</p>
+							</>
+						}
+						{
+							loading&&(
+								<div>
+									<UserSubjectDataCard />
+								</div>
+							)
+						}
 					</div>
-					<div style={{ maxWidth: "30rem", paddingLeft: "5rem", flex:1 }}>
+				</div>
+				<div style={{ flex: 1.3, marginLeft: "6rem" }}>
+					<div>
 						<Form
 							style={{ display: "flex", flexDirection: "row", width: "100%" }}
+							onSubmit={handleSubmit(onSubmit)}
 						>
-							<Form.Control placeholder="Tìm kiếm" style={{ width: "100%" }} />
+							<TextField style={{ width: "100%" }} 
+								{...fields.usersubjectquery} 
+								label={"Tìm kiếm"}
+							/>
 							<Button type="submit" style={{ marginLeft: "0.5rem" }}>
 								Tìm
 							</Button>

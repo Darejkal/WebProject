@@ -1,13 +1,23 @@
-'use client'
-import { useUserService } from '@/app/_services';
-import { Suspense, useEffect, useState } from 'react';
+'use server'
 
-export default function TeacherLayout({
+import { auth, subjectInstanceController, } from "@/app/_helpers/server";
+import { notFound, redirect } from "next/navigation";
+
+export default async function AuthenticationLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>){
-    return <div>
+    try{
+        let {id}=auth.verifyToken()
+        let flag= await subjectInstanceController.doesUserHaveRole(id,"teacher")
+        if(!flag){
+            return notFound()
+        }
+    } catch (e){
+        return notFound()
+    }
+    return <>
         {children}
-    </div>
+    </>
 }

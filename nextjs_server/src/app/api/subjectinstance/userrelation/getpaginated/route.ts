@@ -11,11 +11,10 @@ module.exports = apiHandler({
 });
 const MAX_RANGE=20
 async function getSubjectPaginated(req: Request) {
-    let {limit,next,query,role}:{limit:number,next?:string,role?:string,query?:string}=await req.json()
+    let {limit,next,query,role,subjectinstanceid}:{limit:number,next?:string,role?:string,query?:string,subjectinstanceid?:string}=await req.json()
     limit=Math.min(Math.floor(limit),MAX_RANGE)
-    console.log(limit)
 
-    return await subjectInstanceController.getUserSubjectInstanceRelationNext({limit,next,query,role})
+    return await subjectInstanceController.getUserSubjectInstanceRelationNext({limit,next,query,role,subjectinstanceid})
 }
 getSubjectPaginated.position="admin"
 getSubjectPaginated.schema=joi.object({
@@ -23,4 +22,5 @@ getSubjectPaginated.schema=joi.object({
     role:joi.string(),
     next:joi.string().allow(""),
     query:joi.string(),
+    subjectinstanceid:joi.string(),
 })

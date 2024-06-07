@@ -11,6 +11,7 @@ import { useFetch } from "@/app/_helpers/client";
 import { toast } from "react-toastify";
 import SearchableInput from "@/app/_components/SearchableInput";
 import { PaginatedTable } from "@/app/_components/PaginatedTable";
+import { formatDateString } from "@/app/_helpers/clientutils";
 
 const SubjectsPage = () => {
 	const router = useRouter();
@@ -29,6 +30,10 @@ const SubjectsPage = () => {
 			required: "abbrev is required",
 			validate:(field)=>(abbrevExisted.current==false||"Mã môn học đã tồn tại!")
 		}),
+		description: register("description", { 
+		}),
+		imgurl: register("imgurl", { 
+		}),
 		schoolabbrev: register("schoolabbrev", {
 			required: "schoolabbrev is required",
 			value: "HUST",
@@ -40,7 +45,7 @@ const SubjectsPage = () => {
 			abbrevExisted.current=false;
 		}
 	},[showModal])
-	async function onSubmit({ name, abbrev, schoolabbrev }: any) {
+	async function onSubmit({ name, abbrev, schoolabbrev,imgurl,description }: any) {
 		for(const name of Object.keys(fields)){
 			console.log(name)
 			// @ts-ignore
@@ -49,8 +54,8 @@ const SubjectsPage = () => {
 			}
 		}
 		try{
-			console.log({ name, abbrev, schoolabbrev });
-			const res = await subjectService.create({ name, abbrev, schoolabbrev });
+			console.log({ name, abbrev, schoolabbrev,imgurl,description });
+			const res = await subjectService.create({ name, abbrev, schoolabbrev,imgurl,description });
 			console.log(res);
 			await subjectService.clearPage();
 			await subjectService.getPaginated({limit:20,next:""});
@@ -74,7 +79,7 @@ const SubjectsPage = () => {
 						{ accessorKey: "abbrev", header: "Mã" },
 						// { accessorKey: "uuid", header: "UUID" },
 						{ accessorKey: "authorName", header: "Tên tác giả" },
-						{ accessorKey: "createdat", header: "Tạo lúc" },
+						{ accessorKey: "createdat",Cell:({cell})=>(formatDateString(cell.getValue<string>())), header: "Tạo lúc" },
 						// { accessorKey: "authorid", header: "ID tác giả" },
 						{ accessorKey: "schoolabbrev", header: "ID trường" },
                     ],
@@ -158,6 +163,9 @@ const SubjectsPage = () => {
 											setError(fields.abbrev.name,{message:"Mã môn học đã tồn tại!",type:"submit"})
 											abbrevExisted.current=true
 											console.log(errors[fields.abbrev.name]?.message)
+										} else{
+											clearErrors(fields.abbrev.name)
+											abbrevExisted.current=false
 										}
 									}
 								}}
@@ -174,6 +182,9 @@ const SubjectsPage = () => {
 											setError(fields.abbrev.name,{message:"Mã môn học đã tồn tại!"})
 											abbrevExisted.current=true
 											console.log(errors[fields.abbrev.name]?.message)
+										} else{
+											clearErrors(fields.abbrev.name)
+											abbrevExisted.current=false
 										}
 									}
 								}}
@@ -182,6 +193,30 @@ const SubjectsPage = () => {
 						<Form.Group controlId="schoolabbrev">
 							<Form.Label>Mã trường</Form.Label>
 							<Form.Control type="text" {...fields.schoolabbrev} disabled />
+						</Form.Group>
+						<Form.Group controlId="imgurl">
+							<Form.Label>Link ảnh</Form.Label>
+							<TextField
+								label="Link ảnh"
+								fullWidth
+								{...fields.imgurl}
+								error={!!errors[fields.imgurl.name]}
+								helperText={((errors[fields.imgurl.name]?.message as string)??"")}
+								inputRef={fields.imgurl.ref}
+							/>
+						</Form.Group>
+						<Form.Group controlId="imgurl">
+							<Form.Label>Mô tả về môn học</Form.Label>
+							<TextField
+								label="Mô tả"
+								multiline
+								fullWidth
+								rows={5}
+								{...fields.description}
+								error={!!errors[fields.description.name]}
+								helperText={((errors[fields.description.name]?.message as string)??"")}
+								inputRef={fields.description.ref}
+								/>
 						</Form.Group>
 						<Button
 							variant="primary"

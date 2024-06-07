@@ -1,3 +1,4 @@
+import AppFooter from "../_components/AppFooter";
 import AppHeader from "../_components/AppHeader";
 
 export default function AuthenticationLayout({
@@ -6,9 +7,10 @@ export default function AuthenticationLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<div className="h-100 w-100 ">
-			<AppHeader redirect={true} />
-			{children}
-		</div>
+<>
+        <AppHeader redirect={true} />
+        <div style={{flex:1}}>{children}</div>
+		<AppFooter/>
+    </>
 	);
 }

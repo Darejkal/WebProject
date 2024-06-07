@@ -107,8 +107,11 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 													Thống kê
 												</NavDropdown.Item>
 												<NavDropdown.Divider />
-												<NavDropdown.Item href="/teacher/manage/class">
+												<NavDropdown.Item href="/teacher/manage/subjectinstance">
 													Quản lý lớp học
+												</NavDropdown.Item>
+												<NavDropdown.Item href="/teacher/manage/exam">
+													Ngân hàng đề
 												</NavDropdown.Item>
 											</NavDropdown>
 										</>

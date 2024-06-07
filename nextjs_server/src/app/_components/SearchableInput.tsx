@@ -65,17 +65,33 @@ export default function SearchableInput<
     const {ref:formRegisterRef,...formRegisterNoRef}=formRegister;
     return (
         <Autocomplete
-            filterOptions={(x)=>x}
+            filterOptions={(x:(string | Value)[])=>x}
             options={options}
             value={value}
             inputValue={inputValue}
-            {...(props?.optionLabel?{getOptionLabel:(option:string | Value)=>{
+            {...(props?.optionLabel?{
+                getOptionLabel:(option:string | Value)=>{
                 if(typeof option==="string"){
                     return option
                 } else{
                     return option[props!.optionLabel!] as string
                 }
-            }}:{})}
+                },
+                isOptionEqualToValue:(option:string | Value,value:string | Value)=>{
+                    let optionText,valueText;
+                    if(typeof option==="string"){
+                        optionText= option
+                    } else{
+                        optionText= option[props!.optionLabel!] as string
+                    }
+                    if(typeof value==="string"){
+                        valueText= value
+                    } else{
+                        valueText= value[props!.optionLabel!] as string
+                    }
+                    return valueText===optionText
+                }
+        }:{})}
             onInputChange={(event, value,reason) => {
                 setInputValue(value)
                 afterOnInputChange&&afterOnInputChange({event, value,reason,options})
@@ -104,10 +120,10 @@ export default function SearchableInput<
                     }
                     if(options.findIndex((v)=>{
                         let vText:any="";
-                        if(typeof value==="string"){
-                            vText=value;
+                        if(typeof v==="string"){
+                            vText=v;
                         } else if(props?.optionLabel){
-                            vText=(value as Value)[props.optionLabel]
+                            vText=(v as Value)[props.optionLabel]
                         } else {
                             vText=v;
                         }

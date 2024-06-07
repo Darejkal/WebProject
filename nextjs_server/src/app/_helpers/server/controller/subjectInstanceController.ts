@@ -5,10 +5,10 @@ import { db } from "../model";
 import { customEncrypt, customEncryptCompare, generateUUID } from "../../utils";
 import { subjectController } from "./subjectController";
 import { userController } from "./userController";
-import { DataObjectSharp, FormatListBulleted } from "@mui/icons-material";
 const SubjectInstance = db.SubjectInstance;
 const UserSubjectInstanceRelation = db.UserSubjectInstanceRelation;
 const UserSubjectInstanceFullView = db.UserSubjectInstanceFullView;
+const Subject=db.Subject;
 export const subjectInstanceController = {
 	create: async (subjectabbrev: string, name: string, authorid: string) => {
 		return subjectController.getByAbbrev(subjectabbrev).then(async () => {
@@ -85,23 +85,61 @@ export const subjectInstanceController = {
 		}
 		return subjects;
 	},
-	getNextOfUser: async (props:{userid: string,limit: number, next?: string}) => {
-		let {userid,limit,next}=props
+	getNextOfUser: async (props:{userid: string,limit: number, next?: string,role?: string,query?:string}) => {
+		let {userid,limit,next,role,query}=props
 		let user = await userController.getByUUID(userid);
 		if (!user) {
 			throw "user not found";
 		}
-		let results = await UserSubjectInstanceFullView.find({
-			...(next&&{_id: { $lt: next }}),
-			userid: userid,
-		}).sort({
-			_id: -1,
-		})
-		.limit(limit);
-		return {
-			results,
-			next: results.length == 0 ? undefined : results[results.length - 1]._id,
-		};
+		if(!query){
+			let results = await UserSubjectInstanceFullView.find({
+				...(next&&{_id: { $lt: next }}),
+				...(role&&{role: role}),
+				userid: userid,
+			}).sort({
+				_id: -1,
+			})
+			.limit(limit);
+			return {
+				results,
+				next: results.length == 0 ? undefined : results[results.length - 1]._id,
+			};
+		} else{
+			let nextVal=Number(next);
+			if(!nextVal){
+				nextVal=0;
+			}
+			let [subjects,subjectinstances]= await Promise.all([
+				Subject.find(
+					{
+						$text:{
+							$search:query,
+							$diacriticSensitive:false
+						}
+					}
+				),  SubjectInstance.find(
+					{
+						$text:{
+							$search:query,
+							$diacriticSensitive:false
+						}
+					}
+				)
+			])
+			let results = await UserSubjectInstanceFullView.find({
+				...(next&&{_id: { $lt: next }}),
+				...(role&&{role: role}),
+				subjectinstanceid: {$in: subjectinstances.map((v)=>(v.uuid))},
+				subjectabbrev:{$in: subjects.map((v)=>(v.abbrev))},
+				userid: userid,
+			}).skip(nextVal)
+			.limit(limit);
+			return {
+				results,
+				next: results.length == 0 ? undefined : `${nextVal+results.length}`,
+			};
+		}
+
 	},
 	getNext: async ({limit,next,query}:{limit: number, next?: string,query?: string}) => {
 		let searchprops={}
@@ -146,7 +184,7 @@ export const subjectInstanceController = {
 		}
 
 	},
-	getUserSubjectInstanceRelationNext: async ({limit,next,query,role}:{limit: number, next?: string,role?: string,query?:string}) => {
+	getUserSubjectInstanceRelationNext: async ({limit,next,query,role,subjectinstanceid}:{limit: number, next?: string,role?: string,query?:string,subjectinstanceid?:string}) => {
 		let searchprops={}
 		if(next){
 			searchprops={...searchprops,
@@ -164,6 +202,11 @@ export const subjectInstanceController = {
 		if(role){
 			searchprops={...searchprops,
 				role: role 
+			}
+		}
+		if(subjectinstanceid){
+			searchprops={...searchprops,
+				subjectinstanceid: subjectinstanceid 
 			}
 		}
 		console.log(searchprops)

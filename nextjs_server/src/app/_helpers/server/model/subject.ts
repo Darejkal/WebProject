@@ -9,6 +9,8 @@ interface ISubject {
 	name: string;
 	abbrev: string;
 	createdat: Date;
+	description?: string;
+	imgurl?:string;
 	uuid: string;
 	authorid: string;
 	schoolabbrev: string;
@@ -20,6 +22,8 @@ export const Subject: mongoose.Model<ISubject> = (() => {
 		createdat: { type: Date, required: true },
 		uuid: { type: String, unique: true, required: true },
 		authorid: { type: String, required: true },
+		imgurl: { type: String,default:"" },
+		description: { type: String,default:"" },
 		schoolabbrev: { type: String, required: true },
 	});
 	schema.index({ name: "text", abbrev: "text" });
@@ -83,6 +87,9 @@ interface IUserSubjectInstanceFullView{
     subjectabbrev: string,
 }
 export const UserSubjectInstanceFullView:mongoose.Model<IUserSubjectInstanceFullView> =  (() => {
+	if(mongoose.models.usersubjectinstancefullview){
+		return mongoose.models.usersubjectinstancefullview as mongoose.Model<IUserSubjectInstanceFullView>;
+	}
 	const schema = new Schema({
 		uuid:{ type: String, required: true,unique:true },
 		userid: { type: String, required: true },
@@ -91,9 +98,7 @@ export const UserSubjectInstanceFullView:mongoose.Model<IUserSubjectInstanceFull
 		createdat: { type: Date, required: true },
 	});
 	schema.index({ userid: 1, subjectinstanceid: 1 });
-	let userSubjectInstanceFullView =
-		mongoose.models.usersubjectinstancefullview ||
-		mongoose.model("usersubjectinstancefullview", schema);
+	let userSubjectInstanceFullView = mongoose.model("usersubjectinstancefullview", schema) as unknown as mongoose.Model<IUserSubjectInstanceFullView>;
 	userSubjectInstanceFullView.createCollection<IUserSubjectInstanceFullView>({
 		viewOn: UserSubjectInstanceRelation.modelName,
 		pipeline: [
@@ -117,7 +122,7 @@ export const UserSubjectInstanceFullView:mongoose.Model<IUserSubjectInstanceFull
 			{ $unwind: "$subjectinstanceinfo" },
 			{
 				$project: {
-					_id:1,
+					// _id:1,
 					uuid: 1,
 					userid: 1,
 					subjectinstanceid: 1,
@@ -131,6 +136,5 @@ export const UserSubjectInstanceFullView:mongoose.Model<IUserSubjectInstanceFull
 			},
 		],
 	});
-    
-    return userSubjectInstanceFullView as mongoose.Model<IUserSubjectInstanceFullView>;
+    return userSubjectInstanceFullView ;
 })();
