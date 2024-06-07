@@ -69,11 +69,6 @@ async function getByAbbrevs(abbrevs:string[]){
 }
 async function getNext({limit,next,query}:{limit:number,next?:string,query?:string}) {
     let searchprops={}
-    if(next){
-        searchprops={...searchprops,
-            _id: { $lt: next } 
-        }
-    }
     if(query){
         searchprops={...searchprops,
             $text:{
@@ -97,6 +92,11 @@ async function getNext({limit,next,query}:{limit:number,next?:string,query?:stri
             next: results.length == 0 ? undefined : `${nextVal+results.length}`,
         };
     } else{
+        if(next){
+            searchprops={...searchprops,
+                _id: { $lt: next } 
+            }
+        }
         results=await Subject.find(searchprops)
         .sort({
             _id: -1,

@@ -1,7 +1,7 @@
 "use client";
 import { useFetch } from "@/app/_helpers/client";
 import { ChatBubbleLeftIcon, PhoneIcon } from "@heroicons/react/24/outline";
-import { Keyboard, VideoCall, VideoCallOutlined } from "@mui/icons-material";
+import { CallEnd, Keyboard, MicExternalOff, MicNone, MicOff, VideoCall, VideoCallOutlined, Videocam, VideocamOff } from "@mui/icons-material";
 import { TextField } from "@mui/material";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -97,7 +97,8 @@ export default function ChatPage() {
 	const { roomid } = useParams()
 	const videoContainerRef = useRef<HTMLDivElement>(null);
 	const localVideoStream = useRef<MediaStream | null>(null);
-	// const localAudio=useRef(null)
+	const [muted,setMuted]=useState<boolean>(false);
+	const [videoDisabled,setVideoDisabled]=useState<boolean>(false);
 	function handleStream(stream: MediaStream) {
 		if(localVideoStream.current){
 			return;
@@ -212,7 +213,7 @@ export default function ChatPage() {
 			});
 	}, []);
 	return (
-		<div>
+		<div style={{height:"100vh",margin:"3rem 5rem 0 5rem"}}>
 			<div
 				ref={videoContainerRef}
 				id="videoContainer"
@@ -228,30 +229,34 @@ export default function ChatPage() {
 					bottom: "0",
 					left: "0",
 					right: "0",
-					margin: "0 auto 2rem auto",
-					padding: "1.5rem 2rem",
+					margin: "0 auto 1rem auto",
+					padding: "1rem 2rem 0.2rem 2rem",
 					borderRadius: "20px",
-					backgroundColor: "rgba(0, 0, 0, 0.05);",
-					width: "30%",
+					backgroundColor: "rgba(0, 0, 0, 0.005);",
+					width: "20%",
 					display: "flex",
 					flexDirection: "row",
 					justifyContent: "space-between",
 					alignItems: "center",
 				}}
 			>
-				<Link href="/chat">End Call</Link>
 				<Button
+					style={{borderRadius:"50px",aspectRatio:"1/1",display:"flex",justifyContent:"center",alignItems:"center"}}
+					variant="secondary"
 					onClick={() => {
 						if (localVideoStream.current) {
 							localVideoStream.current.getAudioTracks().map((v) => {
-								v.enabled = !v.enabled;
+								v.enabled = !muted;
 							});
 						}
+						setMuted(pre=>!pre)
 					}}
 				>
-					Mute
+					{muted?<MicOff/>:<MicNone/>}
 				</Button>
 				<Button
+				style={{borderRadius:"50px",aspectRatio:"1/1",display:"flex",justifyContent:"center",alignItems:"center"}}
+					variant="secondary"
 					onClick={() => {
 						if (localVideoStream.current) {
 							localVideoStream.current.getVideoTracks().map((v) => {
@@ -260,8 +265,11 @@ export default function ChatPage() {
 						}
 					}}
 				>
-					Disable cam
+					{videoDisabled?<VideocamOff/>:<Videocam/>}
 				</Button>
+				<Button href="/chat" variant="danger"
+				style={{borderRadius:"50px",aspectRatio:"1/1",display:"flex",justifyContent:"center",alignItems:"center"}}
+				><CallEnd/></Button>
 			</div>
 		</div>
 	);

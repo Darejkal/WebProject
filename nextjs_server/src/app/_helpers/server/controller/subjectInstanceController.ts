@@ -143,11 +143,6 @@ export const subjectInstanceController = {
 	},
 	getNext: async ({limit,next,query}:{limit: number, next?: string,query?: string}) => {
 		let searchprops={}
-		if(next){
-			searchprops={...searchprops,
-				_id: { $lt: next } 
-			}
-		}
 		if(query){
 			searchprops={...searchprops,
 				$text:{
@@ -172,6 +167,11 @@ export const subjectInstanceController = {
 				next: results.length == 0 ? undefined : `${nextVal+results.length}`,
 			};
 		} else{
+			if(next){
+				searchprops={...searchprops,
+					_id: { $lt: next } 
+				}
+			}
 			results=await SubjectInstance.find(searchprops)
 			.sort({
 				_id: -1,

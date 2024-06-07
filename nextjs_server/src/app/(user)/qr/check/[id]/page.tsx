@@ -29,7 +29,7 @@ export default async function QRCheckPage({ params }: { params: { id: string } }
 					flexDirection: "column",
 				}}
 			>
-				<h3>Success</h3>
+				<h3>Điểm danh QR thành công!</h3>
                 </div>
 		);
 	} catch (e) {
@@ -39,9 +39,10 @@ export default async function QRCheckPage({ params }: { params: { id: string } }
 					display: "flex",
 					justifyContent: "center",
 					alignItems: "center",
+					height:"100%"
 				}}
 			>
-				<h3>Failed due to {JSON.stringify(e)}</h3>
+				<h3>Điểm danh QR không thành công! Lỗi: {JSON.stringify(e)}</h3>
 			</div>
 		);
 	}

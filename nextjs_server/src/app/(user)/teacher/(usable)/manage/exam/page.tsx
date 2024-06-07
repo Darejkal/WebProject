@@ -5,14 +5,16 @@ import { useFetch } from "@/app/_helpers/client";
 import { formatDateString } from "@/app/_helpers/clientutils";
 import { IServiceExam } from "@/app/_services/useExamService";
 import { Create, SearchOutlined } from "@mui/icons-material";
-import { Box, IconButton } from "@mui/material";
-import { useState } from "react";
+import { Box, IconButton, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
 import { Card, Button, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { ClassAssignModal } from "./components";
+import { debounce } from "lodash";
 
 export default function ExamPage() {
 	const { getValues, register, setValue, handleSubmit } = useForm();
+	const [currentQuery,setCurrentQuery]=useState<string>();
 	const [examData, setExamData] = useState<IServiceExam[]>([]);
 	const [examDataNext, setExamDataNext] = useState<string>("");
 	const fields = {
@@ -21,6 +23,20 @@ export default function ExamPage() {
 	};
 	const fetch = useFetch();
 	const onSubmit = (props: any) => {};
+	const fetchData=(props:{limit:number,query?:string, next?:string}) => {
+		return fetch
+			.post("/api/exam/getpaginatedbycurrent", {next:examDataNext,query:currentQuery,...props})
+			.then((v) => {
+				if (v) {
+					setExamDataNext(v?.next);
+					return v.results;
+				}
+				return [];
+			})
+			.catch((e) => {
+				return [];
+			});
+	}
 	return (
 		<div style={{ margin: "3rem 10rem" }}>
 			<div
@@ -33,7 +49,7 @@ export default function ExamPage() {
 				}}
 			>
 				<div style={{ marginRight: "auto" }}>
-					<h3>Quản lý thư viện bài kiểm tra</h3>
+					<h3>Quản lý ngân hàng đề của bạn</h3>
 				</div>
 				<div
 					style={{
@@ -59,83 +75,32 @@ export default function ExamPage() {
 					}}
 					onSubmit={handleSubmit(onSubmit)}
 				>
-					<SearchableInput
-						autocompleteProps={{
-							sx: {
-								width: "100%",
-							},
-							freeSolo: false,
-							renderOption: (props, option, state, ownerState) => (
-								<Box
-									component="li"
-									{...props}
-									key={typeof option === "string" ? option : option.uuid}
-								>
-									{typeof option === "string"
-										? option
-										: `${option["name"]} | ${option["uuid"]}`}
-								</Box>
-							),
-						}}
-						fetchData={(input: string) => {
-							return fetch
-								.post("/api/exam/getpaginated", {
-									limit: 5,
-									next: "",
-									query: input,
-								})
-								.then((v) => {
-									if (v) {
-										return v.results;
-									} else {
-										throw "empty response";
-									}
-								})
-								.catch((e: any) => {
-									return [];
-								}) as Promise<IServiceExam[]>;
-						}}
-						props={{
-							optionLabel: "name",
-						}}
-						formRegister={fields.name}
-						textFieldProps={{
-							label: (
+					<TextField
+						fullWidth
+						label={
+							(
 								<>
-									<span>{"Tìm kiếm form bài kiểm tra  "}</span>
+									<span>{"Tìm kiếm mẫu đề đã tạo"}</span>
 									<SearchOutlined />
 								</>
-							),
-							fullWidth: true,
-						}}
-						afterOnChange={({ value }) => {
-							if (!value) {
-								setValue(fields.examid.name, undefined);
-							} else if (typeof value === "string") {
-								setValue(fields.examid.name, value);
-							} else {
-								setValue(fields.examid.name, value.uuid);
-							}
-						}}
-					/>
+							)
+						}
+						onChange={debounce((e)=>{
+							setCurrentQuery(e.target.value===""?undefined:e.target.value);
+							fetchData({limit:20,query:currentQuery,next:""}).then((v)=>{
+								console.log(v);
+								setExamData(v);
+							})
+						})}
+					>
+
+					</TextField>
 				</Form>
 			</div>
+			{currentQuery&&(<p>Đang hiện kết quả truy vấn cho <span style={{fontWeight:"bold"}}>"{currentQuery}"</span></p>)}
 			<CustomInfiniteScroll
 				pagination={{
-					getPaginated: (props) => {
-						return fetch
-							.post("/api/exam/getpaginatedbycurrent", {...props,next:examDataNext})
-							.then((v) => {
-								if (v) {
-									setExamDataNext(v?.next);
-									return v.results;
-								}
-								return [];
-							})
-							.catch((e) => {
-								return [];
-							});
-					},
+					getPaginated: fetchData,
 					data: examData,
 				}}
 				renderItem={({ data, index }) => {

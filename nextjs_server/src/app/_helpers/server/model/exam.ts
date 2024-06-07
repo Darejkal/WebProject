@@ -79,14 +79,26 @@ export const ExamInstance:mongoose.Model<IExamInstance> = (() => {
 		subjectinstanceid: { type: String, required: true },
 		createdat: { type: Date, required: true },
 		endtime: { type: Date, required: false },
-		description: { type: Date, required: false },
-		name: { type: Date, required: false },
+		description: { type: String, required: false },
+		name: { type: String, required: false },
 		authorid:{type:String,required:true}
 	});
 	schema.index({name:"text",description:"text"})
 	return mongoose.models.examinstance || mongoose.model("examinstance", schema);
 })();
-export const ExamAnswer = (() => {
+export interface IExamAnswer{
+	uuid: string,
+	userid: string,
+	examinstanceid: string,
+	createdat: Date,
+	choices:{
+			questionid: string,
+			optionid?: string,
+		}[],
+	closed:boolean,
+	endtime:Date
+}
+export const ExamAnswer:mongoose.Model<IExamAnswer> = (() => {
 	const schema = new Schema({
 		uuid: { type: String, unique: true, required: true },
 		userid: { type: String, required: true },
@@ -98,6 +110,8 @@ export const ExamAnswer = (() => {
 				optionid: { type: String, default: null },
 			},
 		],
+		closed:{type:Boolean,default:false},
+		endtime:{type: Date},
 	});
-	return mongoose.models.examanswer || mongoose.model("examanswer", schema);
+	return mongoose.models.examanswer || mongoose.model<IExamAnswer>("examanswer", schema);
 })();

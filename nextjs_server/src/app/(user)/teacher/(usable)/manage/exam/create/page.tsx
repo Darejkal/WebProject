@@ -99,15 +99,6 @@ export default function CreateExamPage() {
 					</Form.Group>
 					<Form.Group controlId="questionids">
 						<Form.Label>ID các câu hỏi</Form.Label>
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "row",
-								width: "100%",
-								justifyContent: "center",
-								alignItems: "center",
-							}}
-						>
 							<SearchableMultiInput
 								autocompleteProps={{
 									sx: { flex: 1 },
@@ -123,7 +114,7 @@ export default function CreateExamPage() {
 												? option
 												: `Câu hỏi: ${option["question"]} | ID: ${option["uuid"]}`}
 										</Box>
-									),
+									),limitTags:2
 								}}
 								fetchData={async (input: string) => {
 									return await fetch
@@ -157,7 +148,6 @@ export default function CreateExamPage() {
 										(errors[fields.questionids.name]?.message as string) ?? "",
 								}}
 							/>
-						</div>
 					</Form.Group>
 
 					<Button
@@ -191,6 +181,7 @@ export default function CreateExamPage() {
 					alignItems: "center",
 					width: "100%",
 					height: "100%",
+					paddingRight:"10rem"
 				}}
 			>
 				<ExamPreview data={selectedQuestions} />

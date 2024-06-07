@@ -103,10 +103,10 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 									{userService.currentUser?.isTeacher===true && (
 										<>
 											<NavDropdown title="Giáo viên" id="basic-nav-dropdown">
-												<NavDropdown.Item href="/teacher/dashboard">
+												{/* <NavDropdown.Item href="/teacher/dashboard">
 													Thống kê
 												</NavDropdown.Item>
-												<NavDropdown.Divider />
+												<NavDropdown.Divider /> */}
 												<NavDropdown.Item href="/teacher/manage/subjectinstance">
 													Quản lý lớp học
 												</NavDropdown.Item>
@@ -119,10 +119,10 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 									{userService.currentUser?.position === "admin" && (
 										<>
 											<NavDropdown title="Quản lý" id="basic-nav-dropdown">
-												<NavDropdown.Item href="/admin">
+												{/* <NavDropdown.Item href="/admin">
 													Thống kê
 												</NavDropdown.Item>
-												<NavDropdown.Divider />
+												<NavDropdown.Divider /> */}
 												<NavDropdown.Item href="/admin/manage/user">
 													Quản lý người dùng
 												</NavDropdown.Item>

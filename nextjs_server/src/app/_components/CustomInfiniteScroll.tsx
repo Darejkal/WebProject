@@ -21,8 +21,9 @@ export function CustomInfiniteScroll<Value>({
 		loadMoreData();
 	}, []);
 	useEffect(() => {
-        if(data&&data.length){
             setCurrentData(data);
+		if(data&&data.length){
+			setHasMore(true);
         }
 	}, [data]);
 	const loadMoreData = async () => {

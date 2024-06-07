@@ -85,7 +85,7 @@ export function UserSubjectDataCard({ data }: { data?:IServiceUserSubjectViewIns
 				// onClick={()=>{
 				// 	router.push("/teacher/manage/subjectinstance/"+data.uuid)
 				// }}
-				>Xem khoá học</Button>
+				>Quản lý khoá học</Button>
 			</Card.Body>
 		</Card>
 	);

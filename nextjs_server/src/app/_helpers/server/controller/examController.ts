@@ -1,4 +1,4 @@
-import { Exam, ExamInstance, Question } from "../model/exam";
+import { Exam, ExamAnswer, ExamInstance, Question } from "../model/exam";
 import { generateUUID } from "../../utils";
 import { userController } from "./userController";
 import { SubjectInstance, UserSubjectInstanceRelation } from "../model/subject";
@@ -29,6 +29,50 @@ export const examController = {
 		});
 		return await exam.save();
 	},
+	getExam: async ({ uuid }: { uuid: string }) => {
+		let exam = await Exam.findOne({ uuid });
+		if (!exam) {
+			throw "exam not found";
+		}
+		return exam;
+	},
+	getExamAnswerByUser: async ({
+		userid,
+		examinstanceid,
+	}: {
+		userid: string;
+		examinstanceid: string;
+	}) => {
+		let examAnswer = await ExamAnswer.findOne({
+			userid: userid,
+			examinstanceid: examinstanceid,
+		});
+		if (!examAnswer) {
+			throw "no exam answer found";
+		}
+		return;
+	},
+	getExamAnswerByUserOrCreate: async ({
+		userid,
+		examinstanceid,
+	}: {
+		userid: string;
+		examinstanceid: string;
+	}) => {
+		let examAnswer = await ExamAnswer.findOne({
+			userid: userid,
+			examinstanceid: examinstanceid,
+		});
+		if (!examAnswer) {
+			examAnswer = await ExamAnswer.create({
+				userid,
+				examinstanceid,
+				uuid: await generateUUID(),
+				createdat: new Date(),
+			});
+		}
+		return examAnswer;
+	},
 	createQuestion: async (props: {
 		authorid: string;
 		question: string;
@@ -43,14 +87,16 @@ export const examController = {
 			props.options = [];
 		}
 		let { authorid, question, options, category } = props;
-		const user=await userController.getByUUID(authorid);
-		if(!user){
-			throw "user does not exists"
+		const user = await userController.getByUUID(authorid);
+		if (!user) {
+			throw "user does not exists";
 		}
-		console.log(props)
+		console.log(props);
 		const uuid = await generateUUID();
 		const createdat = new Date();
-		options=await Promise.all(options.map(async (v)=>({...v,uuid: await generateUUID()})));
+		options = await Promise.all(
+			options.map(async (v) => ({ ...v, uuid: await generateUUID() }))
+		);
 		const ques = new Question({
 			uuid,
 			createdat,
@@ -59,8 +105,8 @@ export const examController = {
 			options,
 			...(category ? { category } : {}),
 		});
-		console.log("ques")
-		console.log(ques)
+		console.log("ques");
+		console.log(ques);
 		return await ques.save();
 	},
 	deleteExam: async (uuid: string) => {
@@ -82,15 +128,15 @@ export const examController = {
 	deleteExamInstance: async (uuid: string) => {
 		const examInstance = await ExamInstance.findOneAndDelete({ uuid });
 		if (!examInstance) {
-			throw "Exam instance not found";
+			throw "exam instance not found";
 		}
 		return;
 	},
 
-	findExamInstance: async (uuid: string) => {
+	getExamInstance: async (uuid: string) => {
 		const examInstance = await ExamInstance.findOne({ uuid });
 		if (!examInstance) {
-			throw "Exam instance not found";
+			throw "exam instance not found";
 		}
 		return examInstance;
 	},
@@ -98,7 +144,7 @@ export const examController = {
 		limit,
 		next,
 		query,
-		authorid
+		authorid,
 	}: {
 		limit: number;
 		next?: string;
@@ -106,11 +152,8 @@ export const examController = {
 		authorid?: string;
 	}) => {
 		let searchprops = {};
-		if (next) {
-			searchprops = { ...searchprops, _id: { $lt: next } };
-		}
-		if(authorid){
-			searchprops={...searchprops,authorid}
+		if (authorid) {
+			searchprops = { ...searchprops, authorid };
 		}
 		if (query) {
 			searchprops = {
@@ -134,6 +177,9 @@ export const examController = {
 				next: results.length == 0 ? undefined : `${nextVal + results.length}`,
 			};
 		} else {
+			if (next) {
+				searchprops = { ...searchprops, _id: { $lt: next } };
+			}
 			results = await Exam.find(searchprops)
 				.sort({
 					_id: -1,
@@ -145,40 +191,30 @@ export const examController = {
 			};
 		}
 	},
-    getQuestionsByUUIDs:async({uuids}:{
-        uuids:string[]
-    })=>{
-        let results=await Question.find({uuid:{$in:uuids}})
-        if(results.length<uuids.length){
-            throw "some questions do not exist"
-        }
-        return results.map(({
-            question,
-            options,
-            createdat,
-            authorid
-        })=>({
-            question,
-            options,
-            createdat,
-            authorid
-        }))
-    },
-    getNextQuestionsByAuthor: async ({
+	getQuestionsByUUIDs: async ({ uuids }: { uuids: string[] }) => {
+		let results = await Question.find({ uuid: { $in: uuids } });
+		if (results.length < uuids.length) {
+			throw "some questions do not exist";
+		}
+		return results.map(({ question, options, createdat, authorid }) => ({
+			question,
+			options,
+			createdat,
+			authorid,
+		}));
+	},
+	getNextQuestionsByAuthor: async ({
 		limit,
 		next,
 		query,
-		authorid
+		authorid,
 	}: {
 		limit: number;
 		next?: string;
 		query?: string;
 		authorid: string;
 	}) => {
-		let searchprops:any = {authorid};
-		if (next) {
-			searchprops = { ...searchprops, _id: { $lt: next } };
-		}
+		let searchprops: any = { authorid };
 		if (query) {
 			searchprops = {
 				...searchprops,
@@ -201,6 +237,9 @@ export const examController = {
 				next: results.length == 0 ? undefined : `${nextVal + results.length}`,
 			};
 		} else {
+			if (next) {
+				searchprops = { ...searchprops, _id: { $lt: next } };
+			}
 			results = await Question.find(searchprops)
 				.sort({
 					_id: -1,
@@ -212,7 +251,7 @@ export const examController = {
 			};
 		}
 	},
-    getNextQuestions: async ({
+	getNextQuestions: async ({
 		limit,
 		next,
 		query,
@@ -222,9 +261,6 @@ export const examController = {
 		query?: string;
 	}) => {
 		let searchprops = {};
-		if (next) {
-			searchprops = { ...searchprops, _id: { $lt: next } };
-		}
 		if (query) {
 			searchprops = {
 				...searchprops,
@@ -247,6 +283,9 @@ export const examController = {
 				next: results.length == 0 ? undefined : `${nextVal + results.length}`,
 			};
 		} else {
+			if (next) {
+				searchprops = { ...searchprops, _id: { $lt: next } };
+			}
 			results = await Question.find(searchprops)
 				.sort({
 					_id: -1,
@@ -258,56 +297,64 @@ export const examController = {
 			};
 		}
 	},
-	createExamInstance:async ({
-		examid,subjectinstanceid,endtime,description,name,authorid
-	}:{
-		examid:string,
-		subjectinstanceid:string,
-		endtime?:string,
-		description?:string
-		name?:string,
-		authorid:string
-	})=>{
-		if(typeof endtime!=="undefined"&&!moment(endtime,ISO_8601).isValid()){
-			throw "invalid date"
+	createExamInstance: async ({
+		examid,
+		subjectinstanceid,
+		endtime,
+		description,
+		name,
+		authorid,
+	}: {
+		examid: string;
+		subjectinstanceid: string;
+		endtime?: string;
+		description?: string;
+		name?: string;
+		authorid: string;
+	}) => {
+		if (
+			typeof endtime !== "undefined" &&
+			!moment(endtime, ISO_8601).isValid()
+		) {
+			throw "invalid date";
 		}
-		const [exam,subjectinstance,user,usersubjectflag]=await Promise.all(
-			[Exam.findOne({uuid:examid}),
-			SubjectInstance.findOne({uuid:subjectinstanceid}),
-			User.findOne({uuid:authorid}),
-			subjectInstanceController.doesUserHaveRole(authorid,"teacher",subjectinstanceid)
-			]
-		)
-		if(!exam||!subjectinstance||!user||!usersubjectflag){
-			throw "invalid arguments"
+		const [exam, subjectinstance, user, usersubjectflag] = await Promise.all([
+			Exam.findOne({ uuid: examid }),
+			SubjectInstance.findOne({ uuid: subjectinstanceid }),
+			User.findOne({ uuid: authorid }),
+			subjectInstanceController.doesUserHaveRole(
+				authorid,
+				"teacher",
+				subjectinstanceid
+			),
+		]);
+		if (!exam || !subjectinstance || !user || !usersubjectflag) {
+			throw "invalid arguments";
 		}
 		await ExamInstance.create({
 			uuid: await generateUUID(),
 			createdat: new Date(),
-			examid:exam.uuid,
-			subjectinstanceid:subjectinstance.uuid,
+			examid: exam.uuid,
+			subjectinstanceid: subjectinstance.uuid,
 			endtime,
 			description,
 			name,
-			authorid
-		})
-		return
+			authorid,
+		});
+		return;
 	},
 	getNextExamInstanceBySubjectInstance: async ({
 		limit,
 		next,
 		query,
-		subjectinstanceid
+		subjectinstanceid,
 	}: {
 		limit: number;
 		next?: string;
 		query?: string;
 		subjectinstanceid: string;
 	}) => {
-		let searchprops:any = {subjectinstanceid};
-		if (next) {
-			searchprops = { ...searchprops, _id: { $lt: next } };
-		}
+		let searchprops: any = { subjectinstanceid };
 		if (query) {
 			searchprops = {
 				...searchprops,
@@ -330,6 +377,9 @@ export const examController = {
 				next: results.length == 0 ? undefined : `${nextVal + results.length}`,
 			};
 		} else {
+			if (next) {
+				searchprops = { ...searchprops, _id: { $lt: next } };
+			}
 			results = await ExamInstance.find(searchprops)
 				.sort({
 					_id: -1,
@@ -341,5 +391,13 @@ export const examController = {
 			};
 		}
 	},
-	
+	// getOrCreateUserSession: async ({
+	// 	examinstanceid,
+	// 	userid,
+	// }: {
+	// 	examinstanceid: string;
+	// 	userid: string;
+	// }) => {
+
+	// },
 };

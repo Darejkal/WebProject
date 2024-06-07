@@ -126,7 +126,7 @@ function CourseTab({
 		})
 		.then((v) => {
 			if(v){
-				setExamInstances(v.results)
+				setExamInstances((pre)=>v.next?[...v.results,...pre]:v.results)
 				setExamDataNext(v.next);
 				return v.results
 			} else{
@@ -151,12 +151,13 @@ function CourseTab({
 			<h3 style={{ fontWeight: "500" }}>{subjectinstance.name}</h3>
 			{subjectinstance.name && (
 				<>
-					<h3 style={{ fontWeight: "500" }}>Thông tin chi tiết</h3>
+					<h5>Thông tin chi tiết</h5>
 					<div>
 						<div>{subject?.description}</div>
 					</div>
 				</>
 			)}
+			<h3 style={{ fontWeight: "500", marginTop:"3rem" }}>Các bài kiểm tra</h3>
 			<CustomInfiniteScroll
 				pagination={{
 					getPaginated: (props) => {
@@ -169,20 +170,17 @@ function CourseTab({
 						<Card style={{ marginTop: "1rem", width: "100%" }} key={data.uuid}>
 							<Card.Header>Bài kiểm tra: {data.name??""}</Card.Header>
 							<Card.Body>
-								 Tạo ngày: {formatDateString(data.createdat)}
+							<span style={{fontWeight:"bold"}}>Tạo ngày:</span> {formatDateString(data.createdat)}
 								<br />
 								<div
 									style={{
 										width: "100%",
-										display: "flex",
-										flexDirection: "row",
-										justifyContent: "end",
 									}}
 								>
-									{data.description??""}
+									<span style={{fontWeight:"bold"}}>Mô tả:</span> <span style={{}}>{data.description??""}</span>
 								</div>
 								<div style={{display:"flex",flexDirection:"row",justifyContent:"end"}}>
-									<Button href={"/examinstance/"+data.uuid}>Xem chi tiết</Button>
+									<Button href={"/examinstance/get/"+data.uuid}>Xem chi tiết</Button>
 								</div>
 							</Card.Body>
 						</Card>
