@@ -166,21 +166,21 @@ function Register() {
             <Carousel 
                 activeIndex={index} 
                 onSelect={handleSelect} 
-                style={{margin: '50px'}} 
+                style={{margin: '3.125rem'}} 
                 interval={1500}
                 prevIcon={
                     <span
                         style={{
                         display: 'inline-block',
-                        width: '60px',
-                        height: '60px',
+                        width: '3.75rem',
+                        height: '3.75rem',
                         backgroundColor: 'rgba(0, 0, 0, 0.7)',
                         borderRadius: '50%',
                         textAlign: 'center',
-                        lineHeight: '60px',
+                        lineHeight: '3.75rem',
                         color: 'white',
-                        fontSize: '30px',
-                        cursor: 'pointer'
+                        fontSize: '1.875rem',
+                        cursor: 'pointer',
                         }}
                     >
                         &lt;
@@ -190,31 +190,31 @@ function Register() {
                     <span
                         style={{
                         display: 'inline-block',
-                        width: '60px',
-                        height: '60px',
+                        width: '3.75rem',
+                        height: '3.75rem',
                         backgroundColor: 'rgba(0, 0, 0, 0.7)',
                         borderRadius: '50%',
                         textAlign: 'center',
-                        lineHeight: '60px',
+                        lineHeight: '3.75rem',
                         color: 'white',
-                        fontSize: '30px',
+                        fontSize: '1.875rem',
                         cursor: 'pointer'
                         }}
                     >
                         &gt;
                     </span>
                 }
-                >
+            >
                 {carouselslides.map((carouselslides) => (
                     <Carousel.Item key={carouselslides.id}>
-                        <div style={{ height: '500px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <div style={{ height: '31.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                             <img src={carouselslides.linkjpg} alt={carouselslides.alt} style={{ maxHeight: '100%', maxWidth: '100%' }}/>
                         </div>
                         <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <Carousel.Caption style={{flex: 1, padding: '15px', backgroundColor: 'rgba(0, 0, 0, 0.5)', color: 'white', borderRadius: '10px', margin: 'auto', textAlign: 'center', maxWidth: '28%'}}>
+                            <Carousel.Caption style={{flex: 1, padding: '0.9375rem', backgroundColor: 'rgba(0, 0, 0, 0.5)', color: 'white', borderRadius: '0.625rem', margin: 'auto', textAlign: 'center', maxWidth: '28%'}}>
                                 <h3>{carouselslides.title}</h3>
                                 <Button>Tham gia khóa học</Button>
-                                <p style={{marginTop: '10px'}}>có {carouselslides.numbermembers} thành viên</p>
+                                <p style={{marginTop: '0.625rem'}}>có {carouselslides.numbermembers} thành viên</p>
                             </Carousel.Caption>
                         </div>
                     </Carousel.Item>
@@ -222,7 +222,7 @@ function Register() {
             </Carousel>
         </div>
 
-        <div style={{marginTop: '50px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <div style={{marginTop: '3.125rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
             <div className="container">
                 <ul className="row"
                     style={{listStyle: 'none',
@@ -231,12 +231,12 @@ function Register() {
                 >
                     {carouselcards.map((carouselcards) => (
                         <li className="col-12 col-md-6 col-lg-4 col-xl-3" key={carouselcards.id}>
-                            <Card style={{ width: '18rem', marginBottom: '40px'}}>
+                            <Card style={{ width: '18rem', marginBottom: '2.5rem'}}>
                                 <Card.Img variant="top" src={carouselcards.linkjpg} />
                                 <Card.Body>
                                     <Card.Title>{carouselcards.title}</Card.Title>
                                     <Card.Text>
-                                        <span style={{marginBottom: 0}}>SoICT</span><br />
+                                        <span style={{marginBottom: 0}}>SoICT</span>
                                         <span>Sẽ bắt đầu: {carouselcards.time}</span>
                                     </Card.Text>
                                     <Button variant="primary">Tìm hiểu thêm</Button>

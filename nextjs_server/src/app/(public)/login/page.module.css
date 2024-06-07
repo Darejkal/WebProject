@@ -1,4 +1,3 @@
-
 .overlay {
     display: flex;
     justify-content: center;
@@ -14,7 +13,7 @@
 
 .overlayActive {
     pointer-events: none;
-    filter: blur(5px);
+    filter: blur(0.3125rem); /* 5px to rem */
 }
 
 .overlayActive .overlay {
@@ -22,12 +21,12 @@
 }
 
 .card {
-    width: 22%;
+    width: 22%; /* This might be better in pixels for consistent card size across different screens */
     /* height: 40%; */
     background-color: white;
     z-index: 2000;
-    padding: 50px 20px 30px;
-    border-radius: 8px;
+    padding: 3.125rem 1.25rem 1.875rem; /* 50px 20px 30px */
+    border-radius: 0.5rem; /* 8px to rem */
     position: relative;
 }
 
@@ -35,7 +34,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 1.25rem; /* 20px to rem */
 }
 
 .cardtitle {
@@ -45,42 +44,42 @@
 .closeButton {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.5rem; /* 24px to rem */
     font-weight: bold;
     cursor: pointer;
     color: #000;
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 0.625rem; /* 10px to rem */
+    right: 0.625rem; /* 10px to rem */
 }
 
 .cardforget {
     display: flex;
     justify-content: flex-end;
-    padding-bottom: 20px;
+    padding-bottom: 1.25rem; /* 20px to rem */
     color: #3738e2;
-    font-size: 14px;
+    font-size: 0.875rem; /* 14px to rem */
 }
 
 .cardlinebox {
-    padding-top: 10px;
+    padding-top: 0.625rem; /* 10px to rem */
 }
 
 .cardline {
     margin-bottom: 0;
-    margin-top: 20px;
+    margin-top: 1.25rem; /* 20px to rem */
     text-align: center;
-    border-top: 1px solid #404040;
+    border-top: 0.0625rem solid #404040; /* 1px to rem */
     background: white;
 }
 
 .cardline1 {
-    margin-top: 10px;
-    padding-top: 5px;
-    font-size: 14px;
+    margin-top: 0.625rem; /* 10px to rem */
+    padding-top: 0.3125rem; /* 5px to rem */
+    font-size: 0.875rem; /* 14px to rem */
     background: white;
     margin-bottom: 0;
-    padding-bottom: 16px;
+    padding-bottom: 1rem; /* 16px to rem */
 }
 
 .cardbtn {
@@ -95,5 +94,5 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 20px;
+    padding-top: 1.25rem; /* 20px to rem */
 }
