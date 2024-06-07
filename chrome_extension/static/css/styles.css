@@ -1,0 +1,76 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap");
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Quicksand", sans-serif;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #884f77;
+    width: 100%;
+    overflow: hidden;
+}
+.ring {
+    position: relative;
+    width: 23.125rem; /* 370px */
+    height: 23.75rem; /* 380px */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.login {
+    position: absolute;
+    width: 18.75rem; /* 300px */
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 1.25rem; /* 20px */
+}
+.login h2 {
+    font-size: 2rem; /* 32px */
+    color: #fff;
+}
+.login .inputBx {
+    position: relative;
+    width: 100%;
+}
+.login .inputBx input {
+    position: relative;
+    width: 100%;
+    padding: 0.75rem 1.25rem; /* 12px 20px */
+    background: transparent;
+    border: 0.125rem solid #fff; /* 2px */
+    border-radius: 2.5rem; /* 40px */
+    font-size: 1.2rem; /* 19.2px */
+    color: #fff;
+    box-shadow: none;
+    outline: none;
+}
+.login .inputBx input[type="submit"] {
+    width: 100%;
+    background: #0078ff;
+    background: linear-gradient(45deg, #0a2cec, #e60a2f);
+    border: none;
+    cursor: pointer;
+}
+.login .inputBx input::placeholder {
+    color: rgba(255, 255, 255, 0.75);
+}
+.login .links {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem; /* 20px */
+}
+.login .links a {
+    color: #fff;
+    text-decoration: none;
+}
