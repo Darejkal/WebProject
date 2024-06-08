@@ -21,10 +21,11 @@ export function CustomInfiniteScroll<Value>({
 		loadMoreData();
 	}, []);
 	useEffect(() => {
-            setCurrentData(data);
-		if(data&&data.length){
+		if(data&&data.length>currentData.length){
 			setHasMore(true);
         }
+        setCurrentData(data);
+
 	}, [data]);
 	const loadMoreData = async () => {
 		const newData = await getPaginated({limit:20});

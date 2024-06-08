@@ -16,7 +16,7 @@ export const userController = {
 	getByEmail,
 	create,
 	update,
-	delete: _delete,
+	deleteByUUID,
 };
 
 async function authenticate({
@@ -177,7 +177,6 @@ async function update(uuid: string, params: any) {
 
 	await user.save();
 }
-
-async function _delete(uuid: string) {
+async function deleteByUUID(uuid: string) {
 	await User.findOneAndDelete({ uuid });
 }

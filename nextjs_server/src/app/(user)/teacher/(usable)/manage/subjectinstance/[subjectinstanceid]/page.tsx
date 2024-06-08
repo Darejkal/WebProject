@@ -7,13 +7,12 @@ import {
 } from "@/app/_services";
 import { useSubjectInstanceUserService } from "@/app/_services/useSubjectInstanceUserService";
 import { MaterialReactTable } from "material-react-table";
-import { notFound } from "next/navigation";
 
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
 import {
 	AddUserSubjectInstanceRelationModal,
+	AttendanceTable,
 	DeleteSubjectInstanceModalButton,
 	ModifySubjectInstanceModalButton,
 } from "./components";
@@ -109,7 +108,7 @@ export default function SubjectInstancesSinglePage() {
 							{ accessorKey: "useremail", header: "Email" },
 							// { accessorKey: "uuid", header: "UUID" },
 							{ accessorKey: "role", header: "Vai trò" },
-							{ accessorKey: "createdat",Cell:({cell})=>(formatDateString(cell.getValue<string>())), header: "Tạo lúc" },
+							{ accessorKey: "createdat",Cell:({cell})=>(formatDateString(cell.getValue<string>())), header: "Thêm vào lúc" },
 							// { accessorKey: "authorid", header: "ID tác giả" },
 							// { accessorKey: "schoolabbrev", header: "ID trường" },
 						],
@@ -162,7 +161,7 @@ export default function SubjectInstancesSinglePage() {
 							{ accessorKey: "useremail", header: "Email" },
 							// { accessorKey: "uuid", header: "UUID" },
 							{ accessorKey: "role", header: "Vai trò" },
-							{ accessorKey: "createdat",Cell:({cell})=>(formatDateString(cell.getValue<string>())), header: "Tạo lúc" },
+							{ accessorKey: "createdat",Cell:({cell})=>(formatDateString(cell.getValue<string>())), header: "Thêm vào lúc" },
 							// { accessorKey: "authorid", header: "ID tác giả" },
 							// { accessorKey: "schoolabbrev", header: "ID trường" },
 						],
@@ -204,6 +203,9 @@ export default function SubjectInstancesSinglePage() {
 						}}
 					/>
 				)}
+			</div>
+			<div>
+				<AttendanceTable subjectinstanceid={subjectinstanceid}/>
 			</div>
 		</div>
 	);

@@ -3,13 +3,11 @@ package controller
 import (
 	"crypto/rand"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
-	"popman/model"
 	"strings"
 )
 
@@ -54,18 +52,6 @@ func loadConfig() {
 func error_message(writer http.ResponseWriter, request *http.Request, msg string) {
 	url := []string{"/err?msg=", msg}
 	http.Redirect(writer, request, strings.Join(url, ""), 302)
-}
-
-// Checks if the user is logged in and has a session, if not err is not nil
-func session(writer http.ResponseWriter, request *http.Request) (sess model.Session, err error) {
-	cookie, err := request.Cookie(authCookie)
-	if err == nil {
-		sess, err = model.SessionByUUID(cookie.Value)
-		if err != nil || sess.UserId == "" {
-			err = errors.New("invalid session")
-		}
-	}
-	return
 }
 
 // parse HTML templates

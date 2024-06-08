@@ -5,7 +5,7 @@ import { useState,useEffect, useRef } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import {useRouter } from "next/navigation"
 import { useForm } from "react-hook-form";
-import {IServiceUser} from "@/app/_services/useUserService"
+import {IServiceUser, useUserService} from "@/app/_services/useUserService"
 import { useFetch } from "@/app/_helpers/client";
 import { toast } from "react-toastify";
 import SearchableInput from "@/app/_components/SearchableInput";
@@ -148,9 +148,16 @@ export function DeleteUserModal({show,user,afterSubmit}:{show?:boolean,user:ISer
 	useEffect(() => {
 		setShowModal(show ? show : false);
 	}, [show]);
+	const fetch=useFetch()
     const onSubmit=()=>{
-		afterSubmit && afterSubmit();
-        
+		toast.info("Đang truy vấn")
+		fetch.post("/api/user/delete",{uuid:user.uuid}).then(()=>{
+			toast.success("Xóa người dùng thành công!")
+			setShowModal(false)
+			afterSubmit && afterSubmit();
+		}).catch((e)=>{
+			toast.warning("Xóa người dùng thất bại!")
+		})
     }
     return <>
     <IconButton onClick={()=>{
@@ -163,7 +170,7 @@ export function DeleteUserModal({show,user,afterSubmit}:{show?:boolean,user:ISer
 					<Modal.Title>Xóa người dùng</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<Form onSubmit={onSubmit}>
+					<Form onSubmit={handleSubmit(onSubmit)}>
 							<Form.Label>
 								<span className="text-danger">
 									Cảnh báo hành động nguy hiểm:

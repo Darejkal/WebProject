@@ -9,11 +9,13 @@ const Subject = db.Subject;
 export const subjectController = {
     create,
     getByUUID,
+    deleteByUUID,
     getByUUIDs,
     getNext,
     getByAbbrev,
     getByAbbrevs,
-    search
+    search,
+    updateOne
 };
 async function create(props:{name:string,abbrev:string,schoolabbrev:string,authorid:string,description?:string,imgurl?:string}){
     let {
@@ -45,6 +47,9 @@ async function getByUUID(uuid:string){
         throw "cannot find the subject"
     }
     return subject
+}
+async function deleteByUUID(uuid:string){
+    return await Subject.findOneAndDelete({uuid})
 }
 async function getByAbbrev(abbrev:string){
     let subject= await Subject.findOne({abbrev})
@@ -116,4 +121,12 @@ async function search(query:string,limit:number){
         }
     }).limit(limit).exec();
     return results;
+}
+async function updateOne (props:any){
+    let subject=await Subject.findOne({uuid:props.uuid})
+    if(!subject){
+        throw "no subject found";
+    }
+    Object.assign(subject,props)
+    return await subject.save()
 }

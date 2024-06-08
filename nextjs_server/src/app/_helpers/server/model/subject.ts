@@ -75,7 +75,7 @@ export const UserSubjectInstanceRelation: mongoose.Model<IUserSubjectInstanceRel
 			)
 		);
 	})();
-interface IUserSubjectInstanceFullView{
+export interface IUserSubjectInstanceFullView{
 	uuid:string;
     userid: string,
     subjectinstanceid: string,

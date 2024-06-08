@@ -33,7 +33,7 @@ export default function RootLayout({
 			}}>
 					<UserStoreProvider>
 						{children}
-					<ToastContainer />
+					<ToastContainer style={{zIndex:"300000"}} />
 					</UserStoreProvider>
 				<script src="/static/js/jquery-2.1.1.min.js"></script>
 				<script src="/static/js/bootstrap.min.js"></script>

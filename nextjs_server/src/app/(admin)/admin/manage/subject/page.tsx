@@ -6,12 +6,13 @@ import { Button, Form, Modal } from "react-bootstrap";
 import { IServiceSubject, useSubjectService } from "@/app/_services";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, Box, TextField } from "@mui/material";
 import { useFetch } from "@/app/_helpers/client";
 import { toast } from "react-toastify";
 import SearchableInput from "@/app/_components/SearchableInput";
 import { PaginatedTable } from "@/app/_components/PaginatedTable";
 import { formatDateString } from "@/app/_helpers/clientutils";
+import {  UpdateSubjectModal, DeleteSubjectModal } from "./components";
 
 const SubjectsPage = () => {
 	const router = useRouter();
@@ -83,12 +84,18 @@ const SubjectsPage = () => {
 						// { accessorKey: "authorid", header: "ID tác giả" },
 						{ accessorKey: "schoolabbrev", header: "ID trường" },
                     ],
-					muiTableBodyRowProps:({row})=>({
-						onClick:(e)=>{
-							router.push(`/admin/manage/subjects/${row.original.uuid}`)
-						},
-						sx:{cursor: "pointer"}
-					})
+					displayColumnDefOptions: {
+                        'mrt-row-actions': {
+                          header: 'Hành động', 
+                        },
+                    },
+					enableRowActions: true,
+					renderRowActions:({row}) =>(
+                        <Box>
+                            <UpdateSubjectModal subject={row.original} afterSubmit={()=>subjectService.getPaginated({limit:20,next:""})}/>
+                            <DeleteSubjectModal subject={row.original} afterSubmit={()=>subjectService.getPaginated({limit:20,next:""})}/>
+                        </Box>
+					)
                 }}
                 pagination={{
                     getPaginated:subjectService.getPaginated,

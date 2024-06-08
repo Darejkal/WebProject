@@ -6,12 +6,12 @@ mongoose.pluralize(null);
 mongoose.connect(process.env.MONGODB_URI!);
 mongoose.Promise = global.Promise;
 interface IAttendance{
-    subjectid:String,
-    creatorid:String,
-    uuid:String,
+    subjectid:string,
+    creatorid:string,
+    uuid:string,
     createdat:Date,
     report:{
-        userid:String,
+        userid:string,
         attended: Boolean
     }[]
 }

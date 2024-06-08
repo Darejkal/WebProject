@@ -2,6 +2,7 @@
 import SearchableInput from "@/app/_components/SearchableInput";
 import SearchableMultiInput from "@/app/_components/SearchableMultiInput";
 import { useFetch } from "@/app/_helpers/client";
+import { formatDateString } from "@/app/_helpers/clientutils";
 import {
 	IServiceSubjectInstance,
 	useSubjectInstanceService,
@@ -9,6 +10,7 @@ import {
 import { useSubjectInstanceUserService } from "@/app/_services/useSubjectInstanceUserService";
 import { Box } from "@mui/material";
 import TextField from "@mui/material/TextField";
+import { MaterialReactTable } from "material-react-table";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button, Form, FormControl, Modal } from "react-bootstrap";
@@ -63,7 +65,6 @@ export function DeleteSubjectInstanceModalButton({
 				toast.dismiss();
 				toast.warning("Lỗi khi xóa lớp học!", { delay: 200 });
 			});
-		
 	};
 	return (
 		<>
@@ -346,36 +347,28 @@ export function ModifySubjectInstanceModalButton({
 							/>
 						</Form.Group>
 
-							<Form.Group controlId="uuid">
-								<Form.Label>ID lớp học</Form.Label>
-								<FormControl
-									type="text"
-									// fullWidth
-									// autoComplete="off"
-									// inputRef={fields.uuid.ref}
-									// label={"Điền ID lớp"}
-									{...fields.uuid}
-									disabled
-									// error={!!errors[fields.uuid.name]}
-									// helperText={(errors[fields.uuid.name]?.message as string) ?? ""}
-								/>
-							</Form.Group>
+						<Form.Group controlId="uuid">
+							<Form.Label>ID lớp học</Form.Label>
+							<FormControl
+								type="text"
+								// fullWidth
+								// autoComplete="off"
+								// inputRef={fields.uuid.ref}
+								// label={"Điền ID lớp"}
+								{...fields.uuid}
+								disabled
+								// error={!!errors[fields.uuid.name]}
+								// helperText={(errors[fields.uuid.name]?.message as string) ?? ""}
+							/>
+						</Form.Group>
 						<Form.Group controlId="subjectName">
 							<Form.Label>Thời gian kết thúc</Form.Label>
-							<FormControl
-								type="date"
-								{...fields.subjectName}
-								disabled
-							/>
-							</Form.Group>
-							<Form.Group controlId="subjectName">
+							<FormControl type="date" {...fields.subjectName} disabled />
+						</Form.Group>
+						<Form.Group controlId="subjectName">
 							<Form.Label>Mô tả</Form.Label>
-							<FormControl
-								type="date"
-								{...fields.subjectName}
-								disabled
-							/>
-							</Form.Group>
+							<FormControl type="date" {...fields.subjectName} disabled />
+						</Form.Group>
 						<Button
 							variant="primary"
 							type="submit"
@@ -406,14 +399,16 @@ export function AddUserSubjectInstanceRelationModal({
 		setShowModal(show ? show : false);
 	}, [show]);
 	const [showModal, setShowModal] = useState<boolean>(false);
-	const { register, handleSubmit, formState, setValue,setError,getValues } = useForm();
-	const subjectInstanceUserService=useSubjectInstanceUserService()
-	const {errors}=formState;
+	const { register, handleSubmit, formState, setValue, setError, getValues } =
+		useForm();
+	const subjectInstanceUserService = useSubjectInstanceUserService();
+	const { errors } = formState;
 	const fetch = useFetch();
 	const fields = {
-		users: register("users", 
-		// { required: "users are required" }
-	),
+		users: register(
+			"users"
+			// { required: "users are required" }
+		),
 		uuid: register("uuid", {
 			required: "mã id lớp là bắt buộc",
 			// disabled: true,
@@ -432,30 +427,48 @@ export function AddUserSubjectInstanceRelationModal({
 			setValue(fields.name.name, subjectinstance.name);
 		}
 	}, [subjectinstance.name, showModal]);
-	const usersSelected=useRef<{name: string,email: string,position: string,uuid: string,createdat: string,} |  {name: string,email: string,position: string,uuid: string,createdat: string,}[] | null>();
+	const usersSelected = useRef<
+		| {
+				name: string;
+				email: string;
+				position: string;
+				uuid: string;
+				createdat: string;
+		  }
+		| {
+				name: string;
+				email: string;
+				position: string;
+				uuid: string;
+				createdat: string;
+		  }[]
+		| null
+	>();
 	const onSubmit = () => {
-		if(!usersSelected.current){
-			setError(fields.users.name,{message:"vui lòng nhập người muốn thêm"})
-			return
+		if (!usersSelected.current) {
+			setError(fields.users.name, { message: "vui lòng nhập người muốn thêm" });
+			return;
 		}
-		if(!Array.isArray(usersSelected.current!)){
-			usersSelected.current=[usersSelected.current]
+		if (!Array.isArray(usersSelected.current!)) {
+			usersSelected.current = [usersSelected.current];
 		}
-		toast.info("Đang gửi yêu cầu ....")
-		subjectInstanceUserService.addMembers({
-			userids:usersSelected.current.map((v)=>(v.uuid)),
-			subjectinstanceid:getValues(fields.uuid.name),
-			role:role,
-		}).then(()=>{
-			toast.dismiss()
-			toast.success("Thêm thành viên thành công!")
-			afterSubmit&&afterSubmit()
-			setShowModal(false)
-		}).catch((e)=>{
-			toast.dismiss()
-			toast.warning("Thêm thành viên thất bại!")	
-		})
-		
+		toast.info("Đang gửi yêu cầu ....");
+		subjectInstanceUserService
+			.addMembers({
+				userids: usersSelected.current.map((v) => v.uuid),
+				subjectinstanceid: getValues(fields.uuid.name),
+				role: role,
+			})
+			.then(() => {
+				toast.dismiss();
+				toast.success("Thêm thành viên thành công!");
+				afterSubmit && afterSubmit();
+				setShowModal(false);
+			})
+			.catch((e) => {
+				toast.dismiss();
+				toast.warning("Thêm thành viên thất bại!");
+			});
 	};
 	return (
 		<>
@@ -471,48 +484,64 @@ export function AddUserSubjectInstanceRelationModal({
 					<Modal.Title>{label}</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<Form onSubmit={(e)=>{
-						e.preventDefault();
-						onSubmit()
-						}}>
+					<Form
+						onSubmit={(e) => {
+							e.preventDefault();
+							onSubmit();
+						}}
+					>
 						<Form.Group controlId="name">
 							<Form.Label>Tên</Form.Label>
 							<SearchableMultiInput
 								autocompleteProps={{
-									multiple:true,
-									freeSolo:false,
-									renderOption:(props,option,state,ownerState)=>(
+									multiple: true,
+									freeSolo: false,
+									renderOption: (props, option, state, ownerState) => (
 										<Box
 											component="li"
 											{...props}
-											key={(typeof option ==="string")?option:option.email}
+											key={typeof option === "string" ? option : option.email}
 										>
-											{(typeof option==="string")?option:(`Tên: ${option["name"]} | Email: ${option["email"]}`)}
+											{typeof option === "string"
+												? option
+												: `Tên: ${option["name"]} | Email: ${option["email"]}`}
 										</Box>
-										)
-									}}
-								
+									),
+								}}
 								fetchData={async (input: string) => {
-									return await fetch.post(
-										`/api/user/getpaginated`,
-										{next:"",limit:5,query:input}
-									).then((v:{
-										next:string,
-										results:[{name:string,email:string,position:string,uuid:string,createdat:string}]
-									})=>{
-										if(v){
-											return v.results
-										} else{
-											return []
-										}
-									});
+									return await fetch
+										.post(`/api/user/getpaginated`, {
+											next: "",
+											limit: 5,
+											query: input,
+										})
+										.then(
+											(v: {
+												next: string;
+												results: [
+													{
+														name: string;
+														email: string;
+														position: string;
+														uuid: string;
+														createdat: string;
+													}
+												];
+											}) => {
+												if (v) {
+													return v.results;
+												} else {
+													return [];
+												}
+											}
+										);
 								}}
 								props={{
-									optionLabel:"email"
+									optionLabel: "email",
 								}}
-								afterOnChange={({value})=>{
+								afterOnChange={({ value }) => {
 									// @ts-ignore
-									usersSelected.current=value; 
+									usersSelected.current = value;
 								}}
 								formRegister={fields.users}
 								textFieldProps={{ label: "Các thành viên thêm mới" }}
@@ -530,31 +559,31 @@ export function AddUserSubjectInstanceRelationModal({
 								helperText={(errors[fields.name.name]?.message as string) ?? ""}
 							/> */}
 							<FormControl
-									type="text"
-									// fullWidth
-									// autoComplete="off"
-									// inputRef={fields.uuid.ref}
-									// label={"Điền ID lớp"}
-									{...fields.name}
-									disabled
-									// error={!!errors[fields.uuid.name]}
-									// helperText={(errors[fields.uuid.name]?.message as string) ?? ""}
-								/>
+								type="text"
+								// fullWidth
+								// autoComplete="off"
+								// inputRef={fields.uuid.ref}
+								// label={"Điền ID lớp"}
+								{...fields.name}
+								disabled
+								// error={!!errors[fields.uuid.name]}
+								// helperText={(errors[fields.uuid.name]?.message as string) ?? ""}
+							/>
 						</Form.Group>
 						<Form.Group controlId="uuid">
-								<Form.Label>ID lớp học</Form.Label>
-								<FormControl
-									type="text"
-									// fullWidth
-									// autoComplete="off"
-									// inputRef={fields.uuid.ref}
-									// label={"Điền ID lớp"}
-									{...fields.uuid}
-									disabled
-									// error={!!errors[fields.uuid.name]}
-									// helperText={(errors[fields.uuid.name]?.message as string) ?? ""}
-								/>
-							</Form.Group>
+							<Form.Label>ID lớp học</Form.Label>
+							<FormControl
+								type="text"
+								// fullWidth
+								// autoComplete="off"
+								// inputRef={fields.uuid.ref}
+								// label={"Điền ID lớp"}
+								{...fields.uuid}
+								disabled
+								// error={!!errors[fields.uuid.name]}
+								// helperText={(errors[fields.uuid.name]?.message as string) ?? ""}
+							/>
+						</Form.Group>
 						<Button
 							variant="primary"
 							type="submit"
@@ -565,6 +594,80 @@ export function AddUserSubjectInstanceRelationModal({
 					</Form>
 				</Modal.Body>
 			</Modal>
+		</>
+	);
+}
+interface IAttendaceGetAllData{
+		subjectid:string;
+		creatorid:string;
+		uuid:string;
+		createdat:string;
+		report:{
+			userid:string;
+			attended: boolean;
+			username:string;
+			useremail:string;
+			role:string;
+		}[]
+}
+export function AttendanceTable({subjectinstanceid}:{subjectinstanceid:string}) {
+	// const [data,setData]=useState<{
+	// 	subjectid:string,
+	// 	creatorid:string,
+	// 	uuid:string,
+	// 	createdat:string,
+	// 	report:{
+	// 		userid:string,
+	// 		attended: Boolean,
+	// 		username:string,
+	// 		useremail:string,
+	// 		role:string
+	// 	}[]
+	// }[]>();
+	const [formulatedData,setFormulatedData]=useState<any>([]);
+	const [accessorKeys,setAccessorKeys]=useState<any[]>([]);
+	const [isLoading,setIsLoading]=useState<boolean>(true);
+	const fetch=useFetch()
+	useEffect(()=>{
+		fetch.post("/api/attendance/getallreports",{
+			subjectinstanceid
+		}).then((v:IAttendaceGetAllData[])=>{
+			if(v){
+				// setData(v)
+				let mp:any={}
+				for(const val of v[0].report){
+					mp[val.useremail]={username:val.username,useremail:val.useremail,role:val.role}
+				}
+				for(const val of v){
+					for(const valr of val.report){
+						mp[valr.useremail][val.createdat]=valr.attended
+					}
+					setAccessorKeys(pre=>([...pre,{
+						accessorKey:val.createdat,
+						header:formatDateString(val.createdat,"dd/mm/yyyy"),
+						// @ts-ignore
+						Cell:({ cell }:any) => (cell.getValue<boolean>()?"Có mặt":"Vắng")
+					}]))
+				}
+				setFormulatedData(Object.values(mp))
+				setIsLoading(false);
+			}
+			
+		})
+	},[])
+	return (
+		<>
+			<h4 style={{ margin: "1rem 0" }}>Tình trạng điểm danh</h4>
+			<MaterialReactTable
+				columns={[
+					{ accessorKey: "username", header: "Tên" },
+					{ accessorKey: "useremail", header: "Email" },
+					{ accessorKey: "role", header: "Vai trò" },
+					...accessorKeys
+				]}
+				data={formulatedData}
+				state={{isLoading}}
+			/>
 		</>
 	);
 }

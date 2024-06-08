@@ -83,15 +83,15 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 		</Alert>
 	);
 	return (
-		<div>
+		<div style={{zIndex:"200000"}}>
 			{warning}
-			<Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
+			<Navbar collapseOnSelect expand="lg" className="bg-body-tertiary" >
 				<Container>
 					<Navbar.Brand href="/landing">HustServe</Navbar.Brand>
 					<Navbar.Toggle aria-controls="responsive-navbar-nav" />
 					<Navbar.Collapse id="responsive-navbar-nav">
 						<Nav className="me-auto">
-							<Nav.Link href="/explore">Khám phá khóa học</Nav.Link>
+							{/* <Nav.Link href="/explore">Khám phá khóa học</Nav.Link> */}
 							{userService.currentUser?.name && (
 								<>
 									<Nav.Link href="/dashboard">Khóa học của tôi</Nav.Link>
@@ -126,11 +126,11 @@ export default function AppHeader({ redirect }: { redirect?: Boolean }) {
 												<NavDropdown.Item href="/admin/manage/user">
 													Quản lý người dùng
 												</NavDropdown.Item>
-												<NavDropdown.Item href="/admin/manage/subject">
-													Quản lý môn học
-												</NavDropdown.Item>
 												<NavDropdown.Item href="/admin/manage/subjectinstance">
 													Quản lý lớp học
+												</NavDropdown.Item>
+												<NavDropdown.Item href="/admin/manage/subject">
+													Quản lý môn học
 												</NavDropdown.Item>
 											</NavDropdown>
 										</>

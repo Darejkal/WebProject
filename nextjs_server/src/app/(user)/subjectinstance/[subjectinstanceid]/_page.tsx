@@ -62,7 +62,48 @@ export default function SubjectInstancePage() {
 	}, []);
 	const [tab, setTab] = useState(0);
 	return (
-		<div style={{margin:"3rem 10rem 1rem 10rem"}}>{subjectinstance&&(<CourseTab subjectinstance={subjectinstance}/>)}</div>
+		<div style={{ padding: "1rem 10rem" }}>
+			<ThemeProvider theme={theme}>
+				<Tabs
+					value={tab}
+					onChange={(event, value) => {
+						setTab(value);
+					}}
+					aria-label="basic tabs example"
+				>
+					<Tab
+						label="Khóa học"
+						sx={{ textTransform: "capitalize", fontSize: "1.1rem" }}
+						value={0}
+					/>
+					<Tab
+						label="Tiến độ học tập"
+						sx={{ textTransform: "capitalize", fontSize: "1.1rem" }}
+						value={1}
+					/>
+					<Tab
+						label="Thảo luận"
+						sx={{ textTransform: "capitalize", fontSize: "1.1rem" }}
+						value={2}
+					/>
+					<Tab
+						label="Wiki"
+						sx={{ textTransform: "capitalize", fontSize: "1.1rem" }}
+						value={3}
+					/>
+					<Tab
+						label="Tài liệu"
+						sx={{ textTransform: "capitalize", fontSize: "1.1rem" }}
+						value={4}
+					/>
+				</Tabs>
+			</ThemeProvider>
+			<div style={{ padding: "2rem 0 0 0" }}>
+				{tab == 0 && subjectinstance && (
+					<CourseTab subjectinstance={subjectinstance} />
+				)}
+			</div>
+		</div>
 	);
 }
 function CourseTab({
@@ -85,7 +126,7 @@ function CourseTab({
 		})
 		.then((v) => {
 			if(v){
-				setExamInstances((pre)=>next?[...v.results,...pre]:v.results)
+				setExamInstances((pre)=>v.next?[...v.results,...pre]:v.results)
 				setExamDataNext(v.next);
 				return v.results
 			} else{
