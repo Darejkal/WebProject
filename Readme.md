@@ -2,7 +2,7 @@
 Hệ thống quản lý sinh viên kèm tiện ích.
 ## Các tính năng
 - Videocall
-- Điểm danh QR (+ Web Extension)
+- Điểm danh QR
 - Quản lý sinh viên và mối quan hệ của sinh viên với các lớp.
 - Giao và nộp test
 ## Hệ thống
@@ -10,13 +10,7 @@ Hệ thống quản lý sinh viên kèm tiện ích.
 Development:
 - ICE Server: Golang (WebRTC + Gorilla)
 - Backend tập trung + Frontend:  Typescript (Nextjs + Zustack)
-- Notification Service: Fastapi + Apprise
-- Message Queue: Redpanda
 - Database: MongoDB
-
-Deployment:
-- Docker + K8s
-- Ansible
 
 ## Phân công 
 |Tên|MSSV|Công việc|
